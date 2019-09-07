@@ -29,42 +29,26 @@ namespace WpfSaimmodOne
             const int TOTAL_INTERVALS = 20;
             const int TOTAL_VALUES = 500000;
 
-            int GetIntContent(string str)
+            long GetInt64Content(string str)
             {
-                if (!int.TryParse(str, out int res))
+                if (!long.TryParse(str, out long res))
                 {
                     return 0;
                 }
                 return res;
             }
-            var mult = GetIntContent(_multiplier.Text);
-            var init = GetIntContent(_initialValue.Text);
-            var div = GetIntContent(_divider.Text);
+            var mul = GetInt64Content(_multiplier.Text);
+            var ini = GetInt64Content(_initialValue.Text);
+            var div = GetInt64Content(_divider.Text);
 
             #region generation
 
-            IEnumerable<int> sq = new Algorithm(mult, init, div).GetSequence();
-
-            #region msgbox        
-            // var msg = string.Empty;
-            //var count = 0;
-            //foreach (int item in sq)
-            //{
-            //    count++;
-            //    msg += $"{item}\t";
-            //    if (count == 20) break;               
-            //}
-            //MessageBox.Show(msg);
-            #endregion
-            IList<int> generatedValues = new List<int>();
+            IEnumerable<long> sq = new Algorithm(mul, ini, div).GetSequenceOfInt64();    
+            IList<long> generatedValues = new List<long>();
             var count = 0;
-            foreach (int item in sq)
+            foreach (var item in sq)
             {
-                if (count == TOTAL_VALUES)
-                {
-                    break;
-                }
-
+                if (count == TOTAL_VALUES) { break; }
                 generatedValues.Add(item);
                 ++count;
             }
@@ -75,8 +59,8 @@ namespace WpfSaimmodOne
 
             double intervalLength = (double)div / TOTAL_INTERVALS;
 
-            List<int> results = new List<int>();
-            results.AddRange(Enumerable.Repeat(0, TOTAL_INTERVALS));
+            var results = new List<long>();
+            results.AddRange(Enumerable.Repeat<long>(0, TOTAL_INTERVALS));
 
             foreach (var item in generatedValues)
             {
@@ -87,7 +71,7 @@ namespace WpfSaimmodOne
             DrawBarChart(_panel, results);
         }
 
-        private void DrawBarChart(Panel target, IEnumerable<int> values)
+        private void DrawBarChart(Panel target, IEnumerable<long> values)
         {
             target.Children.Clear();
 
