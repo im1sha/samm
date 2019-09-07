@@ -7,6 +7,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Label Content="multiplier" HorizontalAlignment="Left" Margin="26,12,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="multiplyer" Text="3"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="26,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+        <Label Content="initial Value" HorizontalAlignment="Left" Margin="222,12,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="222,43,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+
+        <Label Content="divider" HorizontalAlignment="Left" Margin="428,12,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="divider"  Text="5" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="429,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
+        <Button Content="Button" Click="Calculate" HorizontalAlignment="Left" Margin="26,83,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </Window>

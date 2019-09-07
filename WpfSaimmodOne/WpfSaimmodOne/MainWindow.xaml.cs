@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace WpfSaimmodOne
 {
@@ -20,37 +21,41 @@ namespace WpfSaimmodOne
     /// </summary>
     public partial class MainWindow : Window
     {
+      
         public MainWindow()
         {
             InitializeComponent();
+        }
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
 
+        private void Calculate(object sender, RoutedEventArgs e)
+        {            
+            string msg = string.Empty;
 
-            //int mult,
-            //    init,
-            //    divider;
+            var mult = Convert.ToInt32(multiplyer.Text);
+            var init = Convert.ToInt32(initialValue.Text);
+            var div = Convert.ToInt32(divider.Text);
 
-            //Console.WriteLine($"{nameof(mult)}");
-            //mult = Convert.ToInt32(Console.ReadLine());
+            var alg = new Algorithm(mult, init, div);
+            var sq = alg.GetSequence();
+            var count = 0;
 
-            //Console.WriteLine($"{nameof(init)}");
-            //init = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("\nVALUES\n");
+            foreach (int item in sq)
+            {
+                count++;
+                msg += $"{item}\t";
+                if (count == 20)
+                {
+                    break;
+                }
+            }
 
-            //Console.WriteLine($"{nameof(divider)}");
-            //divider = Convert.ToInt32(Console.ReadLine());
-
-            //var alg = new Algorithm(mult, init, divider);
-            //var sq = alg.GetSequence();
-            //var count = 0;
-            //Console.WriteLine("\nVALUES\n");
-            //foreach (int item in sq)
-            //{
-            //    count++;
-            //    Console.WriteLine(item);
-            //    if (count == 20)
-            //    {
-            //        break;
-            //    }
-            //}
+            MessageBox.Show(msg);
         }
     }
 }
