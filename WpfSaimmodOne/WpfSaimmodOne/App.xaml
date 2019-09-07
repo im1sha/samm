@@ -6,16 +6,6 @@
     <Application.Resources>
         <Style x:Key="BottomStyle" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Bottom"/>
-            <!--<Setter Property="Control.RenderTransform" >
-            <Setter.Value>
-                <TransformGroup>
-                    <RotateTransform Angle="90"/>
-                </TransformGroup>
-            </Setter.Value>
-            </Setter>-->
         </Style>
-
-
-
     </Application.Resources>
 </Application>

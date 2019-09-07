@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Text.RegularExpressions;
 
 namespace WpfSaimmodOne
 {
@@ -20,7 +12,7 @@ namespace WpfSaimmodOne
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {    
+    {
         public MainWindow()
         {
             InitializeComponent();
@@ -68,7 +60,11 @@ namespace WpfSaimmodOne
             var count = 0;
             foreach (int item in sq)
             {
-                if (count == TOTAL_VALUES) break;
+                if (count == TOTAL_VALUES)
+                {
+                    break;
+                }
+
                 generatedValues.Add(item);
                 ++count;
             }
@@ -84,39 +80,49 @@ namespace WpfSaimmodOne
 
             foreach (var item in generatedValues)
             {
-                results[(int)(item/intervalLength)]++;
+                results[(int)(item / intervalLength)]++;
             }
             #endregion
 
             DrawBarChart(_panel, results);
         }
 
-        void DrawBarChart(Panel target, IEnumerable<int> values)
+        private void DrawBarChart(Panel target, IEnumerable<int> values)
         {
             target.Children.Clear();
-            
-            double heightCoef = target.ActualHeight / values.Max(); 
+
+            double heightCoef = target.ActualHeight / values.Max();
             double itemWidth = target.ActualWidth / values.Count();
 
             int totalItems = values.Count();
 
             Style controlStyle = FindResource("BottomStyle") as Style;
 
+            int rowLength = 999.ToString().Length;
             for (int i = 0; i < totalItems; i++)
             {
+                string content = values.ElementAt(i).ToString();
+
+                if (content.Length > rowLength)
+                {
+                    for (int j = content.Length - rowLength; j > 0; j -= rowLength)
+                    {
+                        content = content.Insert(j, "\n");
+                    }
+                }
+
                 var uiElement = new TextBlock
                 {
                     Width = itemWidth,
                     Height = heightCoef * values.ElementAt(i),
-                    Background = i % 2 == 0 ? Brushes.Black: Brushes.Red,
-                    Foreground = i % 2 != 0 ? Brushes.Black: Brushes.Red,
-                    Style = controlStyle,  
-                    Text = values.ElementAt(i).ToString(),
+                    Background = i % 2 == 0 ? Brushes.Black : Brushes.DarkGray,
+                    Foreground = i % 2 != 0 ? Brushes.Black : Brushes.LightGray,
+                    Style = controlStyle,
+                    Text = content,
                 };
 
-
                 target.Children.Add(uiElement);
-            }           
+            }
         }
     }
 }
