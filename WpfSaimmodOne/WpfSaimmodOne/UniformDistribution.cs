@@ -79,6 +79,56 @@ namespace WpfSaimmodOne
             return (result, estimation);
         }
 
+        public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod(IEnumerable<uint> values)
+        {
+            var totalValues = values.Count();
+
+            uint backValue = values.Last();
+            uint frontValue = values.First();
+            var backNumberPositions = new List<int>();
+            var frontNumberPositions = new List<int>();
+
+            for (int i = 0; i < totalValues; i++)
+            {
+                if (backValue == values.ElementAt(i))
+                {
+                    backNumberPositions.Add(i);
+                    if (backNumberPositions.Count() == 2)
+                    {
+                        break;
+                    }
+                }                
+            }
+            if (backNumberPositions.Count() != 2)
+            {
+                return (false, -1, -1);
+            }
+            var period = backNumberPositions[1] - backNumberPositions[0];
+
+            for (int i = 0; i < totalValues; i++)
+            {
+                if (frontValue == values.ElementAt(i))
+                {
+                    frontNumberPositions.Add(i);                   
+                    if (frontNumberPositions.Count() == 2)
+                    {
+                        if (frontNumberPositions[1] - frontNumberPositions[0] == period)
+                        {
+                            return (true,
+                                frontNumberPositions[1] - frontNumberPositions[0], // period
+                                frontNumberPositions[1]); // aperiodicity
+                        }
+                        else
+                        {
+                            frontNumberPositions.RemoveAt(0);
+                        }
+                    }
+                }
+            }
+
+            // if no period
+            return (true, -1, totalValues);
+        }
         #endregion
 
         private const int TOTAL_INTERVALS = 20;

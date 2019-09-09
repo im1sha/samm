@@ -31,15 +31,16 @@ namespace WpfSaimmodOne
                 ini, 
                 div;
 
-            bool loopVar;
+            bool correctData, validPeriod;
             Mediator md;
             do
             {
                 (mul, ini, div) = Lehmer.GenerateParameters();
                 md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
                 md.Initialize();
-                (loopVar, _) = md.EstimateData();
-            } while (!loopVar);
+                (correctData, _) = md.EstimateDistribution();
+                (validPeriod, _, _) = md.EstimatePeriod();
+            } while (!correctData || !validPeriod);
 
             _divider.Text = div.ToString();
             _initialValue.Text = ini.ToString();
@@ -78,9 +79,10 @@ namespace WpfSaimmodOne
             (double expectedValue, double variance, double standardDeviation)
                 = md.GetNormalizedStatistics();
 
-            (_, var estimation) = md.EstimateData(); 
+            (_, var estimation) = md.EstimateDistribution(); 
+            (_, var period, var aperiodicity) = md.EstimatePeriod(); 
 
-            ShowStatistics(expectedValue, variance, standardDeviation, estimation);
+            ShowStatistics(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
         }
 
         private void DrawBarChart(Panel target, IEnumerable<uint> values)
@@ -121,12 +123,15 @@ namespace WpfSaimmodOne
             }
         }
 
-        private void ShowStatistics(double expectedValue, double variance, double standardDeviation, double estimation)
+        private void ShowStatistics(double expectedValue, double variance, double standardDeviation,
+            double estimation, int period, int aperiodicity)
         {
             _expectedValue.Content = "M: " + expectedValue;
             _variance.Content = "D: " + variance;
             _standardDeviation.Content = "σ: " + standardDeviation;
             _estimation.Content = "est: " + estimation;
+            _period.Content = "P: " + period;
+            _aperiodicity.Content = "L: " + aperiodicity;
         }
     }
 }

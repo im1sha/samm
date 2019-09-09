@@ -22,9 +22,14 @@ namespace WpfSaimmodOne
             return _data;
         }
 
-        public (bool isCorrect, double value) EstimateData()
+        public (bool isCorrect, double value) EstimateDistribution()
         {
             return _distribution.EstimateDistribution(_data);
+        }
+
+        public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod()
+        {
+            return _distribution.EstimatePeriod(_data);
         }
 
         public IEnumerable<uint> GetChart()

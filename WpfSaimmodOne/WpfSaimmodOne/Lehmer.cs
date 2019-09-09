@@ -9,7 +9,7 @@ namespace WpfSaimmodOne
 {
     internal class Lehmer : IAlgorithm
     {      
-        const int TOTAL_VALUES = 1000000;
+        const int TOTAL_VALUES = 500000;
         public int TotalValues { get; private set; }
         public uint Multiplier { get; private set; }
         public uint InitialValue { get; private set; }

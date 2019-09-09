@@ -10,5 +10,7 @@ namespace WpfSaimmodOne
             IEnumerable<uint> values);
 
         (bool isCorrect, double value) EstimateDistribution(IEnumerable<uint> values);
+
+        (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod(IEnumerable<uint> values);
     }
 }
