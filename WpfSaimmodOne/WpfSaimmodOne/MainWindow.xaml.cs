@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -17,7 +18,7 @@ namespace WpfSaimmodOne
         {
             InitializeComponent();
         }
-
+  
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
@@ -29,22 +30,24 @@ namespace WpfSaimmodOne
             const int TOTAL_INTERVALS = 20;
             const int TOTAL_VALUES = 500000;
 
-            long GetInt64Content(string str)
+            uint GetUIntContent(string str)
             {
-                if (!long.TryParse(str, out long res))
+                if (!uint.TryParse(str, out uint res))
                 {
                     return 0;
                 }
                 return res;
             }
-            var mul = GetInt64Content(_multiplier.Text);
-            var ini = GetInt64Content(_initialValue.Text);
-            var div = GetInt64Content(_divider.Text);
+            var mul = GetUIntContent(_multiplier.Text);
+            var ini = GetUIntContent(_initialValue.Text);
+            var div = GetUIntContent(_divider.Text);
 
             #region generation
 
-            IEnumerable<long> sq = new Algorithm(mul, ini, div).GetSequenceOfInt64();    
-            IList<long> generatedValues = new List<long>();
+
+            var alg = new Algorithm(mul, ini, div);
+            IEnumerable<uint> sq = alg.GetSequenceOfInt64();    
+            IList<uint> generatedValues = new List<uint>();
             var count = 0;
             foreach (var item in sq)
             {
@@ -59,8 +62,8 @@ namespace WpfSaimmodOne
 
             double intervalLength = (double)div / TOTAL_INTERVALS;
 
-            var results = new List<long>();
-            results.AddRange(Enumerable.Repeat<long>(0, TOTAL_INTERVALS));
+            var results = new List<uint>();
+            results.AddRange(Enumerable.Repeat<uint>(0, TOTAL_INTERVALS));
 
             foreach (var item in generatedValues)
             {
@@ -69,9 +72,11 @@ namespace WpfSaimmodOne
             #endregion
 
             DrawBarChart(_panel, results);
+            alg.GenerateParameters(out uint multiplier, out uint initialValue, out uint divider);
+            MessageBox.Show($"{multiplier}\n{initialValue}\n{divider}");
         }
 
-        private void DrawBarChart(Panel target, IEnumerable<long> values)
+        private void DrawBarChart(Panel target, IEnumerable<uint> values)
         {
             target.Children.Clear();
 
