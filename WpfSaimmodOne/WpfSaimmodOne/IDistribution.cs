@@ -8,6 +8,7 @@ namespace WpfSaimmodOne
 {
     interface IDistribution
     {
-        IEnumerable<uint> Calculate(IEnumerable<uint> values);
+        IEnumerable<uint> GetChartData(IEnumerable<uint> values);
+        (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics(IEnumerable<uint> values);
     }
 }

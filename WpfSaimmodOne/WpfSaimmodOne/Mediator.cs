@@ -13,6 +13,19 @@ namespace WpfSaimmodOne
             _algorithm = algorithm;
         }
 
-        public IEnumerable<uint> GetDistibution() =>  _distribution.Calculate(_algorithm.Perform());        
+        IEnumerable<uint> _data;
+        IEnumerable<uint> _chart;
+
+        public IEnumerable<uint> GetDistibution()
+        {
+            _data = _algorithm.Perform();
+            _chart = _distribution.GetChartData(_data);
+            return _chart;
+        }
+
+        public (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics()
+        {
+            return _distribution.GetNormalizedStatistics(_data);
+        }
     }
 }

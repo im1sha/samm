@@ -7,18 +7,22 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
     <Grid>
-        <Label Content="multiplier" HorizontalAlignment="Left" Margin="25,12,0,0" VerticalAlignment="Top"/>
+        <Label Content="multiplier" HorizontalAlignment="Left" Margin="25,13,0,0" VerticalAlignment="Top"/>
         <TextBox Name="_multiplier" Text="3"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="25,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
-        <Label Content="initial Value" HorizontalAlignment="Left" Margin="222,12,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="_initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="222,43,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+        <Label Content="initial Value" HorizontalAlignment="Left" Margin="169,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.361,0.617"/>
+        <TextBox Name="_initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="169,43,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
 
-        <Label Content="divider" HorizontalAlignment="Left" Margin="428,12,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="_divider"  Text="5" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="429,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label Content="divider" HorizontalAlignment="Left" Margin="318,13,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="_divider"  Text="5" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="318,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
-        <Button Background="White"  Content="calculate" Click="Calculate" HorizontalAlignment="Left" Margin="612,28,0,0" VerticalAlignment="Top" Width="110"/>
+        <Button Content="calculate" Click="Run" HorizontalAlignment="Left" Margin="466,43,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        <Button Content="generate" Click="Generate" HorizontalAlignment="Left" Margin="466,9,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
 
         <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,89,25,25"/>
-
+        
+        <Label Name="_expectedValue" Content="M" HorizontalAlignment="Left" Margin="588,0,0,0" VerticalAlignment="Top"/>
+        <Label Name="_variance" Content="D" HorizontalAlignment="Left" Margin="590,31,0,0" VerticalAlignment="Top" RenderTransformOrigin="2.656,0.523"/>
+        <Label Name="_standardDeviation" Content="σ" HorizontalAlignment="Left" Margin="591,62,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

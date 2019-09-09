@@ -25,7 +25,16 @@ namespace WpfSaimmodOne
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void Calculate(object sender, RoutedEventArgs e)
+        private void Generate(object sender, RoutedEventArgs e)
+        {
+            (uint mul, uint ini, uint div) = Lehmer.GenerateParameters();
+            _divider.Text = div.ToString();
+            _initialValue.Text = ini.ToString();
+            _multiplier.Text = mul.ToString();
+            Run(sender, e);
+        }
+
+        private void Run(object sender, RoutedEventArgs e)
         {
             #region form data parsing
 
@@ -43,9 +52,13 @@ namespace WpfSaimmodOne
 
             #endregion
 
-            var med = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
+            var md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
 
-            DrawBarChart(_panel, med.GetDistibution());
+            DrawBarChart(_panel, md.GetDistibution());
+
+            (double expectedValue, double variance, double standardDeviation)
+                = md.GetNormalizedStatistics();
+            ShowStatistics(expectedValue, variance, standardDeviation);
         }
 
         private void DrawBarChart(Panel target, IEnumerable<uint> values)
@@ -84,6 +97,13 @@ namespace WpfSaimmodOne
 
                 target.Children.Add(uiElement);
             }
+        }
+
+        private void ShowStatistics(double expectedValue, double variance, double standardDeviation)
+        {
+            _expectedValue.Content = "M: " + expectedValue;
+            _variance.Content = "D: " + variance;
+            _standardDeviation.Content = "σ: " + standardDeviation;
         }
     }
 }

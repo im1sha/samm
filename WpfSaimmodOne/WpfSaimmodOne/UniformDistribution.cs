@@ -12,14 +12,46 @@ namespace WpfSaimmodOne
     {
         #region expected results
         // M == {Expected value}
-        public double RightExpectedValue => 0.5;
+        public static double RightExpectedValue => 0.5;
 
         // D == {Variance}
-        public double RightVariance => 1.0 / 12.0;
+        public static double RightVariance => 1.0 / 12.0;
 
         // σ == {Standard deviation}
-        public double RightStandardDeviation => 1.0 / Math.Sqrt(12.0);
+        public static double RightStandardDeviation => Math.Sqrt(RightVariance);
         #endregion
+
+        #region actual values
+        // M 
+        public double GetNormalizedExpectedValue(IEnumerable<uint> values)
+        {
+            return values.Average(i => (double)i / Length);
+        }
+                        
+        // D 
+        public double GetNormalizedVariance(IEnumerable<uint> values)
+        {
+            double expValue = GetNormalizedExpectedValue(values);
+            return (1.0 / (values.Count() - 1.0)) 
+                * values.Sum(x => Math.Pow(((double)x / Length) - expValue, 2.0));
+        }
+
+        // σ 
+        public double GetNormalizedStandardDeviation(IEnumerable<uint> values)
+        {
+            return Math.Sqrt(GetNormalizedVariance(values));
+        }
+
+        public (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics(
+            IEnumerable<uint> values)
+        {
+            return (GetNormalizedExpectedValue(values), 
+                GetNormalizedVariance(values), 
+                GetNormalizedStandardDeviation(values));
+        }
+        #endregion
+
+
 
         private const int TOTAL_INTERVALS = 20;
 
@@ -42,7 +74,7 @@ namespace WpfSaimmodOne
             TotalIntervals = totalIntervals; 
         }
 
-        public IEnumerable<uint> Calculate(IEnumerable<uint> values)
+        public IEnumerable<uint> GetChartData(IEnumerable<uint> values)
         {
             if (values == null)
             {

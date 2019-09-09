@@ -14,24 +14,19 @@ namespace WpfSaimmodOne
         public uint InitialValue { get; private set; }
         public uint Divider { get; private set; }
 
-        public Lehmer(uint? multiplier = null,
-            uint? initialValue = null,
-            uint? divider = null,
+        public Lehmer(uint multiplier,
+            uint initialValue,
+            uint divider,
             int totalValues = TOTAL_VALUES)
         {
             if (multiplier <= 0 || divider <= 0 || totalValues <= 0)
             {
                 throw new ArgumentException ();
             }
-
-            if (multiplier == null || initialValue == null || divider == null)
-            {
-                (multiplier, initialValue, divider) = GenerateParameters();
-            }
-
-            Multiplier = (uint)multiplier;
-            InitialValue = (uint)initialValue;
-            Divider = (uint)divider;
+    
+            Multiplier = multiplier;
+            InitialValue = initialValue;
+            Divider = divider;
             TotalValues = totalValues;
         }
 
@@ -70,7 +65,7 @@ namespace WpfSaimmodOne
         // divider(m)           < (2^n)-1
         // initialValue < divider
         // a < R[0] < m
-        private (uint multiplier, uint initialValue, uint divider) GenerateParameters()
+        public static (uint multiplier, uint initialValue, uint divider) GenerateParameters()
         {
             uint multiplier;
             uint initialValue;
