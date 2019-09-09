@@ -2,7 +2,7 @@
 
 namespace WpfSaimmodOne
 {
-    public static class UIntRandom
+    internal static class UIntRandom
     {
         public static uint GetValue(uint min, uint max, Random rand)
         {

@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace WpfSaimmodOne
-{   
+{
     // Если равномерное распределение в интервале(a, b), то
     // M == (a+b) /2                            // 0.5     
     // D == sqr(b-a) /12                        // 1 /12
     // σ == (b-a) /sqrt(12)                     // 1 /sqrt(12)
-    public class UniformDistribution : IDistribution
+    internal class UniformDistribution : IDistribution
     {
         #region expected results
-        // M == {Expected value}
+        // M
         public static double RightExpectedValue => 0.5;
 
-        // D == {Variance}
+        // D 
         public static double RightVariance => 1.0 / 12.0;
 
-        // σ == {Standard deviation}
+        // σ 
         public static double RightStandardDeviation => Math.Sqrt(RightVariance);
+
+        // 2K/N = PI/4 ± ϵ, 
+        // where K is all pairs located inside of one forth of circle 
+        // and N is total amount of points
+        public static double RightUniformityEstimation => Math.PI / 4;
+
+        // ϵ 
+        public static double UniformityEstimationEpsilon => 0.001;
+
         #endregion
 
         #region actual values
@@ -27,12 +36,12 @@ namespace WpfSaimmodOne
         {
             return values.Average(i => (double)i / Length);
         }
-                        
+
         // D 
         public double GetNormalizedVariance(IEnumerable<uint> values)
         {
             double expValue = GetNormalizedExpectedValue(values);
-            return (1.0 / (values.Count() - 1.0)) 
+            return (1.0 / (values.Count() - 1.0))
                 * values.Sum(x => Math.Pow(((double)x / Length) - expValue, 2.0));
         }
 
@@ -45,13 +54,32 @@ namespace WpfSaimmodOne
         public (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics(
             IEnumerable<uint> values)
         {
-            return (GetNormalizedExpectedValue(values), 
-                GetNormalizedVariance(values), 
+            return (GetNormalizedExpectedValue(values),
+                GetNormalizedVariance(values),
                 GetNormalizedStandardDeviation(values));
         }
+
+        public (bool, double) EstimateDistribution(IEnumerable<uint> values)
+        {
+            var totalPairs = (values.Count() - (values.Count() % 2)) / 2;
+            var count = 0;
+            for (int i = 0; i < totalPairs; i++)
+            {
+                if (Math.Pow(values.ElementAt(2 * i) / (double)Length, 2.0)
+                    + Math.Pow(values.ElementAt(2 * i + 1) / (double)Length, 2.0) < 1)
+                {
+                    count++;
+                }
+            }
+            var estimation = (double)count / totalPairs; // 2 * locatedPoints/totalPoints
+
+            var result = (RightUniformityEstimation - UniformityEstimationEpsilon < estimation)
+                && (estimation < RightUniformityEstimation + UniformityEstimationEpsilon);
+
+            return (result, estimation);
+        }
+
         #endregion
-
-
 
         private const int TOTAL_INTERVALS = 20;
 
@@ -61,7 +89,7 @@ namespace WpfSaimmodOne
         public int TotalIntervals { get; private set; }
 
         public UniformDistribution(
-            uint length,             
+            uint length,
             int totalIntervals = TOTAL_INTERVALS)
         {
             if (totalIntervals <= 0
@@ -71,7 +99,7 @@ namespace WpfSaimmodOne
             }
 
             Length = length;
-            TotalIntervals = totalIntervals; 
+            TotalIntervals = totalIntervals;
         }
 
         public IEnumerable<uint> GetChartData(IEnumerable<uint> values)

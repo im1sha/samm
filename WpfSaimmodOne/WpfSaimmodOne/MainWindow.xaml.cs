@@ -25,16 +25,30 @@ namespace WpfSaimmodOne
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void Generate(object sender, RoutedEventArgs e)
+        private void AutoGenerate(object sender, RoutedEventArgs e)
         {
-            (uint mul, uint ini, uint div) = Lehmer.GenerateParameters();
+            uint mul, 
+                ini, 
+                div;
+
+            bool loopVar;
+            Mediator md;
+            do
+            {
+                (mul, ini, div) = Lehmer.GenerateParameters();
+                md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
+                md.Initialize();
+                (loopVar, _) = md.EstimateData();
+            } while (!loopVar);
+
             _divider.Text = div.ToString();
             _initialValue.Text = ini.ToString();
             _multiplier.Text = mul.ToString();
-            Run(sender, e);
+
+            RunCore(md);
         }
 
-        private void Run(object sender, RoutedEventArgs e)
+        private void ManualRun(object sender, RoutedEventArgs e)
         {
             #region form data parsing
 
@@ -53,12 +67,20 @@ namespace WpfSaimmodOne
             #endregion
 
             var md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
+            md.Initialize();
+            RunCore(md);
+        }
 
-            DrawBarChart(_panel, md.GetDistibution());
+        private void RunCore(Mediator md)
+        {
+            DrawBarChart(_panel, md.GetChart());
 
             (double expectedValue, double variance, double standardDeviation)
                 = md.GetNormalizedStatistics();
-            ShowStatistics(expectedValue, variance, standardDeviation);
+
+            (_, var estimation) = md.EstimateData(); 
+
+            ShowStatistics(expectedValue, variance, standardDeviation, estimation);
         }
 
         private void DrawBarChart(Panel target, IEnumerable<uint> values)
@@ -99,11 +121,12 @@ namespace WpfSaimmodOne
             }
         }
 
-        private void ShowStatistics(double expectedValue, double variance, double standardDeviation)
+        private void ShowStatistics(double expectedValue, double variance, double standardDeviation, double estimation)
         {
             _expectedValue.Content = "M: " + expectedValue;
             _variance.Content = "D: " + variance;
             _standardDeviation.Content = "σ: " + standardDeviation;
+            _estimation.Content = "est: " + estimation;
         }
     }
 }

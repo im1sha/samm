@@ -2,25 +2,34 @@
 
 namespace WpfSaimmodOne
 {
-
     internal class Mediator
     {
         private readonly IDistribution _distribution;
+
         private readonly IAlgorithm _algorithm;
+
         public Mediator(IDistribution distribution, IAlgorithm algorithm)
         {
             _distribution = distribution;
             _algorithm = algorithm;
         }
 
-        IEnumerable<uint> _data;
-        IEnumerable<uint> _chart;
+        private IEnumerable<uint> _data;
 
-        public IEnumerable<uint> GetDistibution()
+        public IEnumerable<uint> Initialize()
         {
             _data = _algorithm.Perform();
-            _chart = _distribution.GetChartData(_data);
-            return _chart;
+            return _data;
+        }
+
+        public (bool isCorrect, double value) EstimateData()
+        {
+            return _distribution.EstimateDistribution(_data);
+        }
+
+        public IEnumerable<uint> GetChart()
+        {
+            return _distribution.GetChartData(_data);
         }
 
         public (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics()

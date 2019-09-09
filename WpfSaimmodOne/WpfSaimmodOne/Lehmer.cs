@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace WpfSaimmodOne
 {
-    class Lehmer : IAlgorithm
+    internal class Lehmer : IAlgorithm
     {      
-        const int TOTAL_VALUES = 500000;
+        const int TOTAL_VALUES = 1000000;
         public int TotalValues { get; private set; }
         public uint Multiplier { get; private set; }
         public uint InitialValue { get; private set; }
@@ -70,7 +70,7 @@ namespace WpfSaimmodOne
         {
             bool CheckBinaryRepresentation(uint val)
             {
-                const int ENOUGH_ONES_IN_REPRESENTATION = 16; // 
+                const int ENOUGH_ONES_IN_REPRESENTATION = 24; // 
                 return Convert.ToString(val, 2).Count(i => i == '1') >= ENOUGH_ONES_IN_REPRESENTATION;
             }
 
@@ -120,6 +120,5 @@ namespace WpfSaimmodOne
 
             return (data[1].value, data[2].value, data[0].value);
         }
-
     }
 }

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WpfSaimmodOne
 {
-    interface IDistribution
+    internal interface IDistribution
     {
         IEnumerable<uint> GetChartData(IEnumerable<uint> values);
-        (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics(IEnumerable<uint> values);
+
+        (double expectedValue, double variance, double standardDeviation) GetNormalizedStatistics(
+            IEnumerable<uint> values);
+
+        (bool isCorrect, double value) EstimateDistribution(IEnumerable<uint> values);
     }
 }
