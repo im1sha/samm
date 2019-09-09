@@ -27,8 +27,7 @@ namespace WpfSaimmodOne
 
         private void Calculate(object sender, RoutedEventArgs e)
         {
-            const int TOTAL_INTERVALS = 20;
-            const int TOTAL_VALUES = 500000;
+            #region form data parsing
 
             uint GetUIntContent(string str)
             {
@@ -42,38 +41,11 @@ namespace WpfSaimmodOne
             var ini = GetUIntContent(_initialValue.Text);
             var div = GetUIntContent(_divider.Text);
 
-            #region generation
-
-
-            var alg = new Algorithm(mul, ini, div);
-            IEnumerable<uint> sq = alg.GetSequenceOfInt64();    
-            IList<uint> generatedValues = new List<uint>();
-            var count = 0;
-            foreach (var item in sq)
-            {
-                if (count == TOTAL_VALUES) { break; }
-                generatedValues.Add(item);
-                ++count;
-            }
-
             #endregion
 
-            #region interval calculation
+            var med = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
 
-            double intervalLength = (double)div / TOTAL_INTERVALS;
-
-            var results = new List<uint>();
-            results.AddRange(Enumerable.Repeat<uint>(0, TOTAL_INTERVALS));
-
-            foreach (var item in generatedValues)
-            {
-                results[(int)(item / intervalLength)]++;
-            }
-            #endregion
-
-            DrawBarChart(_panel, results);
-            alg.GenerateParameters(out uint multiplier, out uint initialValue, out uint divider);
-            MessageBox.Show($"{multiplier}\n{initialValue}\n{divider}");
+            DrawBarChart(_panel, med.GetDistibution());
         }
 
         private void DrawBarChart(Panel target, IEnumerable<uint> values)

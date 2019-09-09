@@ -1,90 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace WpfSaimmodOne
 {
-    internal class Algorithm
-    {
-        private readonly uint _multiplier;
-        private readonly uint _inintialValue;
-        private readonly uint _divider;
-        private readonly IEnumerable<uint> _seq;
+    class Lehmer : IAlgorithm
+    {      
+        const int TOTAL_VALUES = 500000;
+        public int TotalValues { get; private set; }
+        public uint Multiplier { get; private set; }
+        public uint InitialValue { get; private set; }
+        public uint Divider { get; private set; }
 
-        /// <summary>
-        /// R[n+1] = (R[n] *a) %m. m > a
-        /// </summary>
-        /// <param name="multiplier">a</param>
-        /// <param name="initialValue">R[0]</param>
-        /// <param name="divider">m</param>
-        public Algorithm(uint multiplier, uint initialValue, uint divider)
+        public Lehmer(uint? multiplier = null,
+            uint? initialValue = null,
+            uint? divider = null,
+            int totalValues = TOTAL_VALUES)
         {
-            _multiplier = multiplier;
-            _inintialValue = initialValue;
-            _divider = divider;
-            _seq = CreateSequenceOfUInt(multiplier, initialValue, divider);
+            if (multiplier <= 0 || divider <= 0 || totalValues <= 0)
+            {
+                throw new ArgumentException ();
+            }
+
+            if (multiplier == null || initialValue == null || divider == null)
+            {
+                (multiplier, initialValue, divider) = GenerateParameters();
+            }
+
+            Multiplier = (uint)multiplier;
+            InitialValue = (uint)initialValue;
+            Divider = (uint)divider;
+            TotalValues = totalValues;
         }
 
-        public uint Divider => _divider;
-
-        // Gets sequnce of generated members 
-        private IEnumerable<uint> CreateSequenceOfUInt(uint multiplier, uint initialValue, uint divider)
+        public IEnumerable<uint> Perform()
         {
+            return CreateSequence(Multiplier, InitialValue, Divider, TotalValues);
+        }
+
+        // Left bound of sequence == 0
+        // Right bound of sequence == m
+        // R[n+1] = (R[n]*a) %m
+        private IEnumerable<uint> CreateSequence(
+            uint multiplier,
+            uint initialValue,
+            uint divider,
+            int length = TOTAL_VALUES)
+        {
+            var result = new List<uint>();
+
             var currMember = initialValue;
             uint multiplication;
 
-            while (true)
-            {           
+            for (int i = 0; i < length; i++)
+            {
                 // a * R[n] 
                 multiplication = multiplier * currMember;
                 currMember = multiplication % divider;
-                yield return currMember;
+                result.Add(currMember);
             }
+
+            return result;
         }
-
-        public IEnumerable<uint> GetSequenceOfInt64()
-        {
-            foreach (var item in _seq)
-            {
-                yield return item;
-            }
-        }
-
-       
-       
-        // Если равномерное распределение в интервале(a, b), то
-        // M == (a+b) /2                            // 0.5     
-        // D == sqr(b-a) /12                        // 1 /12
-        // σ == (b-a) /sqrt(12)                     // 1 /sqrt(12)
-
-        // M == {Expected value}
-        public double RightExpectedValue => 0.5;
-
-        // D == {Variance}
-        public double RightVariance => 1.0 / 12.0;
-
-        // σ == {Standard deviation}
-        public double RightStandardDeviation => 1.0 / Math.Sqrt(12.0);
-
-       
 
         // multiplier(a)        ~ 2^(n-1)
         // initialValue(R[0])   < (2^n)-1, prime
         // divider(m)           < (2^n)-1
         // initialValue < divider
         // a < R[0] < m
-        public void GenerateParameters(out uint multiplier, out uint initialValue , out uint divider)
+        private (uint multiplier, uint initialValue, uint divider) GenerateParameters()
         {
+            uint multiplier;
+            uint initialValue;
+            uint divider;
+
             var rand = new Random();
 
+            // set values bounds
             var data = new (uint intervalBegin, uint intervalEnd, uint? generatedValue)[3] {
                 ((uint)(0.75 * (uint)Math.Pow(2, 31)), (uint)(1.5 * (uint)Math.Pow(2, 31)), null),
                 ((uint)(1.5 * (uint)Math.Pow(2, 31)), uint.MaxValue, null),
                 ((uint)(1.5 * (uint)Math.Pow(2, 31)), uint.MaxValue, null),
             };
 
+            // values generation 
             for (int i = 0; i < data.Length; i++)
-            {       
+            {
                 while (data[i].generatedValue == null)
                 {
                     uint val = UIntRandom.GetValue(data[i].intervalBegin, data[i].intervalEnd, rand);
@@ -98,9 +101,12 @@ namespace WpfSaimmodOne
                         {
                             data[i].generatedValue = val;
                         }
-                    }                  
+                    }
                 }
             }
+
+            #region sort values
+            //a < R[0] < m
 
             multiplier = (uint)data[0].generatedValue;
 
@@ -115,7 +121,10 @@ namespace WpfSaimmodOne
                 divider = (uint)data[1].generatedValue;
             }
 
+            #endregion
 
+            return (multiplier, initialValue, divider);
         }
+
     }
 }
