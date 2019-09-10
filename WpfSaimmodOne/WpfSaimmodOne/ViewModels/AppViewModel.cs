@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WpfSaimmodOne.Models;
 
 namespace WpfSaimmodOne.ViewModels
 {
@@ -30,9 +31,41 @@ namespace WpfSaimmodOne.ViewModels
                 return _generateCommand ??
                     (_generateCommand = new InteractCommand(stack =>
                     {
-                       
+                        ManualRun(stack);
                     }));
             }
+        }
+        private void ManualRun(object stack)
+        {         
+            var md = new Mediator(
+                new UniformDistribution(), 
+                new Lehmer(_multiplier, _initialValue, _divider));
+
+            IEnumerable<uint> seq =  md.InitializeSequence(500_000);
+            IEnumerable<double> normalizedSequence = SequenceNormalizer.Normalize(seq, _divider);
+
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 20);
+            ViewUpdater.DrawBarChart(stack, bars);
+
+            (double expectedValue, double variance, double standardDeviation)
+                = md.GetStatistics(normalizedSequence);
+
+            var estimation = md.CalculateIndirectEstimation(normalizedSequence);
+            // bool res = md.CheckIndirectEstimation(estimation, 0.001);
+
+            UpdateOutput(expectedValue, variance, standardDeviation, estimation, double.NaN, double.NaN);
+        }
+
+        private void UpdateOutput(double expectedValue, double variance, 
+            double standardDeviation, double estimation, 
+            double period, double aperiodicity)
+        {
+            ExpectedValue = expectedValue.ToString();
+            Variance = variance.ToString();
+            StandardDeviation = standardDeviation.ToString();
+            Estimation = estimation.ToString();
+            Period = period.ToString();
+            Aperiodicity = aperiodicity.ToString();
         }
 
         private InteractCommand _autogenerateCommand;
@@ -73,41 +106,7 @@ namespace WpfSaimmodOne.ViewModels
         //    RunCore(md);
         //}
 
-        //private void ManualRun(object sender, RoutedEventArgs e)
-        //{
-        //    #region form data parsing
-
-        //    uint GetUIntContent(string str)
-        //    {
-        //        if (!uint.TryParse(str, out uint res))
-        //        {
-        //            return 0;
-        //        }
-        //        return res;
-        //    }
-        //    var mul = GetUIntContent(_multiplier.Text);
-        //    var ini = GetUIntContent(_initialValue.Text);
-        //    var div = GetUIntContent(_divider.Text);
-
-        //    #endregion
-
-        //    var md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
-        //    md.Initialize();
-        //    RunCore(md);
-        //}
-
-        //private void RunCore(Mediator md)
-        //{
-        //    DrawBarChart(_panel, md.GetChart());
-
-        //    (double expectedValue, double variance, double standardDeviation)
-        //        = md.GetNormalizedStatistics();
-
-        //    (_, var estimation) = md.EstimateDistribution();
-        //    (_, var period, var aperiodicity) = md.EstimatePeriod();
-
-        //    ShowStatistics(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
-        //}
+       
 
         #endregion
 

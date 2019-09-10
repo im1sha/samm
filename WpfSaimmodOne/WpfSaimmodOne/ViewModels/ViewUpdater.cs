@@ -9,7 +9,7 @@ namespace WpfSaimmodOne.ViewModels
 {
     internal static class ViewUpdater
     {
-        public static void DrawBarChart(object o, IEnumerable<uint> values)
+        public static void DrawBarChart(object o, IEnumerable<int> values)
         {
             if (o == null || !(o is Panel))
             {
