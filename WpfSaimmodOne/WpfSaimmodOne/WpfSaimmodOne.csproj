@@ -59,6 +59,7 @@
     <Compile Include="Interfaces\IDistribution.cs" />
     <Compile Include="Models\Lehmer.cs" />
     <Compile Include="Models\Mediator.cs" />
+    <Compile Include="Analyzers\SequenceAnalyzer.cs" />
     <Compile Include="Utils\SequenceHelper.cs" />
     <Compile Include="Utils\PrimeTests.cs" />
     <Compile Include="Utils\UIntRandom.cs" />

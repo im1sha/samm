@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WpfSaimmodOne.Analyzers;
 using WpfSaimmodOne.Models;
 using WpfSaimmodOne.Utils;
 
@@ -124,6 +125,10 @@ namespace WpfSaimmodOne.ViewModels
                     aperiodicity = periodResults.Value.aperiodicitySegment;
                 }
             } while (!correctData || !validPeriod);
+
+#if DEBUG
+            SequenceAnalyzer.ThrowNotUnique(seq);
+#endif
 
             IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
             ViewUpdater.DrawBarChart(stack, bars);
