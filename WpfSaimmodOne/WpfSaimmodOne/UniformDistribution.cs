@@ -28,6 +28,7 @@ namespace WpfSaimmodOne
         // ϵ 
         public static double UniformityEstimationEpsilon => 0.001;
 
+
         #endregion
 
         #region actual values
@@ -59,7 +60,7 @@ namespace WpfSaimmodOne
                 GetNormalizedStandardDeviation(values));
         }
 
-        public (bool, double) EstimateDistribution(IEnumerable<uint> values)
+        public (bool isCorrect, double value) EstimateDistribution(IEnumerable<uint> values)
         {
             var totalPairs = (values.Count() - (values.Count() % 2)) / 2;
             var count = 0;
@@ -79,7 +80,9 @@ namespace WpfSaimmodOne
             return (result, estimation);
         }
 
-        public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod(IEnumerable<uint> values)
+        public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod(
+            IEnumerable<uint> values,
+            int requiredPeriod)
         {
             var totalValues = values.Count();
 
@@ -99,9 +102,9 @@ namespace WpfSaimmodOne
                     }
                 }                
             }
-            if (backNumberPositions.Count() != 2)
+            if (backNumberPositions.Count() < 2)
             {
-                return (false, -1, -1);
+                return (true, -1, -1);
             }
             var period = backNumberPositions[1] - backNumberPositions[0];
 
@@ -112,10 +115,12 @@ namespace WpfSaimmodOne
                     frontNumberPositions.Add(i);                   
                     if (frontNumberPositions.Count() == 2)
                     {
-                        if (frontNumberPositions[1] - frontNumberPositions[0] == period)
+                        var foundPeriod = frontNumberPositions[1] - frontNumberPositions[0];
+                        if (foundPeriod == period)
                         {
-                            return (true,
-                                frontNumberPositions[1] - frontNumberPositions[0], // period
+                            return (
+                                foundPeriod >= requiredPeriod,
+                                foundPeriod, // period
                                 frontNumberPositions[1]); // aperiodicity
                         }
                         else
@@ -126,8 +131,7 @@ namespace WpfSaimmodOne
                 }
             }
 
-            // if no period
-            return (true, -1, totalValues);
+            return (true, -1, -1);
         }
         #endregion
 

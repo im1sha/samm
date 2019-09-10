@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace WpfSaimmodOne
 {
@@ -8,13 +9,19 @@ namespace WpfSaimmodOne
 
         private readonly IAlgorithm _algorithm;
 
-        public Mediator(IDistribution distribution, IAlgorithm algorithm)
+        public Mediator(IDistribution distribution, IAlgorithm algorithm, int period = 50_000)
         {
             _distribution = distribution;
             _algorithm = algorithm;
+            if (period <= 0)
+            {
+                throw new ArgumentException();
+            }
+            _period = period;
         }
 
         private IEnumerable<uint> _data;
+        private readonly int _period;
 
         public IEnumerable<uint> Initialize()
         {
@@ -29,7 +36,8 @@ namespace WpfSaimmodOne
 
         public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod()
         {
-            return _distribution.EstimatePeriod(_data);
+            
+            return _distribution.EstimatePeriod(_data, _period);
         }
 
         public IEnumerable<uint> GetChart()

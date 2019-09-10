@@ -8,24 +8,25 @@
         Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
     <Grid>
         <Label Content="multiplier" HorizontalAlignment="Left" Margin="25,10,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="_multiplier" Text="3"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-
         <Label Content="initial Value" HorizontalAlignment="Left" Margin="25,36,0,0" VerticalAlignment="Top" />
-        <TextBox Name="_initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-
         <Label Content="divider" HorizontalAlignment="Left" Margin="25,64,0,0" VerticalAlignment="Top" />
+        
+        <!--input-->
+        <TextBox Name="_multiplier" Text="3"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="_initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
         <TextBox Name="_divider"  Text="5" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
         <Button Content="generate" Click="ManualRun" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
         <Button Content="auto generate" Click="AutoGenerate" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
 
-        <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,115,24.6,25"/>
-
+        <!--output-->
         <Label Name="_expectedValue" Content="M" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>
         <Label Name="_variance" Content="D" HorizontalAlignment="Left" Margin="390,40,0,0" VerticalAlignment="Top" />
         <Label Name="_standardDeviation" Content="σ" HorizontalAlignment="Left" Margin="390,60,0,0" VerticalAlignment="Top"/>
         <Label Name="_estimation" Content="est" HorizontalAlignment="Left" Margin="580,20,0,0" VerticalAlignment="Top"/>
         <Label Name="_period" Content="P" HorizontalAlignment="Left" Margin="580,40,0,0" VerticalAlignment="Top"/>
         <Label Name="_aperiodicity" Content="L" HorizontalAlignment="Left" Margin="580,60,0,0" VerticalAlignment="Top"/>
+
+        <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,115,24.6,25"/>
     </Grid>
 </Window>
