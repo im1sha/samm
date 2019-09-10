@@ -44,7 +44,7 @@ namespace WpfSaimmodOne.ViewModels
             IEnumerable<uint> seq =  md.InitializeSequence(500_000);
             IEnumerable<double> normalizedSequence = SequenceNormalizer.Normalize(seq, _divider);
 
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 20);
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0, 1, 20);
             ViewUpdater.DrawBarChart(stack, bars);
 
             (double expectedValue, double variance, double standardDeviation)

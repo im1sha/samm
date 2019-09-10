@@ -19,9 +19,9 @@ namespace WpfSaimmodOne.Models
             return _algorithm.GenerateSequence(totalValues);
         }
 
-        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, int totalIntervals)
+        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, double min, double max, int totalIntervals)
         {
-            return _distribution.GetDistribution(values, totalIntervals);
+            return _distribution.GetDistribution(values, min, max, totalIntervals);
         }
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(

@@ -11,6 +11,7 @@ namespace WpfSaimmodOne.Interfaces
 
         bool CheckIndirectEstimation(double estimation, double epsilon);
 
-        IEnumerable<int> GetDistribution(IEnumerable<double> values, int totalIntervals);
+        IEnumerable<int> GetDistribution(IEnumerable<double> values, double min,
+            double max, int totalIntervals);
     }
 }

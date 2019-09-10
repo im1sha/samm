@@ -32,7 +32,7 @@ namespace WpfSaimmodOne.Models
         // M 
         public double GetExpectedValue(IEnumerable<double> values)
         {
-            return values.Average(i => i) / values.Count(); 
+            return values.Average(i => i); 
         }
 
         // D 
@@ -142,18 +142,18 @@ namespace WpfSaimmodOne.Models
         // then Length == max value     
         public IEnumerable<int> GetDistribution(
             IEnumerable<double> values, 
+            double min,
+            double max,
             int totalIntervals)
         {
-            if (values == null || totalIntervals <= 0)
+            if (values == null || totalIntervals <= 0 
+                || min > max || values.Min() < min || values.Max() > max)
             {
                 throw new ArgumentException();
             }
     
             var results = new List<int>();
             results.AddRange(Enumerable.Repeat(0, totalIntervals));
-
-            double min = values.Min();
-            double max = values.Max();
 
             double intervalLength = (max - min) / totalIntervals;
 
