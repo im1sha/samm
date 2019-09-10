@@ -81,61 +81,7 @@ namespace WpfSaimmodOne.Models
             return (RightUniformityEstimation - epsilon < estimation)
                && (estimation < RightUniformityEstimation + epsilon);
         }
-
-        //public (bool isCorrect, int period, int aperiodicitySegment) EstimatePeriod(
-        //    IEnumerable<uint> values,
-        //    int requiredPeriod)
-        //{
-        //    var totalValues = values.Count();
-
-        //    uint backValue = values.Last();
-        //    uint frontValue = values.First();
-        //    var backNumberPositions = new List<int>();
-        //    var frontNumberPositions = new List<int>();
-
-        //    for (int i = 0; i < totalValues; i++)
-        //    {
-        //        if (backValue == values.ElementAt(i))
-        //        {
-        //            backNumberPositions.Add(i);
-        //            if (backNumberPositions.Count() == 2)
-        //            {
-        //                break;
-        //            }
-        //        }                
-        //    }
-        //    if (backNumberPositions.Count() < 2)
-        //    {
-        //        return (true, -1, -1);
-        //    }
-        //    var period = backNumberPositions[1] - backNumberPositions[0];
-
-        //    for (int i = 0; i < totalValues; i++)
-        //    {
-        //        if (frontValue == values.ElementAt(i))
-        //        {
-        //            frontNumberPositions.Add(i);                   
-        //            if (frontNumberPositions.Count() == 2)
-        //            {
-        //                var foundPeriod = frontNumberPositions[1] - frontNumberPositions[0];
-        //                if (foundPeriod == period)
-        //                {
-        //                    return (
-        //                        foundPeriod >= requiredPeriod,
-        //                        foundPeriod, // period
-        //                        frontNumberPositions[1]); // aperiodicity
-        //                }
-        //                else
-        //                {
-        //                    frontNumberPositions.RemoveAt(0);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return (true, -1, -1);
-        //}
-      
+         
         #endregion
 
         // if min value == 0 

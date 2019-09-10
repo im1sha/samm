@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using WpfSaimmodOne.Models;
+using WpfSaimmodOne.Utils;
 
 namespace WpfSaimmodOne.ViewModels
 {
@@ -31,34 +32,41 @@ namespace WpfSaimmodOne.ViewModels
                 return _generateCommand ??
                     (_generateCommand = new InteractCommand(stack =>
                     {
-                        ManualRun(stack);
+                        Generate(stack);
                     }));
             }
         }
-        private void ManualRun(object stack)
+        private void Generate(object stack)
         {         
             var md = new Mediator(
                 new UniformDistribution(), 
                 new Lehmer(_multiplier, _initialValue, _divider));
 
             IEnumerable<uint> seq =  md.InitializeSequence(500_000);
-            IEnumerable<double> normalizedSequence = SequenceNormalizer.Normalize(seq, _divider);
-
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0, 1, 20);
+            IEnumerable<double> normalizedSequence = SequenceHelper.Normalize(seq, _divider);
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
             ViewUpdater.DrawBarChart(stack, bars);
 
             (double expectedValue, double variance, double standardDeviation)
                 = md.GetStatistics(normalizedSequence);
 
             var estimation = md.CalculateIndirectEstimation(normalizedSequence);
-            // bool res = md.CheckIndirectEstimation(estimation, 0.001);
 
-            UpdateOutput(expectedValue, variance, standardDeviation, estimation, double.NaN, double.NaN);
+            int period = 0;
+            int aperiodicity = 0;
+            var periodResults = SequenceHelper.EstimatePeriod(seq);           
+            if (periodResults.HasValue)
+            {
+                period = periodResults.Value.period;
+                aperiodicity = periodResults.Value.aperiodicitySegment;
+            }
+
+            UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
         }
 
         private void UpdateOutput(double expectedValue, double variance, 
-            double standardDeviation, double estimation, 
-            double period, double aperiodicity)
+            double standardDeviation, double estimation,
+            int period, int aperiodicity)
         {
             ExpectedValue = expectedValue.ToString();
             Variance = variance.ToString();
@@ -76,12 +84,12 @@ namespace WpfSaimmodOne.ViewModels
                 return _autogenerateCommand ??
                     (_autogenerateCommand = new InteractCommand(stack =>
                     {
-
+                        //AutoGenerate(stack);
                     }));
             }
         }
 
-        //private void AutoGenerate(object sender, RoutedEventArgs e)
+        //private void AutoGenerate(object stack)
         //{
         //    uint mul;
         //    uint ini;
@@ -106,7 +114,7 @@ namespace WpfSaimmodOne.ViewModels
         //    RunCore(md);
         //}
 
-       
+
 
         #endregion
 
@@ -152,23 +160,23 @@ namespace WpfSaimmodOne.ViewModels
                 OnPropertyChanged();
             }
         }
-        private double _period;
+        private int _period;
         public string Period
         {
             get => $"P: {_period}";
             set
             {
-                _period = Convert.ToDouble(value);
+                _period = Convert.ToInt32(value);
                 OnPropertyChanged();
             }
         }
-        private double _aperiodicity;
+        private int _aperiodicity;
         public string Aperiodicity
         {
             get => $"L: {_aperiodicity}";
             set
             {
-                _aperiodicity = Convert.ToDouble(value);
+                _aperiodicity = Convert.ToInt32(value);
                 OnPropertyChanged();
             }
         }
