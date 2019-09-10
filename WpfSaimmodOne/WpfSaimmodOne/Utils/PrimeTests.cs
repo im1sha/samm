@@ -1,4 +1,4 @@
-﻿namespace WpfSaimmodOne
+﻿namespace WpfSaimmodOne.Utils
 {
     internal static class PrimeTests
     {

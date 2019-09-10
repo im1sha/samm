@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WpfSaimmodOne
+namespace WpfSaimmodOne.Utils
 {
     internal static class UIntRandom
     {

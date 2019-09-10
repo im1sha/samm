@@ -4,47 +4,51 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WpfSaimmodOne.Interfaces;
+using WpfSaimmodOne.Utils;
 
-namespace WpfSaimmodOne
+namespace WpfSaimmodOne.Models
 {
     internal class Lehmer : IAlgorithm
     {      
-        const int TOTAL_VALUES = 500000;
-        public int TotalValues { get; private set; }
-        public uint Multiplier { get; private set; }
-        public uint InitialValue { get; private set; }
-        public uint Divider { get; private set; }
+        public uint Multiplier { get; }
+        public uint InitialValue { get; }
+        public uint Divider { get; }
 
-        public Lehmer(uint multiplier,
+        public Lehmer(
+            uint multiplier,
             uint initialValue,
-            uint divider,
-            int totalValues = TOTAL_VALUES)
+            uint divider)
         {
-            if (multiplier <= 0 || divider <= 0 || totalValues <= 0)
+            if (multiplier <= 0 || divider <= 0 || initialValue <= 0)
             {
-                throw new ArgumentException ();
+                throw new ArgumentException();
             }
     
             Multiplier = multiplier;
             InitialValue = initialValue;
             Divider = divider;
-            TotalValues = totalValues;
         }
 
-        public IEnumerable<uint> Perform()
-        {
-            return CreateSequence(Multiplier, InitialValue, Divider, TotalValues);
+        public IEnumerable<uint> GenerateSequence(int totalValues)
+        {            
+            return GenerateSequence(Multiplier, InitialValue, Divider, totalValues);
         }
 
         // Left bound of sequence == 0
         // Right bound of sequence == m
         // R[n+1] = (R[n]*a) %m
-        private IEnumerable<uint> CreateSequence(
+        private IEnumerable<uint> GenerateSequence(
             uint multiplier,
             uint initialValue,
             uint divider,
-            int length = TOTAL_VALUES)
+            int length)
         {
+            if (length <= 0)
+            {
+                throw new ArgumentException();
+            }
+
             var result = new List<uint>();
 
             var currMember = initialValue;
@@ -66,11 +70,11 @@ namespace WpfSaimmodOne
         // divider(m)           < (2^n)-1
         // initialValue < divider
         // a < R[0] < m
-        public static (uint multiplier, uint initialValue, uint divider) GenerateParameters()
+        public static (uint multiplier, uint initialValue, uint divider) GenerateRandomParameters()
         {
             bool CheckBinaryRepresentation(uint val)
             {
-                const int ENOUGH_ONES_IN_REPRESENTATION = 24; // 
+                const int ENOUGH_ONES_IN_REPRESENTATION = 24; 
                 return Convert.ToString(val, 2).Count(i => i == '1') >= ENOUGH_ONES_IN_REPRESENTATION;
             }
 

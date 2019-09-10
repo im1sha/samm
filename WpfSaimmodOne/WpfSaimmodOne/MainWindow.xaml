@@ -12,20 +12,21 @@
         <Label Content="divider" HorizontalAlignment="Left" Margin="25,64,0,0" VerticalAlignment="Top" />
         
         <!--input-->
-        <TextBox Name="_multiplier" Text="3"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="_initialValue" Text="1" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="_divider"  Text="5" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding Multiplier}"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Text="{Binding InitialValue}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+        <TextBox Text="{Binding Divider}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
-        <Button Content="generate" Click="ManualRun" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        <Button Content="auto generate" Click="AutoGenerate" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-
+        <Button Content="generate" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        <Button Content="auto generate" Command="{Binding AutoGenerateCommand}" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        
+             
         <!--output-->
-        <Label Name="_expectedValue" Content="M" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>
-        <Label Name="_variance" Content="D" HorizontalAlignment="Left" Margin="390,40,0,0" VerticalAlignment="Top" />
-        <Label Name="_standardDeviation" Content="σ" HorizontalAlignment="Left" Margin="390,60,0,0" VerticalAlignment="Top"/>
-        <Label Name="_estimation" Content="est" HorizontalAlignment="Left" Margin="580,20,0,0" VerticalAlignment="Top"/>
-        <Label Name="_period" Content="P" HorizontalAlignment="Left" Margin="580,40,0,0" VerticalAlignment="Top"/>
-        <Label Name="_aperiodicity" Content="L" HorizontalAlignment="Left" Margin="580,60,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding ExpectedValue}" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Variance}" HorizontalAlignment="Left" Margin="390,40,0,0" VerticalAlignment="Top" />
+        <Label Content="{Binding StandardDeviation}" HorizontalAlignment="Left" Margin="390,60,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Estimation  }" HorizontalAlignment="Left" Margin="580,20,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Period }" HorizontalAlignment="Left" Margin="580,40,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding Aperiodicity }" HorizontalAlignment="Left" Margin="580,60,0,0" VerticalAlignment="Top"/>
 
         <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,115,24.6,25"/>
     </Grid>

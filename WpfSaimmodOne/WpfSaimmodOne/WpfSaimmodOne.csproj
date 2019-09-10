@@ -55,17 +55,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="IAlgorithm.cs" />
-    <Compile Include="IDistribution.cs" />
-    <Compile Include="Lehmer.cs" />
-    <Compile Include="PrimeTests.cs" />
-    <Compile Include="UIntRandom.cs" />
-    <Compile Include="UniformDistribution.cs" />
+    <Compile Include="Interfaces\IAlgorithm.cs" />
+    <Compile Include="Interfaces\IDistribution.cs" />
+    <Compile Include="Models\Lehmer.cs" />
+    <Compile Include="Utils\PrimeTests.cs" />
+    <Compile Include="Utils\UIntRandom.cs" />
+    <Compile Include="Models\UniformDistribution.cs" />
+    <Compile Include="ViewModels\AppViewModel.cs" />
+    <Compile Include="ViewModels\InteractCommand.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Mediator.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -103,5 +104,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
