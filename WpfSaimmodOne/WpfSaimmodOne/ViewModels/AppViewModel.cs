@@ -32,26 +32,27 @@ namespace WpfSaimmodOne.ViewModels
                 return _generateCommand ??
                     (_generateCommand = new InteractCommand(stack =>
                     {
-                        Generate(stack);
+                        Generate(stack, _multiplier, _initialValue, _divider);
                     }));
             }
         }
-        private void Generate(object stack)
+        private void Generate(object stack, uint multiplier, uint  initialValue, uint divider)
         {         
             var md = new Mediator(
                 new UniformDistribution(), 
-                new Lehmer(_multiplier, _initialValue, _divider));
+                new Lehmer(multiplier, initialValue, divider));
 
             IEnumerable<uint> seq =  md.InitializeSequence(500_000);
-            IEnumerable<double> normalizedSequence = SequenceHelper.Normalize(seq, _divider);
+            IEnumerable<double> normalizedSequence = SequenceHelper.Normalize(seq, divider); // [0,1]
+
+            // chart
             IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
             ViewUpdater.DrawBarChart(stack, bars);
 
+            // stat
             (double expectedValue, double variance, double standardDeviation)
                 = md.GetStatistics(normalizedSequence);
-
             var estimation = md.CalculateIndirectEstimation(normalizedSequence);
-
             int period = 0;
             int aperiodicity = 0;
             var periodResults = SequenceHelper.EstimatePeriod(seq);           
@@ -61,9 +62,86 @@ namespace WpfSaimmodOne.ViewModels
                 aperiodicity = periodResults.Value.aperiodicitySegment;
             }
 
+            //stat to output
             UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
         }
 
+      
+        private InteractCommand _autogenerateCommand;
+        public InteractCommand AutogenerateCommand
+        {
+            get
+            {
+                return _autogenerateCommand ??
+                    (_autogenerateCommand = new InteractCommand(stack =>
+                    {
+                        AutoGenerate(stack);
+                    }));
+            }
+        }
+
+        private void AutoGenerate(object stack)
+        {
+            uint mul, ini, div;
+            bool correctData, validPeriod;
+            int? period, aperiodicity;
+            double estimation;
+
+            IEnumerable<uint> seq;
+            IEnumerable<double> normalizedSequence;
+
+            Mediator md;
+
+            do
+            {
+                (mul, ini, div) = Lehmer.GenerateRandomParameters();
+                md = new Mediator(new UniformDistribution(), new Lehmer(mul, ini, div));
+
+                seq = md.InitializeSequence(500_000);
+                normalizedSequence = SequenceHelper.Normalize(seq, div);
+                estimation = md.CalculateIndirectEstimation(normalizedSequence);
+                validPeriod = md.CheckIndirectEstimation(
+                    estimation, 
+                    0.001);   
+
+                var periodResults = SequenceHelper.EstimatePeriod(seq);
+
+                period = null;
+                aperiodicity = null;
+                if (!periodResults.HasValue || periodResults.Value.period > 50_000)
+                {
+                    correctData = true;
+                    if (periodResults.HasValue)
+                    {
+                        period = periodResults.Value.period;
+                        aperiodicity = periodResults.Value.aperiodicitySegment;
+                    }
+                }
+                else
+                {
+                    correctData = false;
+                    period = periodResults.Value.period;
+                    aperiodicity = periodResults.Value.aperiodicitySegment;
+                }
+            } while (!correctData || !validPeriod);
+
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
+            ViewUpdater.DrawBarChart(stack, bars);
+
+            (double expectedValue, double variance, double standardDeviation)
+                    = md.GetStatistics(normalizedSequence);
+
+            UpdateLabels(mul, ini, div);
+            UpdateOutput(expectedValue, variance, standardDeviation, estimation, 
+                period ?? -1, aperiodicity ?? -1);
+        }
+
+        private void UpdateLabels(uint multiplier, uint initialValue, uint divider)
+        {
+            Multiplier = multiplier.ToString();
+            InitialValue = initialValue.ToString();
+            Divider = divider.ToString();
+        }
         private void UpdateOutput(double expectedValue, double variance, 
             double standardDeviation, double estimation,
             int period, int aperiodicity)
@@ -75,46 +153,6 @@ namespace WpfSaimmodOne.ViewModels
             Period = period.ToString();
             Aperiodicity = aperiodicity.ToString();
         }
-
-        private InteractCommand _autogenerateCommand;
-        public InteractCommand AutogenerateCommand
-        {
-            get
-            {
-                return _autogenerateCommand ??
-                    (_autogenerateCommand = new InteractCommand(stack =>
-                    {
-                        //AutoGenerate(stack);
-                    }));
-            }
-        }
-
-        //private void AutoGenerate(object stack)
-        //{
-        //    uint mul;
-        //    uint ini;
-        //    uint div;
-        //    bool correctData;
-        //    bool validPeriod;
-
-        //    Mediator md;
-        //    do
-        //    {
-        //        (mul, ini, div) = Lehmer.GenerateRandomParameters();
-        //        md = new Mediator(new UniformDistribution(div), new Lehmer(mul, ini, div));
-        //        md.Initialize();
-        //        (correctData, _) = md.EstimateDistribution();
-        //        (validPeriod, _, _) = md.EstimatePeriod();
-        //    } while (!correctData || !validPeriod);
-
-        //    _divider.Text = div.ToString();
-        //    _initialValue.Text = ini.ToString();
-        //    _multiplier.Text = mul.ToString();
-
-        //    RunCore(md);
-        //}
-
-
 
         #endregion
 

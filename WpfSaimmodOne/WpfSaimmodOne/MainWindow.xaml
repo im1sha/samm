@@ -17,7 +17,7 @@
         <TextBox Text="{Binding Divider}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
         <Button Content="generate" Command="{Binding GenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        <Button Content="auto generate" Command="{Binding AutoGenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        <Button Content="auto generate" Command="{Binding AutogenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
                     
         <!--output-->
         <Label Content="{Binding ExpectedValue}" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>

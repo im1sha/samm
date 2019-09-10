@@ -44,7 +44,7 @@ namespace WpfSaimmodOne.Utils
             }
             if (backNumberPositions.Count() < 2)
             {
-                return ( 0, 0);
+                return null;
             }
             var period = backNumberPositions[1] - backNumberPositions[0];
 
@@ -68,7 +68,7 @@ namespace WpfSaimmodOne.Utils
                 }
             }
 
-            return (0,0);
+            return null;
         }
     }
 }
