@@ -229,6 +229,10 @@ namespace WpfSaimmodOne.ViewModels
             get => _multiplier.ToString();
             set
             {
+                if (!uint.TryParse(value, out _))
+                {
+                    return;
+                }
                 _multiplier = Convert.ToUInt32(value);
                 OnPropertyChanged();
             }
@@ -239,6 +243,10 @@ namespace WpfSaimmodOne.ViewModels
             get => _initialValue.ToString();
             set
             {
+                if (!uint.TryParse(value, out _))
+                {
+                    return;
+                }
                 _initialValue = Convert.ToUInt32(value);
                 OnPropertyChanged();
             }
@@ -249,6 +257,10 @@ namespace WpfSaimmodOne.ViewModels
             get => _divider.ToString();
             set
             {
+                if (!uint.TryParse(value, out _))
+                {
+                    return;
+                }
                 _divider = Convert.ToUInt32(value);
                 OnPropertyChanged();
             }
