@@ -63,6 +63,7 @@
     <Compile Include="Models\UniformDistribution.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\InteractCommand.cs" />
+    <Compile Include="ViewModels\ViewUpdater.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

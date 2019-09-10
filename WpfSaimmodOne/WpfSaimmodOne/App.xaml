@@ -4,8 +4,6 @@
              xmlns:local="clr-namespace:WpfSaimmodOne"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style x:Key="BottomStyle" TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Bottom"/>
-        </Style>
+       
     </Application.Resources>
 </Application>

@@ -12,14 +12,13 @@
         <Label Content="divider" HorizontalAlignment="Left" Margin="25,64,0,0" VerticalAlignment="Top" />
         
         <!--input-->
-        <TextBox Text="{Binding Multiplier}"  PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Text="{Binding Multiplier}"   PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox Text="{Binding InitialValue}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
         <TextBox Text="{Binding Divider}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
-        <Button Content="generate" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        <Button Content="auto generate" Command="{Binding AutoGenerateCommand}" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        
-             
+        <Button Content="generate" Command="{Binding GenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        <Button Content="auto generate" Command="{Binding AutoGenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,22,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+                    
         <!--output-->
         <Label Content="{Binding ExpectedValue}" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>
         <Label Content="{Binding Variance}" HorizontalAlignment="Left" Margin="390,40,0,0" VerticalAlignment="Top" />
