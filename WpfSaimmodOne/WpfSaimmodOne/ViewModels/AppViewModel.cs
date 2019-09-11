@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using WpfSaimmodOne.Analyzers;
 using WpfSaimmodOne.Models;
 using WpfSaimmodOne.Utils;
 
@@ -44,7 +43,7 @@ namespace WpfSaimmodOne.ViewModels
                 new Lehmer(multiplier, initialValue, divider));
 
             IEnumerable<uint> seq =  md.InitializeSequence(500_000);
-            IEnumerable<double> normalizedSequence = SequenceHelper.Normalize(seq, divider); // [0,1]
+            IEnumerable<double> normalizedSequence = SequenceNormalizer.Normalize(seq, divider); // [0,1]
 
             // chart
             IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
@@ -54,15 +53,14 @@ namespace WpfSaimmodOne.ViewModels
             (double expectedValue, double variance, double standardDeviation)
                 = md.GetStatistics(normalizedSequence);
             var estimation = md.CalculateIndirectEstimation(normalizedSequence);
-            int period = 0;
-            int aperiodicity = 0;
-            var periodResults = SequenceHelper.EstimatePeriod(seq);           
-            if (periodResults.HasValue)
-            {
-                period = periodResults.Value.period;
-                aperiodicity = periodResults.Value.aperiodicitySegment;
-            }
 
+            var periodResults = CycleDetector<uint>.FindCycle(
+                multiplier, initialValue, divider, 
+                (a, r0, mod) => (a * r0) % mod);
+        
+            int period = periodResults.clength;
+            int aperiodicity = periodResults.cstart + period;
+            
             //stat to output
             UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
         }
@@ -83,9 +81,9 @@ namespace WpfSaimmodOne.ViewModels
 
         private void AutoGenerate(object stack)
         {
-            uint mul, ini, div;
+            uint multiplier, initialValue, divider;
             bool correctData, validPeriod;
-            int? period, aperiodicity;
+            int period, aperiodicity;
             double estimation;
 
             IEnumerable<uint> seq;
@@ -95,40 +93,25 @@ namespace WpfSaimmodOne.ViewModels
 
             do
             {
-                (mul, ini, div) = Lehmer.GenerateRandomParameters();
-                md = new Mediator(new UniformDistribution(), new Lehmer(mul, ini, div));
+                (multiplier, initialValue, divider) = Lehmer.GenerateRandomParameters();
+                md = new Mediator(new UniformDistribution(), new Lehmer(multiplier, initialValue, divider));
 
                 seq = md.InitializeSequence(500_000);
-                normalizedSequence = SequenceHelper.Normalize(seq, div);
+                normalizedSequence = SequenceNormalizer.Normalize(seq, divider);
                 estimation = md.CalculateIndirectEstimation(normalizedSequence);
                 validPeriod = md.CheckIndirectEstimation(
                     estimation, 
-                    0.001);   
+                    0.001);
 
-                var periodResults = SequenceHelper.EstimatePeriod(seq);
+                var periodResults = CycleDetector<uint>.FindCycle(
+                    multiplier, initialValue, divider,
+                    (a, r0, mod) => (a * r0) % mod);
 
-                period = null;
-                aperiodicity = null;
-                if (!periodResults.HasValue || periodResults.Value.period > 50_000)
-                {
-                    correctData = true;
-                    if (periodResults.HasValue)
-                    {
-                        period = periodResults.Value.period;
-                        aperiodicity = periodResults.Value.aperiodicitySegment;
-                    }
-                }
-                else
-                {
-                    correctData = false;
-                    period = periodResults.Value.period;
-                    aperiodicity = periodResults.Value.aperiodicitySegment;
-                }
+                period = periodResults.clength;
+                aperiodicity = periodResults.cstart + period;                                
+                correctData = period > 50_000;
+      
             } while (!correctData || !validPeriod);
-
-#if DEBUG
-            SequenceAnalyzer.ThrowNotUnique(seq);
-#endif
 
             IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
             ViewUpdater.DrawBarChart(stack, bars);
@@ -136,12 +119,13 @@ namespace WpfSaimmodOne.ViewModels
             (double expectedValue, double variance, double standardDeviation)
                     = md.GetStatistics(normalizedSequence);
 
-            UpdateLabels(mul, ini, div);
-            UpdateOutput(expectedValue, variance, standardDeviation, estimation, 
-                period ?? -1, aperiodicity ?? -1);
+            UpdateTextboxes(multiplier, initialValue, divider);
+            UpdateOutput(expectedValue, variance, 
+                standardDeviation, estimation, 
+                period, aperiodicity);
         }
 
-        private void UpdateLabels(uint multiplier, uint initialValue, uint divider)
+        private void UpdateTextboxes(uint multiplier, uint initialValue, uint divider)
         {
             Multiplier = multiplier.ToString();
             InitialValue = initialValue.ToString();
