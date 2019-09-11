@@ -23,6 +23,8 @@ namespace WpfCosOne
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = new ViewModels.AppViewModel();
         }
     }
 }
