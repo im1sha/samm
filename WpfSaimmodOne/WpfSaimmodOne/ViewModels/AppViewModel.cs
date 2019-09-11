@@ -195,7 +195,7 @@ namespace WpfSaimmodOne.ViewModels
 
         #region textboxes
 
-        private uint _multiplier = 3;
+        private uint _multiplier = 2172724891;
         public string Multiplier
         {
             get => _multiplier.ToString();
@@ -209,7 +209,7 @@ namespace WpfSaimmodOne.ViewModels
                 OnPropertyChanged();
             }
         }
-        private uint _initialValue = 1;
+        private uint _initialValue = 3479695279;
         public string InitialValue
         {
             get => _initialValue.ToString();
@@ -223,7 +223,7 @@ namespace WpfSaimmodOne.ViewModels
                 OnPropertyChanged();
             }
         }
-        private uint _divider = 5;
+        private uint _divider = 4290123121;
         public string Divider
         {
             get => _divider.ToString();
