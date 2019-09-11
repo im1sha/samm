@@ -39,5 +39,10 @@ namespace WpfSaimmodOne.Models
         {
             return  _distribution.CheckIndirectEstimation(estimation, epsilon);
         }
+
+        public (int clength, int cstart) FindCycle(uint multiplier, uint initialValue, uint divider)
+        {
+            return _algorithm.FindCycle(multiplier, initialValue, divider);
+        }
     }
 }

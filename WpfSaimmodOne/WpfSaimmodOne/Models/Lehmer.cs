@@ -10,7 +10,7 @@ using WpfSaimmodOne.Utils;
 namespace WpfSaimmodOne.Models
 {
     internal class Lehmer : IAlgorithm
-    {      
+    {
         public uint Multiplier { get; }
         public uint InitialValue { get; }
         public uint Divider { get; }
@@ -24,15 +24,15 @@ namespace WpfSaimmodOne.Models
             {
                 throw new ArgumentException();
             }
-    
+
             Multiplier = multiplier;
             InitialValue = initialValue;
             Divider = divider;
         }
 
         public IEnumerable<uint> GenerateSequence(int totalValues)
-        {            
-            return GenerateSequence(Multiplier, InitialValue, Divider, totalValues);
+        {
+            return GenerateSequence(Multiplier, InitialValue, Divider, totalValues, _generator);
         }
 
         // Left bound of sequence == 0
@@ -42,7 +42,8 @@ namespace WpfSaimmodOne.Models
             uint multiplier,
             uint initialValue,
             uint divider,
-            int length)
+            int length,
+            Func<uint, uint, uint, uint> generator)
         {
             if (length <= 0)
             {
@@ -50,16 +51,12 @@ namespace WpfSaimmodOne.Models
             }
 
             var result = new List<uint>();
-
-            var currMember = initialValue;
-            uint multiplication;
+            var current = initialValue;
 
             for (int i = 0; i < length; i++)
             {
-                // a * R[n] 
-                multiplication = multiplier * currMember;
-                currMember = multiplication % divider;
-                result.Add(currMember);
+                current = generator(multiplier, current, divider);
+                result.Add(current);
             }
 
             return result;
@@ -74,13 +71,13 @@ namespace WpfSaimmodOne.Models
         {
             bool CheckBinaryRepresentation(uint val)
             {
-                const int ENOUGH_ONES_IN_REPRESENTATION = 24; 
+                const int ENOUGH_ONES_IN_REPRESENTATION = 24;
                 return Convert.ToString(val, 2).Count(i => i == '1') >= ENOUGH_ONES_IN_REPRESENTATION;
             }
 
             uint GenerateRandomValue(
-                uint intervalBegin, 
-                uint intervalEnd, 
+                uint intervalBegin,
+                uint intervalEnd,
                 Random random,
                 IEnumerable<uint> deniedValues,
                 bool checkPrime = false,
@@ -100,7 +97,7 @@ namespace WpfSaimmodOne.Models
                     return val;
                 }
             }
-                   
+
             var rand = new Random();
             IEnumerable<uint> deniedVals = new List<uint>();
 
@@ -115,8 +112,8 @@ namespace WpfSaimmodOne.Models
             for (int i = 0; i < data.Length; i++)
             {
                 data[i].value = GenerateRandomValue(
-                    data[i].intervalBegin, data[i].intervalEnd, 
-                    rand, deniedVals, 
+                    data[i].intervalBegin, data[i].intervalEnd,
+                    rand, deniedVals,
                     data[i].prime, data[i].bitCheck);
 
                 deniedVals.Append(data[i].value);
@@ -124,5 +121,17 @@ namespace WpfSaimmodOne.Models
 
             return (data[1].value, data[2].value, data[0].value);
         }
+
+        public (int clength, int cstart) FindCycle(uint multiplier, uint initialValue, uint divider)
+        {
+            var periodResults = CycleDetector<uint>.FindCycle(
+                     multiplier, initialValue, divider,
+                     _generator);
+
+            return (periodResults.clength, periodResults.cstart);
+        }
+
+        // USAGE: var next = _generator(multiplier, current, divider);
+        private readonly Func<uint, uint, uint, uint> _generator = (a, r0, mod) => (a * r0) % mod;
     }
 }

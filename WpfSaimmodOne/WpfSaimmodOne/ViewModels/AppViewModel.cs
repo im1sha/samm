@@ -54,10 +54,8 @@ namespace WpfSaimmodOne.ViewModels
                 = md.GetStatistics(normalizedSequence);
             var estimation = md.CalculateIndirectEstimation(normalizedSequence);
 
-            var periodResults = CycleDetector<uint>.FindCycle(
-                multiplier, initialValue, divider, 
-                (a, r0, mod) => (a * r0) % mod);
-        
+            var periodResults = md.FindCycle(multiplier, initialValue, divider);
+
             int period = periodResults.clength;
             int aperiodicity = periodResults.cstart + period;
             
@@ -103,9 +101,7 @@ namespace WpfSaimmodOne.ViewModels
                     estimation, 
                     0.001);
 
-                var periodResults = CycleDetector<uint>.FindCycle(
-                    multiplier, initialValue, divider,
-                    (a, r0, mod) => (a * r0) % mod);
+                var periodResults = md.FindCycle(multiplier, initialValue, divider);
 
                 period = periodResults.clength;
                 aperiodicity = periodResults.cstart + period;                                
