@@ -37,33 +37,15 @@ namespace WpfSaimmodOne.ViewModels
             }
         }
         private void Generate(object stack, uint multiplier, uint  initialValue, uint divider)
-        {         
-            var md = new Mediator(
-                new UniformDistribution(), 
-                new Lehmer(multiplier, initialValue, divider));
+        {
+            RunCore(out Mediator md, multiplier, initialValue, divider,
+                out IEnumerable<double> normalizedSequence, 
+                out double estimation, out int period, out int aperiodicity);
 
-            IEnumerable<uint> seq =  md.InitializeSequence(500_000);
-            IEnumerable<double> normalizedSequence = SequenceNormalizer.Normalize(seq, divider); // [0,1]
-
-            // chart
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
-            ViewUpdater.DrawBarChart(stack, bars);
-
-            // stat
-            (double expectedValue, double variance, double standardDeviation)
-                = md.GetStatistics(normalizedSequence);
-            var estimation = md.CalculateIndirectEstimation(normalizedSequence);
-
-            var periodResults = md.FindCycle(multiplier, initialValue, divider);
-
-            int period = periodResults.clength;
-            int aperiodicity = periodResults.cstart + period;
-            
-            //stat to output
-            UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
+            UpdateView(md, normalizedSequence, stack, estimation, period, aperiodicity);
         }
 
-      
+
         private InteractCommand _autogenerateCommand;
         public InteractCommand AutogenerateCommand
         {
@@ -80,45 +62,50 @@ namespace WpfSaimmodOne.ViewModels
         private void AutoGenerate(object stack)
         {
             uint multiplier, initialValue, divider;
-            bool correctData, validPeriod;
+            bool correctData, validPeriod;// flags
             int period, aperiodicity;
             double estimation;
-
-            IEnumerable<uint> seq;
             IEnumerable<double> normalizedSequence;
-
             Mediator md;
 
             do
             {
                 (multiplier, initialValue, divider) = Lehmer.GenerateRandomParameters();
-                md = new Mediator(new UniformDistribution(), new Lehmer(multiplier, initialValue, divider));
 
-                seq = md.InitializeSequence(500_000);
-                normalizedSequence = SequenceNormalizer.Normalize(seq, divider);
-                estimation = md.CalculateIndirectEstimation(normalizedSequence);
-                validPeriod = md.CheckIndirectEstimation(
-                    estimation, 
-                    0.001);
+                RunCore(out md, multiplier, initialValue, divider, out normalizedSequence, 
+                    out estimation, out period, out aperiodicity);
 
-                var periodResults = md.FindCycle(multiplier, initialValue, divider);
-
-                period = periodResults.clength;
-                aperiodicity = periodResults.cstart + period;                                
-                correctData = period > 50_000;
-      
+                validPeriod = md.CheckIndirectEstimation(estimation, 0.001);                
+                correctData = period > 50_000;     
             } while (!correctData || !validPeriod);
 
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
-            ViewUpdater.DrawBarChart(stack, bars);
-
-            (double expectedValue, double variance, double standardDeviation)
-                    = md.GetStatistics(normalizedSequence);
-
             UpdateTextboxes(multiplier, initialValue, divider);
-            UpdateOutput(expectedValue, variance, 
-                standardDeviation, estimation, 
-                period, aperiodicity);
+            UpdateView(md, normalizedSequence, stack, estimation, period, aperiodicity);
+        }
+
+        private void RunCore(out Mediator md, uint multiplier, uint initialValue, uint divider,
+            out IEnumerable<double> normalizedSequence, out double estimation,
+            out int period, out int aperiodicity)
+        {
+            md = new Mediator(
+               new UniformDistribution(),
+               new Lehmer(multiplier, initialValue, divider));
+            IEnumerable<uint> seq = md.InitializeSequence(500_000);
+            normalizedSequence = SequenceNormalizer.Normalize(seq, divider); // [0,1]
+            estimation = md.CalculateIndirectEstimation(normalizedSequence);
+            var periodResults = md.FindCycle(multiplier, initialValue, divider);
+            period = periodResults.clength;
+            aperiodicity = periodResults.cstart + period;
+        }
+
+        private void UpdateView(Mediator md, IEnumerable<double> normalizedSequence, object stack, 
+            double estimation, int period, int aperiodicity)
+        {
+            (double expectedValue, double variance, double standardDeviation)
+               = md.GetStatistics(normalizedSequence);
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
+            UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
+            ViewUpdater.DrawBarChart(stack, bars);
         }
 
         private void UpdateTextboxes(uint multiplier, uint initialValue, uint divider)
