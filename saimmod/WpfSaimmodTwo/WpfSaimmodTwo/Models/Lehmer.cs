@@ -68,36 +68,7 @@ namespace WpfSaimmodTwo.Models
         // initialValue < divider
         // a < R[0] < m
         public static (uint multiplier, uint initialValue, uint divider) GenerateRandomParameters()
-        {
-            bool CheckBinaryRepresentation(uint val)
-            {
-                const int ENOUGH_ONES_IN_REPRESENTATION = 24;
-                return Convert.ToString(val, 2).Count(i => i == '1') >= ENOUGH_ONES_IN_REPRESENTATION;
-            }
-
-            uint GenerateRandomValue(
-                uint intervalBegin,
-                uint intervalEnd,
-                Random random,
-                IEnumerable<uint> deniedValues,
-                bool checkPrime = false,
-                bool checkBits = false)
-            {
-                while (true)
-                {
-                    uint val = UIntRandom.GetValue(intervalBegin, intervalEnd, random);
-
-                    if ((deniedValues != null && deniedValues.Contains(val))
-                        || (checkBits && !CheckBinaryRepresentation(val))
-                        || (checkPrime && !PrimeTests.IsPrime(val)))
-                    {
-                        continue;
-                    }
-
-                    return val;
-                }
-            }
-
+        {                      
             var rand = new Random();
             IEnumerable<uint> deniedVals = new List<uint>();
 
@@ -111,7 +82,7 @@ namespace WpfSaimmodTwo.Models
             // values generation 
             for (int i = 0; i < data.Length; i++)
             {
-                data[i].value = GenerateRandomValue(
+                data[i].value = UIntRandom.GenerateRandomValue(
                     data[i].intervalBegin, data[i].intervalEnd,
                     rand, deniedVals,
                     data[i].prime, data[i].bitCheck);
@@ -130,6 +101,7 @@ namespace WpfSaimmodTwo.Models
         }
 
         // USAGE: var next = _generator(multiplier, current, divider);
-        private readonly Func<uint, uint, uint, uint> _generator = (a, r0, mod) => (a * r0) % mod;
+        private readonly Func<uint, uint, uint, uint> _generator = 
+            (multiplier, initialValue, divider) => (multiplier * initialValue) % divider;
     }
 }

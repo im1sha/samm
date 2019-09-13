@@ -55,15 +55,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Distributions\UniformDistribution.cs" />
     <Compile Include="Interfaces\IAlgorithm.cs" />
     <Compile Include="Interfaces\IDistribution.cs" />
+    <Compile Include="Interfaces\INormalizedDistribution.cs" />
     <Compile Include="Models\Lehmer.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Utils\CircleDetector.cs" />
     <Compile Include="Utils\SequenceNormalizer.cs" />
     <Compile Include="Utils\PrimeTests.cs" />
     <Compile Include="Utils\UIntRandom.cs" />
-    <Compile Include="Models\UniformDistribution.cs" />
+    <Compile Include="Models\NormalizedUniformDistribution.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\InteractCommand.cs" />
     <Compile Include="ViewModels\ViewUpdater.cs" />

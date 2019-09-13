@@ -9,7 +9,7 @@ namespace WpfSaimmodTwo.Models
     // M == (a+b) /2                            // 0.5     
     // D == sqr(b-a) /12                        // 1 /12
     // σ == (b-a) /sqrt(12)                     // 1 /sqrt(12)
-    internal class UniformDistribution : IDistribution
+    internal class NormalizedUniformDistribution : INormalizedDistribution
     {
         #region expected results
         // M
@@ -87,10 +87,11 @@ namespace WpfSaimmodTwo.Models
         // then Length == max value     
         public IEnumerable<int> GetDistribution(
             IEnumerable<double> values, 
-            double min,
-            double max,
             int totalIntervals)
         {
+            double min = 0.0;
+            double max = 1.0;
+
             if (values == null || totalIntervals <= 0 
                 || min > max || values.Min() < min || values.Max() > max)
             {

@@ -88,7 +88,7 @@ namespace WpfSaimmodTwo.ViewModels
             out int period, out int aperiodicity)
         {
             md = new AppModel(
-                new UniformDistribution(),
+                new NormalizedUniformDistribution(),
                 new Lehmer(multiplier, initialValue, divider));
             IEnumerable<uint> seq = md.InitializeSequence(500_000);
             normalizedSequence = md.Normalize(seq, divider); // [0,1]
@@ -103,7 +103,7 @@ namespace WpfSaimmodTwo.ViewModels
         {
             (double expectedValue, double variance, double standardDeviation)
                = md.GetStatistics(normalizedSequence);
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 20);
             UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
             ViewUpdater.DrawBarChart(stack, bars);
         }

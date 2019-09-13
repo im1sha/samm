@@ -6,10 +6,10 @@ namespace WpfSaimmodTwo.Models
 {
     internal class AppModel
     {
-        private readonly IDistribution _distribution;
+        private readonly INormalizedDistribution _distribution;
         private readonly IAlgorithm _algorithm;
 
-        public AppModel(IDistribution distribution, IAlgorithm algorithm)
+        public AppModel(INormalizedDistribution distribution, IAlgorithm algorithm)
         {
             _distribution = distribution;
             _algorithm = algorithm;
@@ -19,8 +19,8 @@ namespace WpfSaimmodTwo.Models
             => _algorithm.GenerateSequence(totalValues);
         
 
-        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, double min, double max, int totalIntervals)        
-            => _distribution.GetDistribution(values, min, max, totalIntervals);
+        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, int totalIntervals)        
+            => _distribution.GetDistribution(values, totalIntervals);
         
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)       
