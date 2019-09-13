@@ -38,7 +38,7 @@ namespace WpfSaimmodTwo.ViewModels
         }
         private void Generate(object stack, uint multiplier, uint  initialValue, uint divider)
         {
-            RunCore(out Mediator md, multiplier, initialValue, divider,
+            RunCore(out AppModel md, multiplier, initialValue, divider,
                 out IEnumerable<double> normalizedSequence, 
                 out double estimation, out int period, out int aperiodicity);
 
@@ -66,11 +66,11 @@ namespace WpfSaimmodTwo.ViewModels
             int period, aperiodicity;
             double estimation;
             IEnumerable<double> normalizedSequence;
-            Mediator md;
+            AppModel md;
 
             do
             {
-                (multiplier, initialValue, divider) = Mediator.GenerateRandomParameters();
+                (multiplier, initialValue, divider) = AppModel.GenerateRandomParameters();
 
                 RunCore(out md, multiplier, initialValue, divider, out normalizedSequence, 
                     out estimation, out period, out aperiodicity);
@@ -83,11 +83,11 @@ namespace WpfSaimmodTwo.ViewModels
             UpdateView(md, normalizedSequence, stack, estimation, period, aperiodicity);
         }
 
-        private void RunCore(out Mediator md, uint multiplier, uint initialValue, uint divider,
+        private void RunCore(out AppModel md, uint multiplier, uint initialValue, uint divider,
             out IEnumerable<double> normalizedSequence, out double estimation,
             out int period, out int aperiodicity)
         {
-            md = new Mediator(
+            md = new AppModel(
                 new UniformDistribution(),
                 new Lehmer(multiplier, initialValue, divider));
             IEnumerable<uint> seq = md.InitializeSequence(500_000);
@@ -98,7 +98,7 @@ namespace WpfSaimmodTwo.ViewModels
             aperiodicity = start + period;
         }
 
-        private void UpdateView(Mediator md, IEnumerable<double> normalizedSequence, object stack, 
+        private void UpdateView(AppModel md, IEnumerable<double> normalizedSequence, object stack, 
             double estimation, int period, int aperiodicity)
         {
             (double expectedValue, double variance, double standardDeviation)

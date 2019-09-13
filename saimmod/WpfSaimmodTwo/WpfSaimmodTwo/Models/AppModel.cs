@@ -4,12 +4,12 @@ using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal class Mediator
+    internal class AppModel
     {
         private readonly IDistribution _distribution;
         private readonly IAlgorithm _algorithm;
 
-        public Mediator(IDistribution distribution, IAlgorithm algorithm)
+        public AppModel(IDistribution distribution, IAlgorithm algorithm)
         {
             _distribution = distribution;
             _algorithm = algorithm;
