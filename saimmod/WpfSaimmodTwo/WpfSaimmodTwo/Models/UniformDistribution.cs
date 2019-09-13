@@ -31,9 +31,8 @@ namespace WpfSaimmodTwo.Models
         #region actual values
         // M 
         public double GetExpectedValue(IEnumerable<double> values)
-        {
-            return values.Average(i => i); 
-        }
+            => values.Average(i => i); 
+        
 
         // D 
         public double GetVariance(IEnumerable<double> values)
@@ -79,7 +78,7 @@ namespace WpfSaimmodTwo.Models
         public bool CheckIndirectEstimation(double estimation, double epsilon)
         {
             return (RightUniformityEstimation - epsilon < estimation)
-               && (estimation < RightUniformityEstimation + epsilon);
+                && (estimation < RightUniformityEstimation + epsilon);
         }
          
         #endregion
@@ -103,24 +102,13 @@ namespace WpfSaimmodTwo.Models
 
             double intervalLength = (max - min) / totalIntervals;
 
-            double localMin = min - intervalLength;
-            double localMax = min;
-
             for (int i = 0; i < results.Count; i++)
             {
-                if (i == results.Count - 1)
-                {
-                    localMax = max;
-                }
-                else
-                {
-                    localMax += intervalLength;
-                }
-                localMin += intervalLength;
+                double localMin = i * intervalLength;
+                double localMax = (i + 1) * intervalLength;
                 
                 results[i] = values.Count(j => (j >= localMin) && (j < localMax));                                    
             }
-
             return results;
         }
     }

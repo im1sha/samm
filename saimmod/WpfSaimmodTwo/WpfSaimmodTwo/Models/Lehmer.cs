@@ -122,13 +122,11 @@ namespace WpfSaimmodTwo.Models
             return (data[1].value, data[2].value, data[0].value);
         }
 
-        public (int clength, int cstart) FindCycle(uint multiplier, uint initialValue, uint divider)
+        public (int length, int start) FindCycle(uint multiplier, uint initialValue, uint divider)
         {
-            var periodResults = CycleDetector<uint>.FindCycle(
-                     multiplier, initialValue, divider,
-                     _generator);
-
-            return (periodResults.clength, periodResults.cstart);
+            return CycleDetector<uint>.FindCycle(
+                multiplier, initialValue, divider,
+                _generator);
         }
 
         // USAGE: var next = _generator(multiplier, current, divider);

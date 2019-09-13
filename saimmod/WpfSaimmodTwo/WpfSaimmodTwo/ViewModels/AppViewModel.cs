@@ -62,7 +62,7 @@ namespace WpfSaimmodTwo.ViewModels
         private void AutoGenerate(object stack)
         {
             uint multiplier, initialValue, divider;
-            bool correctData, validPeriod;// flags
+            bool correctData, validPeriod; // flags
             int period, aperiodicity;
             double estimation;
             IEnumerable<double> normalizedSequence;
@@ -70,7 +70,7 @@ namespace WpfSaimmodTwo.ViewModels
 
             do
             {
-                (multiplier, initialValue, divider) = Lehmer.GenerateRandomParameters();
+                (multiplier, initialValue, divider) = Mediator.GenerateRandomParameters();
 
                 RunCore(out md, multiplier, initialValue, divider, out normalizedSequence, 
                     out estimation, out period, out aperiodicity);
@@ -88,14 +88,14 @@ namespace WpfSaimmodTwo.ViewModels
             out int period, out int aperiodicity)
         {
             md = new Mediator(
-               new UniformDistribution(),
-               new Lehmer(multiplier, initialValue, divider));
+                new UniformDistribution(),
+                new Lehmer(multiplier, initialValue, divider));
             IEnumerable<uint> seq = md.InitializeSequence(500_000);
-            normalizedSequence = SequenceNormalizer.Normalize(seq, divider); // [0,1]
+            normalizedSequence = md.Normalize(seq, divider); // [0,1]
             estimation = md.CalculateIndirectEstimation(normalizedSequence);
-            var periodResults = md.FindCycle(multiplier, initialValue, divider);
-            period = periodResults.clength;
-            aperiodicity = periodResults.cstart + period;
+            var (length, start) = md.FindCycle(multiplier, initialValue, divider);
+            period = length;
+            aperiodicity = start + period;
         }
 
         private void UpdateView(Mediator md, IEnumerable<double> normalizedSequence, object stack, 

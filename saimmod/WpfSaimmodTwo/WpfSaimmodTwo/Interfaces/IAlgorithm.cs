@@ -6,6 +6,6 @@ namespace WpfSaimmodTwo.Interfaces
     {
         IEnumerable<uint> GenerateSequence(int totalValues);
 
-        (int clength, int cstart) FindCycle(uint multiplier, uint initialValue, uint divider);
+        (int length, int start) FindCycle(uint multiplier, uint initialValue, uint divider);
     }
 }

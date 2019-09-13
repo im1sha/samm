@@ -23,13 +23,13 @@ namespace WpfSaimmodTwo.Utils
         ///    Item1 is lambda (the length of the cycle) 
         ///    Item2 is mu, the zero-based index of the item that started the first cycle.</returns>
         /// <param name="yielder">Function delegate that generates the series by iterated execution.</param>
-        public static (int clength, int cstart) FindCycle(T mult, T x0, T div, Func<T, T, T, T> yielder)
+        public static (int length, int start) FindCycle(T multiplier, T initialValue, T divider, Func<T, T, T, T> yielder)
         {
             int power, lambda;
             T tortoise, hare;
             power = lambda = 1;
-            tortoise = x0;
-            hare = yielder(mult, x0, div);
+            tortoise = initialValue;
+            hare = yielder(multiplier, initialValue, divider);
 
             // Find lambda, the cycle length
             while (!tortoise.Equals(hare))
@@ -40,22 +40,22 @@ namespace WpfSaimmodTwo.Utils
                     power *= 2;
                     lambda = 0;
                 }
-                hare = yielder(mult, hare, div);
+                hare = yielder(multiplier, hare, divider);
                 lambda += 1;
             }
 
             // Find mu, the zero-based index of the start of the cycle
             var mu = 0;
-            tortoise = hare = x0;
+            tortoise = hare = initialValue;
             for (var times = 0; times < lambda; times++)
             {
-                hare = yielder(mult, hare, div);
+                hare = yielder(multiplier, hare, divider);
             }
 
             while (!tortoise.Equals(hare))
             {
-                tortoise = yielder(mult, tortoise, div);
-                hare = yielder(mult, hare, div);
+                tortoise = yielder(multiplier, tortoise, divider);
+                hare = yielder(multiplier, hare, divider);
                 mu += 1;
             }
 
