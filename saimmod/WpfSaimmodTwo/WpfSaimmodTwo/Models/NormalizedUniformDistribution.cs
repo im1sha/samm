@@ -27,6 +27,7 @@ namespace WpfSaimmodTwo.Models
         // and N is total amount of points
         public static double RightUniformityEstimation => Math.PI / 4;
 
+        
         #endregion
 
         #region actual values
@@ -64,10 +65,10 @@ namespace WpfSaimmodTwo.Models
         }
 
         #endregion
+        public double MinValue => 0.0;
 
-        public double Begin => 0.0;
+        public double MaxValue => 1.0;
 
-        public double End => 1.0;
     }
 }
 

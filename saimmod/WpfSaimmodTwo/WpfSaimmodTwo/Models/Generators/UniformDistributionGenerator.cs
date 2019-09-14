@@ -2,28 +2,21 @@
 using System.Linq;
 using System;
 using WpfSaimmodTwo.Interfaces.Generators;
+using WpfSaimmodTwo.Interfaces.Distributions;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    internal class UniformDistributionGenerator : IUniformNormalizedBasedGenerator
+    internal class UniformDistributionGenerator : UniformNormalizedBasedGenerator
     {
-        double MinValue { get; }
-
-        double MaxValue { get; }
-
-        public UniformDistributionGenerator(double min, double max)
+    
+        public UniformDistributionGenerator(INotNormalizedDistribution distribution)
+            : base(distribution)
         {
-            if (min >= max)
-            {
-                throw new ArgumentException();
-            }
-            MinValue = min;
-            MaxValue = max;
         }
 
-        public IEnumerable<double> GenerateSequence(IEnumerable<double> values)
+        public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            return values.Select(i => MinValue + ((MaxValue - MinValue) * i));
+            return values.Select(i => _distribution.MinValue + ((_distribution.MaxValue - _distribution.MinValue) * i));
         }
     }
 }

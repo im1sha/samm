@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WpfSaimmodTwo.Interfaces.Distributions;
 
 namespace WpfSaimmodTwo.Interfaces.Generators
 {

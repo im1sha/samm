@@ -8,12 +8,11 @@ namespace WpfSaimmodTwo.Interfaces.Distributions
 
         double RightVariance { get; }
 
-        double Begin { get; }
-
-        double End { get; }
-
         (double expectedValue, double variance, double standardDeviation) GetStatistics(
             IEnumerable<double> values);
 
+        double MinValue { get; }
+
+        double MaxValue { get; }
     }
 }
