@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WpfSaimmodTwo.Interfaces;
 using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Utils;
 
@@ -69,7 +65,7 @@ namespace WpfSaimmodTwo.Models
         // initialValue < divider
         // a < R[0] < m
         public static (uint multiplier, uint initialValue, uint divider) GenerateRandomParameters()
-        {                      
+        {
             var rand = new Random();
             IEnumerable<uint> deniedVals = new List<uint>();
 
@@ -102,7 +98,7 @@ namespace WpfSaimmodTwo.Models
         }
 
         // USAGE: var next = _generator(multiplier, current, divider);
-        private readonly Func<uint, uint, uint, uint> _generator = 
+        private readonly Func<uint, uint, uint, uint> _generator =
             (multiplier, initialValue, divider) => (multiplier * initialValue) % divider;
     }
 }

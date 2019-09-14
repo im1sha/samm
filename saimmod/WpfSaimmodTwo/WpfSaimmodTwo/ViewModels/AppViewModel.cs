@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using WpfSaimmodTwo.Models;
-using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.ViewModels
 {
-    class AppViewModel : INotifyPropertyChanged
+    internal class AppViewModel : INotifyPropertyChanged
     {
 
         #region INotifyPropertyChanged 
@@ -25,21 +21,15 @@ namespace WpfSaimmodTwo.ViewModels
 
         #region commands
         private InteractCommand _generateCommand;
-        public InteractCommand GenerateCommand
-        {
-            get
-            {
-                return _generateCommand ??
+        public InteractCommand GenerateCommand => _generateCommand ??
                     (_generateCommand = new InteractCommand(stack =>
                     {
                         Generate(stack, _multiplier, _initialValue, _divider);
                     }));
-            }
-        }
-        private void Generate(object stack, uint multiplier, uint  initialValue, uint divider)
+        private void Generate(object stack, uint multiplier, uint initialValue, uint divider)
         {
             RunCore(out AppModel md, multiplier, initialValue, divider,
-                out IEnumerable<double> normalizedSequence, 
+                out IEnumerable<double> normalizedSequence,
                 out double estimation, out int period, out int aperiodicity);
 
             UpdateView(md, normalizedSequence, stack, estimation, period, aperiodicity);
@@ -47,17 +37,11 @@ namespace WpfSaimmodTwo.ViewModels
 
 
         private InteractCommand _autogenerateCommand;
-        public InteractCommand AutogenerateCommand
-        {
-            get
-            {
-                return _autogenerateCommand ??
+        public InteractCommand AutogenerateCommand => _autogenerateCommand ??
                     (_autogenerateCommand = new InteractCommand(stack =>
                     {
                         AutoGenerate(stack);
                     }));
-            }
-        }
 
         private void AutoGenerate(object stack)
         {
@@ -72,11 +56,11 @@ namespace WpfSaimmodTwo.ViewModels
             {
                 (multiplier, initialValue, divider) = AppModel.GenerateRandomParameters();
 
-                RunCore(out md, multiplier, initialValue, divider, out normalizedSequence, 
+                RunCore(out md, multiplier, initialValue, divider, out normalizedSequence,
                     out estimation, out period, out aperiodicity);
 
-                validPeriod = md.CheckIndirectEstimation(estimation, 0.001);                
-                correctData = period > 50_000;     
+                validPeriod = md.CheckIndirectEstimation(estimation, 0.001);
+                correctData = period > 50_000;
             } while (!correctData || !validPeriod);
 
             UpdateTextboxes(multiplier, initialValue, divider);
@@ -98,7 +82,7 @@ namespace WpfSaimmodTwo.ViewModels
             aperiodicity = start + period;
         }
 
-        private void UpdateView(AppModel md, IEnumerable<double> normalizedSequence, object stack, 
+        private void UpdateView(AppModel md, IEnumerable<double> normalizedSequence, object stack,
             double estimation, int period, int aperiodicity)
         {
             (double expectedValue, double variance, double standardDeviation)
@@ -114,7 +98,7 @@ namespace WpfSaimmodTwo.ViewModels
             InitialValue = initialValue.ToString();
             Divider = divider.ToString();
         }
-        private void UpdateOutput(double expectedValue, double variance, 
+        private void UpdateOutput(double expectedValue, double variance,
             double standardDeviation, double estimation,
             int period, int aperiodicity)
         {
@@ -137,7 +121,7 @@ namespace WpfSaimmodTwo.ViewModels
             set
             {
                 _expectedValue = Convert.ToDouble(value);
-                OnPropertyChanged();               
+                OnPropertyChanged();
             }
         }
         private double _variance;

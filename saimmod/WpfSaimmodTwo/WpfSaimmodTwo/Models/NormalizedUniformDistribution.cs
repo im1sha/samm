@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WpfSaimmodTwo.Interfaces;
 using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Utils;
 
@@ -27,14 +26,16 @@ namespace WpfSaimmodTwo.Models
         // where K is all pairs located inside of one forth of circle 
         // and N is total amount of points
         public static double RightUniformityEstimation => Math.PI / 4;
-     
+
         #endregion
 
         #region actual values
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(
-            IEnumerable<double> values)       
-            => StatisticsGenerator.GetStatistics(values);
+            IEnumerable<double> values)
+        {
+            return StatisticsGenerator.GetStatistics(values);
+        }
 
         /// <summary>
         /// Calculates indirect estimation. Should be aprox. Pi/4
@@ -66,7 +67,7 @@ namespace WpfSaimmodTwo.Models
 
         public double Begin => 0.0;
 
-        public double End => 1.0;            
+        public double End => 1.0;
     }
 }
 
