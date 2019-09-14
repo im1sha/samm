@@ -90,7 +90,7 @@ namespace WpfSaimmodTwo.ViewModels
             md = new AppModel(
                 new NormalizedUniformDistribution(),
                 new Lehmer(multiplier, initialValue, divider));
-            IEnumerable<uint> seq = md.InitializeSequence(500_000);
+            IEnumerable<uint> seq = md.GenerateSequence(500_000);
             normalizedSequence = md.Normalize(seq, divider); // [0,1]
             estimation = md.CalculateIndirectEstimation(normalizedSequence);
             var (length, start) = md.FindCycle(multiplier, initialValue, divider);
@@ -103,7 +103,7 @@ namespace WpfSaimmodTwo.ViewModels
         {
             (double expectedValue, double variance, double standardDeviation)
                = md.GetStatistics(normalizedSequence);
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
+            IEnumerable<int> bars = md.GetDistribution(normalizedSequence, 0.0, 1.0, 20);
             UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
             ViewUpdater.DrawBarChart(stack, bars);
         }

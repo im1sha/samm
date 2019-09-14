@@ -15,11 +15,11 @@ namespace WpfSaimmodTwo.Models
             _algorithm = algorithm;
         }
 
-        public IEnumerable<uint> InitializeSequence(int totalValues)
+        public IEnumerable<uint> GenerateSequence(int totalValues)
             => _algorithm.GenerateSequence(totalValues);
         
 
-        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, double begin, double end, int totalIntervals)        
+        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)        
             => SequenceHelper.GetDistribution(values, begin, end, totalIntervals);
         
 
