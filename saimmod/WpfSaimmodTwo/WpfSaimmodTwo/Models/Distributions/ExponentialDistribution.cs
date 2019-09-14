@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace WpfSaimmodTwo.Models.Distributions
+﻿namespace WpfSaimmodTwo.Models.Distributions
 {
     public class ExponentialDistribution : NotNormalizedDistribution
     {
         public ExponentialDistribution(double begin, double end, double lambda)
-            : base(begin, end, 1 / lambda, 1 / Math.Pow(lambda, 2.0))
+            : base(begin, end, 1 / lambda, 1 / lambda / lambda)
         {
         }
     }

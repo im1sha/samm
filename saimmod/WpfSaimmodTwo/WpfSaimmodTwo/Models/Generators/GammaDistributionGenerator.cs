@@ -14,17 +14,17 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            throw new Exception();
+            throw new NotImplementedException();
 
-            if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
-            {
-                throw new ApplicationException();
-            }
+            //if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
+            //{
+            //    throw new ApplicationException();
+            //}
 
-            double eta = _distribution.AdditionalParameters[0];
-            double lambda = _distribution.AdditionalParameters[1];
+            //double eta = _distribution.AdditionalParameters[0];
+            //double lambda = _distribution.AdditionalParameters[1];
 
-            return null;
+            //return null;
         }
     }
 }
