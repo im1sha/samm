@@ -2,7 +2,7 @@
 
 namespace WpfSaimmodTwo.Interfaces.Generators
 {
-    internal interface IAperiodicGenerator : IGenerator
+    public interface IAperiodicGenerator : IGenerator
     {
         uint Multiplier { get; }
 

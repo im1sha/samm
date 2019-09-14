@@ -1,6 +1,6 @@
 ﻿namespace WpfSaimmodTwo.Interfaces.Generators
 {
-    internal interface IGenerator
+    public interface IGenerator
     {
     }
 }

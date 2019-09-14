@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    internal class TriangleDistributionGenerator : UniformNormalizedBasedGenerator
+    public class TriangleDistributionGenerator : UniformNormalizedBasedGenerator
     {
         public TriangleDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)

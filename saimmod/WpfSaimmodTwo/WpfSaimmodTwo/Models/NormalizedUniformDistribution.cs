@@ -10,7 +10,7 @@ namespace WpfSaimmodTwo.Models
     // M == (a+b) /2                            // 0.5     
     // D == sqr(b-a) /12                        // 1 /12
     // σ == (b-a) /sqrt(12)                     // 1 /sqrt(12)
-    internal class NormalizedUniformDistribution : INormalizedDistribution
+    public class NormalizedUniformDistribution : INormalizedDistribution
     {
         #region expected results
         // M

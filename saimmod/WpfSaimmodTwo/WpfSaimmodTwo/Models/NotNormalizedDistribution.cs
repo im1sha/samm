@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal abstract class NotNormalizedDistribution : INotNormalizedDistribution
+    public abstract class NotNormalizedDistribution : INotNormalizedDistribution
     {
         public double RightExpectedValue { get; }
 
@@ -15,12 +15,15 @@ namespace WpfSaimmodTwo.Models
 
         public double MaxValue { get; }
 
+        public double[] AdditionalParameters { get; }
+
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
         {
             return StatisticsGenerator.GetStatistics(values);
         }
 
-        public NotNormalizedDistribution(double minValue, double maxValue, double rightExpectedValue, double rightVariance)
+        public NotNormalizedDistribution(double minValue, double maxValue, double rightExpectedValue, 
+            double rightVariance, double[] additionalParameter = null)
         {
             if (minValue >= maxValue)
             {
@@ -30,6 +33,7 @@ namespace WpfSaimmodTwo.Models
             MaxValue = maxValue;
             RightExpectedValue = rightExpectedValue;
             RightVariance = rightVariance;
+            AdditionalParameters = additionalParameter;
         }
     }
 }

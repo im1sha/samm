@@ -2,7 +2,7 @@
 
 namespace WpfSaimmodTwo.Interfaces.Distributions
 {
-    internal interface INormalizedDistribution : IDistribution
+    public interface INormalizedDistribution : IDistribution
     {      
         double CalculateIndirectEstimation(IEnumerable<double> values);
 

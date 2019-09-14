@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal class AppModel
+    public class AppModel
     {
         private readonly INormalizedDistribution _distribution;
         private readonly IAperiodicGenerator _algorithm;

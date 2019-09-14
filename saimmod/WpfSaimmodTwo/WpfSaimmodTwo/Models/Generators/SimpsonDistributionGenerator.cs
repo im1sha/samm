@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    internal class SimpsonDistributionGenerator : UniformNormalizedBasedGenerator
+    public class SimpsonDistributionGenerator : UniformNormalizedBasedGenerator
     {
         public SimpsonDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)

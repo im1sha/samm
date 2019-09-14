@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace WpfSaimmodTwo.ViewModels
 {
-    internal static class ViewUpdater
+    public static class ViewUpdater
     {
         public static void DrawBarChart(object o, IEnumerable<int> values)
         {

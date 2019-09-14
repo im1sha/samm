@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    internal class GammaDistributionGenerator : UniformNormalizedBasedGenerator
+    public class GammaDistributionGenerator : UniformNormalizedBasedGenerator
     {
         public GammaDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)
@@ -14,7 +14,17 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            throw new NotImplementedException();
+            throw new Exception();
+
+            if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
+            {
+                throw new ApplicationException();
+            }
+
+            double eta = _distribution.AdditionalParameters[0];
+            double lambda = _distribution.AdditionalParameters[1];
+
+            return null;
         }
     }
 }

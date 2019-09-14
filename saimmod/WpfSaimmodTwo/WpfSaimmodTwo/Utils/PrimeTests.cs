@@ -1,6 +1,6 @@
 ﻿namespace WpfSaimmodTwo.Utils
 {
-    internal static class PrimeTests
+    public static class PrimeTests
     {
         public static bool IsPrime(uint n)
         {

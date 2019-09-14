@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WpfSaimmodTwo.Utils
 {
-    internal static class StatisticsGenerator
+    public static class StatisticsGenerator
     {
         public static double GetExpectedValue(IEnumerable<double> values)
             => values.Average(i => i);

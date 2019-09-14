@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WpfSaimmodTwo.Utils
 {
-    internal static class UIntRandom
+    public static class UIntRandom
     {
         public static uint GenerateValue(uint min, uint max, Random rand)
         {

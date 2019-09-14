@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WpfSaimmodTwo.Utils
 {
-    internal static class SequenceHelper
+    public static class SequenceHelper
     {
         // seq.All( i => i > 0 && i < length) && (seq.Max() < length)
         public static IEnumerable<double> Normalize(IEnumerable<uint> seq, double length)

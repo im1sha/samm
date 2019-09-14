@@ -3,7 +3,7 @@ using WpfSaimmodTwo.Interfaces.Distributions;
 
 namespace WpfSaimmodTwo.Interfaces.Generators
 {
-    internal interface IUniformNormalizedBasedGenerator : IGenerator
+    public interface IUniformNormalizedBasedGenerator : IGenerator
     {
         /// <summary>
         /// Generates values from normalized sequence 

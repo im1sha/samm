@@ -6,7 +6,7 @@ using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal class LehmerGenerator : IAperiodicGenerator
+    public class LehmerGenerator : IAperiodicGenerator
     {
         public uint Multiplier { get; }
         public uint InitialValue { get; }

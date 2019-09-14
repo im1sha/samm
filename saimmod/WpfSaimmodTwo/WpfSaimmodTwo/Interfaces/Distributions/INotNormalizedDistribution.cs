@@ -1,6 +1,7 @@
 ﻿namespace WpfSaimmodTwo.Interfaces.Distributions
 {
-    internal interface INotNormalizedDistribution : IDistribution
+    public interface INotNormalizedDistribution : IDistribution
     {
+        double[] AdditionalParameters { get; }
     }
 }

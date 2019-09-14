@@ -6,7 +6,7 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    internal class NormalDistributionGenerator : UniformNormalizedBasedGenerator
+    public class NormalDistributionGenerator : UniformNormalizedBasedGenerator
     {
         public NormalDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)

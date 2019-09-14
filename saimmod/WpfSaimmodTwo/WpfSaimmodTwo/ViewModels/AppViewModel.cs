@@ -6,7 +6,7 @@ using WpfSaimmodTwo.Models;
 
 namespace WpfSaimmodTwo.ViewModels
 {
-    internal class AppViewModel : INotifyPropertyChanged
+    public class AppViewModel : INotifyPropertyChanged
     {
 
         #region INotifyPropertyChanged 

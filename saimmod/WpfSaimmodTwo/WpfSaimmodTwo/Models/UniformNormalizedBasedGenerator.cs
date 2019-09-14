@@ -5,7 +5,7 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal abstract class UniformNormalizedBasedGenerator : IUniformNormalizedBasedGenerator
+    public abstract class UniformNormalizedBasedGenerator : IUniformNormalizedBasedGenerator
     {
 
         protected INotNormalizedDistribution _distribution;

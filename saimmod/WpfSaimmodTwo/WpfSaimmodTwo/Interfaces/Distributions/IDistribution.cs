@@ -2,7 +2,7 @@
 
 namespace WpfSaimmodTwo.Interfaces.Distributions
 {
-    internal interface IDistribution
+    public interface IDistribution
     {
         double RightExpectedValue { get; }
 
