@@ -55,7 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Distributions\UniformDistribution.cs" />
+    <Compile Include="Models\Distributions\UniformDistribution.cs" />
     <Compile Include="Interfaces\IAlgorithm.cs" />
     <Compile Include="Interfaces\IDistribution.cs" />
     <Compile Include="Interfaces\INormalizedDistribution.cs" />

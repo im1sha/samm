@@ -26,6 +26,10 @@ namespace WpfSaimmodTwo.Models
         // and N is total amount of points
         public static double RightUniformityEstimation => Math.PI / 4;
 
+        public double Begin => 0.0;
+
+        public double End => 1.0;
+
         #endregion
 
         #region actual values
@@ -80,35 +84,36 @@ namespace WpfSaimmodTwo.Models
             return (RightUniformityEstimation - epsilon < estimation)
                 && (estimation < RightUniformityEstimation + epsilon);
         }
-         
+
         #endregion
 
         // if min value == 0 
         // then Length == max value     
-        public IEnumerable<int> GetDistribution(
-            IEnumerable<double> values, 
+        public IEnumerable<int> GetNormalizedDistribution(
+            IEnumerable<double> values,
             int totalIntervals)
-        {
-            double min = 0.0;
-            double max = 1.0;
+            => GetDistribution(values, 0.0, 1.0, totalIntervals);
+        
 
-            if (values == null || totalIntervals <= 0 
-                || min > max || values.Min() < min || values.Max() > max)
+        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
+        {
+            if (values == null || totalIntervals <= 0
+                || begin > end || values.Min() < begin || values.Max() > end)
             {
                 throw new ArgumentException();
             }
-    
+
             var results = new List<int>();
             results.AddRange(Enumerable.Repeat(0, totalIntervals));
 
-            double intervalLength = (max - min) / totalIntervals;
+            double intervalLength = (end - begin) / totalIntervals;
 
             for (int i = 0; i < results.Count; i++)
             {
                 double localMin = i * intervalLength;
                 double localMax = (i + 1) * intervalLength;
-                
-                results[i] = values.Count(j => (j >= localMin) && (j < localMax));                                    
+
+                results[i] = values.Count(j => (j >= localMin) && (j < localMax));
             }
             return results;
         }

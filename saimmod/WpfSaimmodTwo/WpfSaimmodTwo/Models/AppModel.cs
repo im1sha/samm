@@ -20,7 +20,7 @@ namespace WpfSaimmodTwo.Models
         
 
         public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, int totalIntervals)        
-            => _distribution.GetDistribution(values, totalIntervals);
+            => _distribution.GetNormalizedDistribution(values, totalIntervals);
         
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)       

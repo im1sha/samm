@@ -2,15 +2,12 @@
 
 namespace WpfSaimmodTwo.Interfaces
 {
-    internal interface INormalizedDistribution
-    {
-        (double expectedValue, double variance, double standardDeviation) GetStatistics(
-           IEnumerable<double> values);
-
+    internal interface INormalizedDistribution : IDistribution
+    {      
         double CalculateIndirectEstimation(IEnumerable<double> values);
 
         bool CheckIndirectEstimation(double estimation, double epsilon);
 
-        IEnumerable<int> GetDistribution(IEnumerable<double> values, int totalIntervals);
+        IEnumerable<int> GetNormalizedDistribution(IEnumerable<double> values, int totalIntervals);
     }
 }
