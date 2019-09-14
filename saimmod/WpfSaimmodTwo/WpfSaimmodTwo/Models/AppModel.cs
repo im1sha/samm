@@ -19,11 +19,12 @@ namespace WpfSaimmodTwo.Models
             => _algorithm.GenerateSequence(totalValues);
         
 
-        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, int totalIntervals)        
-            => _distribution.GetNormalizedDistribution(values, totalIntervals);
+        public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, double begin, double end, int totalIntervals)        
+            => _distribution.GetDistribution(values, begin,end, totalIntervals);
         
 
-        public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)       
+        public (double expectedValue, double variance, double standardDeviation) GetStatistics(
+            IEnumerable<double> values)       
             => _distribution.GetStatistics(values);
         
 

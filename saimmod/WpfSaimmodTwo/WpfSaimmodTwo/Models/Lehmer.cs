@@ -82,7 +82,7 @@ namespace WpfSaimmodTwo.Models
             // values generation 
             for (int i = 0; i < data.Length; i++)
             {
-                data[i].value = UIntRandom.GenerateRandomValue(
+                data[i].value = UIntRandom.GenerateValue(
                     data[i].intervalBegin, data[i].intervalEnd,
                     rand, deniedVals,
                     data[i].prime, data[i].bitCheck);

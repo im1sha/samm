@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WpfSaimmodTwo.Interfaces;
+using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
@@ -25,39 +26,14 @@ namespace WpfSaimmodTwo.Models
         // where K is all pairs located inside of one forth of circle 
         // and N is total amount of points
         public static double RightUniformityEstimation => Math.PI / 4;
-
-        public double Begin => 0.0;
-
-        public double End => 1.0;
-
+     
         #endregion
 
         #region actual values
-        // M 
-        public double GetExpectedValue(IEnumerable<double> values)
-            => values.Average(i => i); 
-        
-
-        // D 
-        public double GetVariance(IEnumerable<double> values)
-        {
-            double expValue = GetExpectedValue(values);
-            return (1.0 / (values.Count() - 1.0))
-                * values.Sum(x => Math.Pow(x - expValue, 2.0));
-        }
-
-        // σ 
-        public double GetStandardDeviation(double normalizedVariance)        
-            => Math.Sqrt(normalizedVariance);
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(
-            IEnumerable<double> values)
-        {
-            double expVal = GetExpectedValue(values);
-            double variance = GetVariance(values);
-            double stdDeviation = GetStandardDeviation(variance);
-            return (expVal, variance, stdDeviation);
-        }
+            IEnumerable<double> values)       
+            => StatisticsGenerator.GetStatistics(values);
 
         /// <summary>
         /// Calculates indirect estimation. Should be aprox. Pi/4
@@ -87,14 +63,12 @@ namespace WpfSaimmodTwo.Models
 
         #endregion
 
+        public double Begin => 0.0;
+
+        public double End => 1.0;
         // if min value == 0 
         // then Length == max value     
-        public IEnumerable<int> GetNormalizedDistribution(
-            IEnumerable<double> values,
-            int totalIntervals)
-            => GetDistribution(values, 0.0, 1.0, totalIntervals);
-        
-
+      
         public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
         {
             if (values == null || totalIntervals <= 0

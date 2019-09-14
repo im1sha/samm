@@ -103,7 +103,7 @@ namespace WpfSaimmodTwo.ViewModels
         {
             (double expectedValue, double variance, double standardDeviation)
                = md.GetStatistics(normalizedSequence);
-            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 20);
+            IEnumerable<int> bars = md.GetDistributedValues(normalizedSequence, 0.0, 1.0, 20);
             UpdateOutput(expectedValue, variance, standardDeviation, estimation, period, aperiodicity);
             ViewUpdater.DrawBarChart(stack, bars);
         }

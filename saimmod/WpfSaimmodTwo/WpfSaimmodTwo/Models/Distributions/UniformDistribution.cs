@@ -4,7 +4,7 @@ using WpfSaimmodTwo.Interfaces;
 
 namespace WpfSaimmodTwo.Models.Distributions
 {
-    internal class UniformDistribution : IDistribution
+    internal class UniformDistribution : INotNormalizedDistribution
     {
         public double Begin { get; }
 
@@ -16,12 +16,12 @@ namespace WpfSaimmodTwo.Models.Distributions
             End = end;
         }
 
-        public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
+        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
+        public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
         {
             throw new NotImplementedException();
         }

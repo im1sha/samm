@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interfaces\INotNormalizedDistribution.cs" />
     <Compile Include="Models\Distributions\UniformDistribution.cs" />
     <Compile Include="Interfaces\IAlgorithm.cs" />
     <Compile Include="Interfaces\IDistribution.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Utils\CircleDetector.cs" />
     <Compile Include="Utils\SequenceNormalizer.cs" />
     <Compile Include="Utils\PrimeTests.cs" />
+    <Compile Include="Utils\StatisticsGenerator.cs" />
     <Compile Include="Utils\UIntRandom.cs" />
     <Compile Include="Models\NormalizedUniformDistribution.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />

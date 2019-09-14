@@ -7,7 +7,5 @@ namespace WpfSaimmodTwo.Interfaces
         double CalculateIndirectEstimation(IEnumerable<double> values);
 
         bool CheckIndirectEstimation(double estimation, double epsilon);
-
-        IEnumerable<int> GetNormalizedDistribution(IEnumerable<double> values, int totalIntervals);
     }
 }

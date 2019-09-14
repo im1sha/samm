@@ -6,7 +6,7 @@ namespace WpfSaimmodTwo.Utils
 {
     internal static class UIntRandom
     {
-        public static uint GetValue(uint min, uint max, Random rand)
+        public static uint GenerateValue(uint min, uint max, Random rand)
         {
             byte[] buf = new byte[8];
             rand.NextBytes(buf);
@@ -15,7 +15,7 @@ namespace WpfSaimmodTwo.Utils
             return (uintRand % (max - min)) + min;
         }
 
-        public static uint GenerateRandomValue(
+        public static uint GenerateValue(
                 uint intervalBegin,
                 uint intervalEnd,
                 Random random,
@@ -31,7 +31,7 @@ namespace WpfSaimmodTwo.Utils
 
             while (true)
             {
-                uint val = UIntRandom.GetValue(intervalBegin, intervalEnd, random);
+                uint val = UIntRandom.GenerateValue(intervalBegin, intervalEnd, random);
 
                 if ((deniedValues != null && deniedValues.Contains(val))
                     || (checkBits && !CheckBinaryRepresentation(val))
