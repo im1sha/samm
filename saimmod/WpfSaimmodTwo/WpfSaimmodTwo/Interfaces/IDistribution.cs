@@ -11,7 +11,5 @@ namespace WpfSaimmodTwo.Interfaces
         (double expectedValue, double variance, double standardDeviation) GetStatistics(
             IEnumerable<double> values);
 
-        IEnumerable<int> GetDistribution(IEnumerable<double> values, 
-            double begin, double end, int totalIntervals);
     }
 }

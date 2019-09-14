@@ -20,7 +20,7 @@ namespace WpfSaimmodTwo.Models
         
 
         public IEnumerable<int> GetDistributedValues(IEnumerable<double> values, double begin, double end, int totalIntervals)        
-            => _distribution.GetDistribution(values, begin,end, totalIntervals);
+            => SequenceHelper.GetDistribution(values, begin, end, totalIntervals);
         
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(
@@ -44,6 +44,6 @@ namespace WpfSaimmodTwo.Models
             => Lehmer.GenerateRandomParameters();
 
         public IEnumerable<double> Normalize(IEnumerable<uint>seq, uint divider)
-            => SequenceNormalizer.Normalize(seq, divider);
+            => SequenceHelper.Normalize(seq, divider);
     }
 }

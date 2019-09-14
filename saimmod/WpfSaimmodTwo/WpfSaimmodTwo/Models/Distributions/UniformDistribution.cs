@@ -16,11 +16,6 @@ namespace WpfSaimmodTwo.Models.Distributions
             End = end;
         }
 
-        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
-        {
-            throw new NotImplementedException();
-        }
-
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
         {
             throw new NotImplementedException();

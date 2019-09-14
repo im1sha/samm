@@ -63,7 +63,7 @@
     <Compile Include="Models\Lehmer.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Utils\CircleDetector.cs" />
-    <Compile Include="Utils\SequenceNormalizer.cs" />
+    <Compile Include="Utils\SequenceHelper.cs" />
     <Compile Include="Utils\PrimeTests.cs" />
     <Compile Include="Utils\StatisticsGenerator.cs" />
     <Compile Include="Utils\UIntRandom.cs" />
