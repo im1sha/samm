@@ -1,24 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WpfSaimmodTwo.Interfaces.Distributions;
-namespace WpfSaimmodTwo.Models.Distributions
+﻿namespace WpfSaimmodTwo.Models.Distributions
 {
-    class TriangleDistribution : INotNormalizedDistribution
+    internal class TriangleDistribution : NotNormalizedDistribution
     {
-        public double RightExpectedValue => throw new NotImplementedException();
-
-        public double RightVariance => throw new NotImplementedException();
-
-        public double Begin => throw new NotImplementedException();
-
-        public double End => throw new NotImplementedException();
-
-        public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
+        public TriangleDistribution(double begin, double end)
+           : base(begin, end, 0, 0)
         {
-            throw new NotImplementedException();
         }
     }
 }
