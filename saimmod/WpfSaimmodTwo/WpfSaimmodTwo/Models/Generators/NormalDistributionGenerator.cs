@@ -22,7 +22,9 @@ namespace WpfSaimmodTwo.Models.Generators
             double stdDeviation = Math.Sqrt(_distribution.RightVariance);
 
             int startTake, middleSkip, endTake;
-            const int totalTake = 6;
+
+            const int totalTake = 6; // enough precision. it should be in range 6..12
+
             for (int i = 0; i < length; i++)
             {
                 if (i < length - totalTake)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Interfaces.Generators;
 
@@ -14,7 +15,7 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            throw new NotImplementedException();
+            return values.Select(i => -Math.Log(i) * _distribution.RightExpectedValue);
         }
     }
 }
