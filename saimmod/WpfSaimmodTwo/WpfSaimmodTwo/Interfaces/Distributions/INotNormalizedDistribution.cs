@@ -1,4 +1,4 @@
-﻿namespace WpfSaimmodTwo.Interfaces
+﻿namespace WpfSaimmodTwo.Interfaces.Distributions
 {
     internal interface INotNormalizedDistribution : IDistribution
     {

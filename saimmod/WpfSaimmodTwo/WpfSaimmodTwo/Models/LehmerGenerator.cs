@@ -5,17 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WpfSaimmodTwo.Interfaces;
+using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
-    internal class Lehmer : IAlgorithm
+    internal class LehmerGenerator : IAperiodicGenerator
     {
         public uint Multiplier { get; }
         public uint InitialValue { get; }
         public uint Divider { get; }
 
-        public Lehmer(
+        public LehmerGenerator(
             uint multiplier,
             uint initialValue,
             uint divider)

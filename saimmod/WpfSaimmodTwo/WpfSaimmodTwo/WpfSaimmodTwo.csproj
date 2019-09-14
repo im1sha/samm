@@ -55,12 +55,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Interfaces\INotNormalizedDistribution.cs" />
+    <Compile Include="Interfaces\Generators\IGenerator.cs" />
+    <Compile Include="Interfaces\Distributions\INotNormalizedDistribution.cs" />
+    <Compile Include="Interfaces\Generators\IUniformNormalizedBasedGenerator.cs" />
     <Compile Include="Models\Distributions\UniformDistribution.cs" />
-    <Compile Include="Interfaces\IAlgorithm.cs" />
-    <Compile Include="Interfaces\IDistribution.cs" />
-    <Compile Include="Interfaces\INormalizedDistribution.cs" />
-    <Compile Include="Models\Lehmer.cs" />
+    <Compile Include="Interfaces\Generators\IAperiodicGenerator.cs" />
+    <Compile Include="Interfaces\Distributions\IDistribution.cs" />
+    <Compile Include="Interfaces\Distributions\INormalizedDistribution.cs" />
+    <Compile Include="Models\Generators\UniformDistributionGenerator.cs" />
+    <Compile Include="Models\LehmerGenerator.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Utils\CircleDetector.cs" />
     <Compile Include="Utils\SequenceHelper.cs" />

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace WpfSaimmodTwo.Interfaces
+namespace WpfSaimmodTwo.Interfaces.Distributions
 {
     internal interface INormalizedDistribution : IDistribution
     {      

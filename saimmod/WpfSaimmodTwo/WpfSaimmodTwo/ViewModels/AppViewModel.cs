@@ -89,7 +89,7 @@ namespace WpfSaimmodTwo.ViewModels
         {
             md = new AppModel(
                 new NormalizedUniformDistribution(),
-                new Lehmer(multiplier, initialValue, divider));
+                new LehmerGenerator(multiplier, initialValue, divider));
             IEnumerable<uint> seq = md.GenerateSequence(500_000);
             normalizedSequence = md.Normalize(seq, divider); // [0,1]
             estimation = md.CalculateIndirectEstimation(normalizedSequence);

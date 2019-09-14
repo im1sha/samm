@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WpfSaimmodTwo.Interfaces;
+using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
@@ -14,13 +15,13 @@ namespace WpfSaimmodTwo.Models
     {
         #region expected results
         // M
-        public static double RightExpectedValue => 0.5;
+        public double RightExpectedValue => 0.5;
 
         // D 
-        public static double RightVariance => 1.0 / 12.0;
+        public double RightVariance => 1.0 / 12.0;
 
         // σ 
-        public static double RightStandardDeviation => Math.Sqrt(RightVariance);
+        public double RightStandardDeviation => Math.Sqrt(RightVariance);
 
         // 2K/N = PI/4 ± ϵ, 
         // where K is all pairs located inside of one forth of circle 

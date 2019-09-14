@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using WpfSaimmodTwo.Interfaces;
+using WpfSaimmodTwo.Interfaces.Distributions;
+using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
@@ -7,9 +8,9 @@ namespace WpfSaimmodTwo.Models
     internal class AppModel
     {
         private readonly INormalizedDistribution _distribution;
-        private readonly IAlgorithm _algorithm;
+        private readonly IAperiodicGenerator _algorithm;
 
-        public AppModel(INormalizedDistribution distribution, IAlgorithm algorithm)
+        public AppModel(INormalizedDistribution distribution, IAperiodicGenerator algorithm)
         {
             _distribution = distribution;
             _algorithm = algorithm;
@@ -41,7 +42,7 @@ namespace WpfSaimmodTwo.Models
         
 
         public static (uint multiplier, uint initialValue, uint divider) GenerateRandomParameters() 
-            => Lehmer.GenerateRandomParameters();
+            => LehmerGenerator.GenerateRandomParameters();
 
         public IEnumerable<double> Normalize(IEnumerable<uint>seq, uint divider)
             => SequenceHelper.Normalize(seq, divider);

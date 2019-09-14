@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace WpfSaimmodTwo.Interfaces
+namespace WpfSaimmodTwo.Interfaces.Distributions
 {
     internal interface IDistribution
     {
+        double RightExpectedValue { get; }
+
+        double RightVariance { get; }
+
         double Begin { get; }
 
         double End { get; }
