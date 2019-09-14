@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using WpfSaimmodTwo.Interfaces.Distributions;
+
+namespace WpfSaimmodTwo.Models.Distributions
+{
+    internal class GammaDistribution : INotNormalizedDistribution
+    {
+        public double RightExpectedValue => throw new NotImplementedException();
+
+        public double RightVariance => throw new NotImplementedException();
+
+        public double Begin => throw new NotImplementedException();
+
+        public double End => throw new NotImplementedException();
+
+        public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
