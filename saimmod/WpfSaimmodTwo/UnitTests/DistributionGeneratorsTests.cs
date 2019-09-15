@@ -68,6 +68,17 @@ namespace UnitTests
                 && (Math.Sqrt(dist.RightVariance) - epsilon < Math.Sqrt(resultVariance)));
         }
 
+        [TestCase(0, 10000, 30_000)]
+        [TestCase(-5005, 4995, 30_000)]
+        [TestCase(-10001, -1, 30_000)]
+   
+        public void TriangleDistributionGeneratorTest(double begin, double end, int totalValues)
+        {
+            var dist = new TriangleDistribution(begin, end);
+            var generator = new TriangleDistributionGenerator(dist);
+            Assert.DoesNotThrow(() => GetStat(generator, totalValues));
+        }
+
         private (double expectedValue, double variance, double standardDeviation) GetStat(
             UniformNormalizedBasedGenerator generator, int totalValues)
         {
