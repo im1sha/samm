@@ -34,12 +34,30 @@ namespace WpfSaimmodTwo.Utils
 
             for (int i = 0; i < results.Count; i++)
             {
-                double localMin = i * intervalLength;
-                double localMax = (i + 1) * intervalLength;
+                double localMin = begin + (i * intervalLength);
+                double localMax = begin + ((i + 1) * intervalLength);
 
                 results[i] = values.Count(j => (j >= localMin) && (j < localMax));
             }
             return results;
         }
+
+
+        //public static IEnumerable<double> GetAverageOnIntervals(IEnumerable<double> sortedValues, IEnumerable<int> distribution)
+        //{
+        //    if (sortedValues.Count() != distribution.Sum())
+        //    {
+        //        throw new ArgumentException();
+        //    }
+        //    int length = distribution.Count();
+        //    double[] results = new double[length];
+
+        //    for (int i = 0; i < length; i++)
+        //    {
+        //        results[i] = sortedValues.Skip(distribution.Take(i).Sum()).Take(distribution.ElementAt(i)).Average();
+        //    }
+
+        //    return results;
+        //}
     }
 }

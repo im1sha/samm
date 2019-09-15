@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WpfSaimmodTwo.Models.Distributions
 {
@@ -8,6 +9,11 @@ namespace WpfSaimmodTwo.Models.Distributions
             : base(begin, end, (begin + end) / 2.0, Math.Pow(begin - end, 2.0) / 12.0)
         {
 
+        }
+
+        public override bool EstimateDistribution(IEnumerable<double> values, double epsilon)
+        {
+            throw new NotImplementedException();
         }
     }
 }
