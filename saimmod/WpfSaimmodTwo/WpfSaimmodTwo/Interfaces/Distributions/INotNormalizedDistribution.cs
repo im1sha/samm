@@ -9,5 +9,7 @@ namespace WpfSaimmodTwo.Interfaces.Distributions
         bool EstimateDistribution(IEnumerable<double> values, double epsilon);
 
         bool EstimateStatistics(double expectedValue, double variance, double epsilon);
+
+        void OverrideMinMax(double min, double max);
     }
 }

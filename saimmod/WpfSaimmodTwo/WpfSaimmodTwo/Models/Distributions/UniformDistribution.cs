@@ -14,8 +14,8 @@ namespace WpfSaimmodTwo.Models.Distributions
         
         public override bool EstimateDistribution(IEnumerable<double> values, double epsilon)
         {
-            var expectedEstimation = 1.0 / values.Count();
-            return values.All(i => i < expectedEstimation + epsilon && i > expectedEstimation - epsilon);
+            var expectedProbability = 1.0 / values.Count();
+            return values.All(i => i < expectedProbability + epsilon && i > expectedProbability - epsilon);
         }
     }
 }

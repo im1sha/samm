@@ -41,6 +41,8 @@ namespace WpfSaimmodTwo.Models.Generators
                 results[i] = _distribution.RightExpectedValue + (stdDeviation * mult);
             }
 
+            _distribution.OverrideMinMax(results.Min(), results.Max());
+
             return results;
         }
     }

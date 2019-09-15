@@ -21,37 +21,61 @@ namespace UnitTests
         [TestCase(511, 1477, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
         [TestCase(-1538, -497, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
 
-        public void UniformDistributionGeneratorTest(double min, double max,
+        public void UniformDistributionGeneratorTest(double begin, double end,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {
-            var dist = new UniformDistribution(min, max);
+            var dist = new UniformDistribution(begin, end);
             var generator = new UniformDistributionGenerator(dist);
+            CheckAssert(
+                generator, dist, 
+                begin, end,
+                distributionEpsilon, statEpsilon, 
+                totalValues, totalIntervals);
+        }
+
+        private void CheckAssert(UniformNormalizedBasedGenerator generator, NotNormalizedDistribution dist,
+            double? begin, double? end, 
+            double distributionEpsilon, double statEpsilon, 
+            int totalValues, int totalIntervals)
+        {
             // 
             var uniformNotNormalizedSeq = new LehmerGenerator(_multiplier, _initialValue, _divider).GenerateSequence(totalValues);
             var uniformNormalizedSeq = SequenceHelper.Normalize(uniformNotNormalizedSeq, _divider);
             //
             var newNotNormalizedSeq = generator.GenerateSequence(uniformNormalizedSeq);
             (double expVal, double variance, _) = StatisticsGenerator.GetStatistics(newNotNormalizedSeq);
-            var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, min, max, totalIntervals).Select(i => i / (double)totalValues);
+
+            double castBegin, castEnd;
+            if (begin == null || end == null)
+            {
+                castBegin = newNotNormalizedSeq.Min();
+                castEnd = newNotNormalizedSeq.Max();
+            }
+            else
+            {
+                castBegin = (double)begin;
+                castEnd = (double)end;
+            }
+
+            var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, castBegin, castEnd, totalIntervals).Select(i => i / (double)totalValues).ToArray();
 
             var distResults = dist.EstimateDistribution(distribution, distributionEpsilon);
             var statResults = dist.EstimateStatistics(expVal, variance, statEpsilon);
             Assert.IsTrue(distResults && statResults);
         }
 
-        //[TestCase(5, 2, 0.02, 30_000)]
-        //[TestCase(-49, 5, 0.05, 30_000)]
-        //[TestCase(-101, 10, 0.1, 30_000)]
-        //public void NormalDistributionGeneratorTest(double expectedValue, double variance, double epsilon, int totalValues)
-        //{
-        //    var dist = new NormalDistribution(expectedValue, variance);
-        //    var generator = new NormalDistributionGenerator(dist);
-        //    (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
-        //    Assert.IsTrue((resultExp < expectedValue + epsilon)
-        //        && (resultExp > expectedValue - epsilon)
-        //        && (Math.Sqrt(variance) + epsilon > Math.Sqrt(resultVariance))
-        //        && (Math.Sqrt(variance) - epsilon < Math.Sqrt(resultVariance)));
-        //}
+        [TestCase(511, 50, 0.02, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        public void NormalDistributionGeneratorTest(double expectedValue, double variance,
+            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
+        {
+            var dist = new NormalDistribution(expectedValue, variance);
+            var generator = new NormalDistributionGenerator(dist);
+            CheckAssert(
+               generator, dist,
+               null, null,
+               distributionEpsilon, statEpsilon,
+               totalValues, totalIntervals);
+        }
 
         //[TestCase(0, 100, 0.5, 1, 30_000)]
         //[TestCase(-50, 50, 1, 1, 30_000)]

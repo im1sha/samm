@@ -11,14 +11,16 @@ namespace WpfSaimmodTwo.Models
 
         public double RightVariance { get; }
 
-        public double MinValue { get; }
+        public double MinValue { get; private set; }
 
-        public double MaxValue { get; }
+        public double MaxValue { get; private set; }
+
+        public bool ShouldOverrideMinMax { get; }
 
         public double[] AdditionalParameters { get; }
 
         public NotNormalizedDistribution(double minValue, double maxValue, double rightExpectedValue,
-            double rightVariance, double[] additionalParameter = null)
+            double rightVariance, double[] additionalParameter = null, bool shouldOverrideMinMax = false)
         {
             if (minValue >= maxValue)
             {
@@ -29,6 +31,7 @@ namespace WpfSaimmodTwo.Models
             RightExpectedValue = rightExpectedValue;
             RightVariance = rightVariance;
             AdditionalParameters = additionalParameter;
+            ShouldOverrideMinMax = shouldOverrideMinMax;
         }
 
         public (double expectedValue, double variance, double standardDeviation) GetStatistics(IEnumerable<double> values)
@@ -50,6 +53,17 @@ namespace WpfSaimmodTwo.Models
                 && (RightExpectedValue > expectedValue - epsilon)
                 && (Math.Sqrt(variance) + epsilon > Math.Sqrt(RightVariance))
                 && (Math.Sqrt(variance) - epsilon < Math.Sqrt(RightVariance));
+        }
+
+        public void OverrideMinMax(double min, double max)
+        {
+            if (!ShouldOverrideMinMax)
+            {
+                throw new ApplicationException();
+            }
+
+            MinValue = min;
+            MaxValue = max;
         }
     }
 }
