@@ -12,11 +12,13 @@ namespace WpfSaimmodTwo.Models.Distributions
         }
         // sum of values == 1.0
         public override bool EstimateDistribution(IEnumerable<double> values, double epsilon)
-        {            
+        {
+            //return true;
+
             double Estimate(double x)
             {
-                return (1 / Math.Sqrt(Math.PI * 2 * RightVariance))
-                    * Math.Pow(Math.E, (RightExpectedValue - x) / (2 * RightVariance));
+                return (1 / Math.Sqrt(Math.PI * 2.0 * RightVariance))
+                    * Math.Pow(Math.E, -Math.Pow(RightExpectedValue - x, 2.0) / (2.0 * RightVariance));
             }
 
             double length = MaxValue - MinValue;
@@ -32,8 +34,8 @@ namespace WpfSaimmodTwo.Models.Distributions
                 {
                 }
                 else
-                {
-                    return false;
+                {                   
+                    return false;                   
                 }
             }
             return true;

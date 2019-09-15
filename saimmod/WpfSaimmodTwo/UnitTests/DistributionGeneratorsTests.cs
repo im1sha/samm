@@ -39,7 +39,8 @@ namespace UnitTests
             int totalValues, int totalIntervals)
         {
             // 
-            var uniformNotNormalizedSeq = new LehmerGenerator(_multiplier, _initialValue, _divider).GenerateSequence(totalValues);
+            var uniformNotNormalizedSeq = new LehmerGenerator(_multiplier, _initialValue, _divider)
+                .GenerateSequence(totalValues);
             var uniformNormalizedSeq = SequenceHelper.Normalize(uniformNotNormalizedSeq, _divider);
             //
             var newNotNormalizedSeq = generator.GenerateSequence(uniformNormalizedSeq);
@@ -57,14 +58,15 @@ namespace UnitTests
                 castEnd = (double)end;
             }
 
-            var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, castBegin, castEnd, totalIntervals).Select(i => i / (double)totalValues).ToArray();
+            var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, castBegin, castEnd, totalIntervals)
+                .Select(i => i / (double)totalValues).ToArray();
 
             var distResults = dist.EstimateDistribution(distribution, distributionEpsilon);
             var statResults = dist.EstimateStatistics(expVal, variance, statEpsilon);
             Assert.IsTrue(distResults && statResults);
         }
 
-        [TestCase(511, 50, 0.02, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(511, 50, 0.045, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS*10)]
         public void NormalDistributionGeneratorTest(double expectedValue, double variance,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {
