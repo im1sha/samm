@@ -19,10 +19,11 @@ namespace UnitTests
         [TestCase(-101, -1, 0.1, 30_000)]
         public void UniformDistributionGeneratorTest(double min, double max, double epsilon, int totalValues)
         {
-            var generator = new UniformDistributionGenerator(new UniformDistribution(min, max));  
-            (double exp, _, double stdDiv) = GetStat(generator, totalValues);
-            Assert.IsTrue((exp < ((min + max) / 2) + epsilon)
-                && (exp > ((min + max) / 2) - epsilon));
+            var dist = new UniformDistribution(min, max);
+            var generator = new UniformDistributionGenerator(dist);
+            (double exp, _, _) = GetStat(generator, totalValues);
+            Assert.IsTrue((exp < (dist.RightExpectedValue) + epsilon)
+                && (exp > (dist.RightExpectedValue) - epsilon));
         }
 
         [TestCase(5, 2, 0.02, 30_000)]
@@ -30,7 +31,8 @@ namespace UnitTests
         [TestCase(-101, 10, 0.1, 30_000)]
         public void NormalDistributionGeneratorTest(double expectedValue, double variance, double epsilon, int totalValues)
         {
-            var generator = new NormalDistributionGenerator(new NormalDistribution(expectedValue, variance));
+            var dist = new NormalDistribution(expectedValue, variance);
+            var generator = new NormalDistributionGenerator(dist);
             (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
             Assert.IsTrue((resultExp < expectedValue + epsilon) 
                 && (resultExp > expectedValue - epsilon)
@@ -43,12 +45,27 @@ namespace UnitTests
         [TestCase(-101, -1, 2, 1, 30_000)]
         public void ExponentialDistributionGeneratorTest(double begin, double end, double lambda, double epsilon, int totalValues)
         {
-            var generator = new ExponentialDistributionGenerator(new ExponentialDistribution(begin, end, lambda));
+            var dist = new ExponentialDistribution(begin, end, lambda);
+            var generator = new ExponentialDistributionGenerator(dist);
             (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
-            Assert.IsTrue((resultExp < 1 / lambda + epsilon)
-                && (resultExp > 1 / lambda - epsilon)
-                && (Math.Sqrt(1 / lambda) + epsilon > Math.Sqrt(resultVariance))
-                && (Math.Sqrt(1 / lambda) - epsilon < Math.Sqrt(resultVariance)));
+            Assert.IsTrue((resultExp < dist.RightExpectedValue + epsilon)
+                && (resultExp > dist.RightExpectedValue - epsilon)
+                && (Math.Sqrt(dist.RightVariance) + epsilon > Math.Sqrt(resultVariance))
+                && (Math.Sqrt(dist.RightVariance) - epsilon < Math.Sqrt(resultVariance)));
+        }
+
+        [TestCase(0, 100, 2, 5000, 0.1, 30_000)]
+        [TestCase(-50, 50, 11, 1, 0.1, 30_000)]
+        [TestCase(-101, -1, 19, -5000, 0.1, 30_000)]
+        public void GammaDistributionGeneratorTest(double begin, double end, double eta, double lambda, double epsilon, int totalValues)
+        {
+            var dist = new GammaDistribution(begin, end, eta, lambda);
+            var generator = new GammaDistributionGenerator(dist);
+            (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
+            Assert.IsTrue((resultExp < dist.RightExpectedValue + epsilon)
+                && (resultExp > dist.RightExpectedValue - epsilon)
+                && (Math.Sqrt(dist.RightVariance) + epsilon > Math.Sqrt(resultVariance))
+                && (Math.Sqrt(dist.RightVariance) - epsilon < Math.Sqrt(resultVariance)));
         }
 
         private (double expectedValue, double variance, double standardDeviation) GetStat(
