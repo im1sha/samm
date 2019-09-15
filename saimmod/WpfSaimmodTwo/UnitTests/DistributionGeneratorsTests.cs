@@ -17,7 +17,9 @@ namespace UnitTests
         private const int USUAL_TEST_LENGTH = 30_000;
         private const int USUAL_INTERVALS = 20;
 
-        [TestCase(-500, 499, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(-513, 499, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(511, 1477, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(-1538, -497, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
 
         public void UniformDistributionGeneratorTest(double min, double max,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
@@ -45,7 +47,7 @@ namespace UnitTests
         //    var dist = new NormalDistribution(expectedValue, variance);
         //    var generator = new NormalDistributionGenerator(dist);
         //    (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
-        //    Assert.IsTrue((resultExp < expectedValue + epsilon) 
+        //    Assert.IsTrue((resultExp < expectedValue + epsilon)
         //        && (resultExp > expectedValue - epsilon)
         //        && (Math.Sqrt(variance) + epsilon > Math.Sqrt(resultVariance))
         //        && (Math.Sqrt(variance) - epsilon < Math.Sqrt(resultVariance)));
