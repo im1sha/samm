@@ -59,13 +59,13 @@ namespace UnitTests
             var dist = new UniformDistribution(begin, end);
             var generator = new UniformDistributionGenerator(dist);
             CheckAssert(
-                generator, dist, 
+                generator, dist,
                 begin, end,
-                distributionEpsilon, statEpsilon, 
+                distributionEpsilon, statEpsilon,
                 totalValues, totalIntervals);
         }
-    
-        [TestCase(511, 50, 0.005, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS*5)]
+
+        [TestCase(511, 50, 0.005, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS * 5)]
         public void NormalDistributionGeneratorTest(double expectedValue, double variance,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {
@@ -78,17 +78,17 @@ namespace UnitTests
                totalValues, totalIntervals);
         }
 
-        [TestCase(511, 50, 0.045, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
-        public void ExponentialDistributionGeneratorTest(double expectedValue, double variance,
+        [TestCase(0.05, 0.005, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS * 3)]
+        public void ExponentialDistributionGeneratorTest(double lambda,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {
-            //var dist = new ExponentialDistribution(begin, end, lambda);
-            //var generator = new ExponentialDistributionGenerator(dist);
-            //CheckAssert(
-            //    generator, dist,
-            //    begin, end,
-            //    distributionEpsilon, statEpsilon,
-            //    totalValues, totalIntervals);
+            var dist = new ExponentialDistribution(lambda);
+            var generator = new ExponentialDistributionGenerator(dist);
+            CheckAssert(
+                generator, dist,
+                null, null,
+                distributionEpsilon, statEpsilon,
+                totalValues, totalIntervals);
         }
 
         //[TestCase(0, 100, 2, 5000, 0.1, 30_000)]
