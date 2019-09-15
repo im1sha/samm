@@ -17,26 +17,10 @@ namespace UnitTests
         private const int USUAL_TEST_LENGTH = 30_000;
         private const int USUAL_INTERVALS = 20;
 
-        [TestCase(-513, 499, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
-        [TestCase(511, 1477, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
-        [TestCase(-1538, -497, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
-
-        public void UniformDistributionGeneratorTest(double begin, double end,
-            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
-        {
-            var dist = new UniformDistribution(begin, end);
-            var generator = new UniformDistributionGenerator(dist);
-            CheckAssert(
-                generator, dist, 
-                begin, end,
-                distributionEpsilon, statEpsilon, 
-                totalValues, totalIntervals);
-        }
-
         private void CheckAssert(UniformNormalizedBasedGenerator generator, NotNormalizedDistribution dist,
-            double? begin, double? end, 
-            double distributionEpsilon, double statEpsilon, 
-            int totalValues, int totalIntervals)
+          double? begin, double? end,
+          double distributionEpsilon, double statEpsilon,
+          int totalValues, int totalIntervals)
         {
             // 
             var uniformNotNormalizedSeq = new LehmerGenerator(_multiplier, _initialValue, _divider)
@@ -66,7 +50,22 @@ namespace UnitTests
             Assert.IsTrue(distResults && statResults);
         }
 
-        [TestCase(511, 50, 0.045, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS*10)]
+        [TestCase(-513, 499, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(511, 1477, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        [TestCase(-1538, -497, 0.005, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        public void UniformDistributionGeneratorTest(double begin, double end,
+            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
+        {
+            var dist = new UniformDistribution(begin, end);
+            var generator = new UniformDistributionGenerator(dist);
+            CheckAssert(
+                generator, dist, 
+                begin, end,
+                distributionEpsilon, statEpsilon, 
+                totalValues, totalIntervals);
+        }
+    
+        [TestCase(511, 50, 0.005, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS*5)]
         public void NormalDistributionGeneratorTest(double expectedValue, double variance,
             double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {
@@ -79,19 +78,18 @@ namespace UnitTests
                totalValues, totalIntervals);
         }
 
-        //[TestCase(0, 100, 0.5, 1, 30_000)]
-        //[TestCase(-50, 50, 1, 1, 30_000)]
-        //[TestCase(-101, -1, 2, 1, 30_000)]
-        //public void ExponentialDistributionGeneratorTest(double begin, double end, double lambda, double epsilon, int totalValues)
-        //{
-        //    var dist = new ExponentialDistribution(begin, end, lambda);
-        //    var generator = new ExponentialDistributionGenerator(dist);
-        //    (double resultExp, double resultVariance, _) = GetStat(generator, totalValues);
-        //    Assert.IsTrue((resultExp < dist.RightExpectedValue + epsilon)
-        //        && (resultExp > dist.RightExpectedValue - epsilon)
-        //        && (Math.Sqrt(dist.RightVariance) + epsilon > Math.Sqrt(resultVariance))
-        //        && (Math.Sqrt(dist.RightVariance) - epsilon < Math.Sqrt(resultVariance)));
-        //}
+        [TestCase(511, 50, 0.045, 1, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
+        public void ExponentialDistributionGeneratorTest(double expectedValue, double variance,
+            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
+        {
+            //var dist = new ExponentialDistribution(begin, end, lambda);
+            //var generator = new ExponentialDistributionGenerator(dist);
+            //CheckAssert(
+            //    generator, dist,
+            //    begin, end,
+            //    distributionEpsilon, statEpsilon,
+            //    totalValues, totalIntervals);
+        }
 
         //[TestCase(0, 100, 2, 5000, 0.1, 30_000)]
         //[TestCase(-50, 50, 11, 1, 0.1, 30_000)]

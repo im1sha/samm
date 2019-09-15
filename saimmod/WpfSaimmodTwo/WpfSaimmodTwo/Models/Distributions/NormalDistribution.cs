@@ -25,7 +25,9 @@ namespace WpfSaimmodTwo.Models.Distributions
             double interval = length / values.Count();
 
             var arguments = Enumerable.Range(0, values.Count()).Select(i => (MinValue + interval / 2.0) + i * interval);
-            var expectedProbabilites = arguments.Select(i => Estimate(i));
+            var probabilites = arguments.Select(i => Estimate(i));
+            var probabilitesSum = probabilites.Sum();
+            var expectedProbabilites = probabilites.Select(i => i / probabilitesSum);
 
             for (int i = 0; i < values.Count(); i++)
             {
@@ -34,8 +36,8 @@ namespace WpfSaimmodTwo.Models.Distributions
                 {
                 }
                 else
-                {                   
-                    return false;                   
+                {
+                    return false;
                 }
             }
             return true;
