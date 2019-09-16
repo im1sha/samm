@@ -10,12 +10,12 @@ namespace WpfSaimmodTwo
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly AppViewModel _vm;
         public MainWindow()
         {
+            AppViewModel vm;
             InitializeComponent();
-            DataContext = _vm = new AppViewModel();
-            _vm.InitializeCommand.Execute(null);
+            DataContext = vm = new AppViewModel();
+            vm.InitializeCommand.Execute(null);
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)

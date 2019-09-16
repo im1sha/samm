@@ -15,7 +15,7 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            return values.Select(i => _distribution.MinValue + ((_distribution.MaxValue - _distribution.MinValue) * i));
+            return values.Select(i => Distribution.MinValue + ((Distribution.MaxValue - Distribution.MinValue) * i));
         }
     }
 }

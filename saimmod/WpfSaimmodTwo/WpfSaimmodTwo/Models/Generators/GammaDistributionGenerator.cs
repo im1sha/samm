@@ -11,9 +11,9 @@ namespace WpfSaimmodTwo.Models.Generators
         public GammaDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)
         {
-            if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
+            if (Distribution.AdditionalParameters == null || Distribution.AdditionalParameters.Length != 2)
             {
-                throw new ApplicationException($"Expected {nameof(_distribution.AdditionalParameters)} format: " +
+                throw new ApplicationException($"Expected {nameof(Distribution.AdditionalParameters)} format: " +
                     $"double[2] {{ eta, lambda }}");
             }
         }
@@ -36,8 +36,8 @@ namespace WpfSaimmodTwo.Models.Generators
             }
 
             int length = values.Count();
-            int eta = (int)_distribution.AdditionalParameters[0];
-            double lambda = _distribution.AdditionalParameters[1];
+            int eta = (int)Distribution.AdditionalParameters[0];
+            double lambda = Distribution.AdditionalParameters[1];
 
             double[] multiplications = new double[length];
 
@@ -52,7 +52,7 @@ namespace WpfSaimmodTwo.Models.Generators
 
             var results = multiplications.Select(i => -(1 / lambda) * Math.Log(i));
 
-            _distribution.OverrideMinMax(results.Min(), results.Max());
+            Distribution.OverrideMinMax(results.Min(), results.Max());
 
             return results;
         }

@@ -7,12 +7,11 @@ namespace WpfSaimmodTwo.Models.Core
 {
     public abstract class UniformNormalizedBasedGenerator : IUniformNormalizedBasedGenerator
     {
-
-        protected INotNormalizedDistribution _distribution;
+        public INotNormalizedDistribution Distribution { get; }
 
         public UniformNormalizedBasedGenerator(INotNormalizedDistribution distribution)
         {
-            _distribution = distribution;
+            Distribution = distribution;
         }
 
         public abstract IEnumerable<double> GenerateSequence(IEnumerable<double> values);

@@ -12,12 +12,10 @@ namespace WpfSaimmodTwo.Models
     public class AppModel
     {
         private IEnumerable<double> _normalizedUniformDistributedSequence;
-        private readonly NormalizedUniformDistribution _normalizedUniformDistribution;
         private readonly IAperiodicGenerator _aperiodicGenerator;
 
-        public AppModel(NormalizedUniformDistribution distribution, IAperiodicGenerator generator)
+        public AppModel(IAperiodicGenerator generator)
         {
-            _normalizedUniformDistribution = distribution;
             _aperiodicGenerator = generator;
         }
 
@@ -32,18 +30,18 @@ namespace WpfSaimmodTwo.Models
 
         public (double expectedValue, double variance, double standardDeviation, IEnumerable<double> distribution) Run(
             UniformNormalizedBasedGenerator generator,
-            NotNormalizedDistribution dist,
-            int totalValues, int totalIntervals)
+            int totalValues,
+            int totalIntervals)
         {
             return Core(
-                generator, dist,
-                totalValues, totalIntervals,
+                generator,
+                totalValues, 
+                totalIntervals,
                 _normalizedUniformDistributedSequence);
         }
 
         private (double expectedValue, double variance, double standardDeviation, IEnumerable<double> distribution) Core(
             UniformNormalizedBasedGenerator generator, 
-            NotNormalizedDistribution dist,
             int totalValues,
             int totalIntervals, 
             IEnumerable<double> uniformNormalizedSeq)
@@ -51,6 +49,7 @@ namespace WpfSaimmodTwo.Models
             var newNotNormalizedSeq = generator.GenerateSequence(uniformNormalizedSeq);
             (double expVal, double variance, double standardDeviation) = StatisticsGenerator.GetStatistics(newNotNormalizedSeq);
 
+            var dist = generator.Distribution;
             double begin = dist.MinValue;
             double end = dist.MaxValue;
 

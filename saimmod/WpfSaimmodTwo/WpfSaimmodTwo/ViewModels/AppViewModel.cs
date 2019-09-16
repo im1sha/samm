@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using WpfSaimmodTwo.Models;
 using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Models.Distributions;
@@ -11,40 +12,7 @@ using WpfSaimmodTwo.Models.Generators;
 namespace WpfSaimmodTwo.ViewModels
 {
     public class AppViewModel : INotifyPropertyChanged
-    {
-        #region autogenerate command -unused
-        //private InteractCommand _autogenerateCommand;
-        //public InteractCommand AutogenerateCommand => _autogenerateCommand ??
-        //            (_autogenerateCommand = new InteractCommand(stack =>
-        //            {
-        //                AutoGenerate(stack);
-        //            }));
-
-        //private void AutoGenerate(object stack)
-        //{
-        //    uint multiplier, initialValue, divider;
-        //    bool correctData, validPeriod; // flags
-        //    int period, aperiodicity;
-        //    double estimation;
-        //    IEnumerable<double> normalizedSequence;
-        //    AppModel md;
-
-        //    do
-        //    {
-        //        (multiplier, initialValue, divider) = AppModel.GenerateRandomParameters();
-
-        //        RunCore(out md, multiplier, initialValue, divider, out normalizedSequence,
-        //            out estimation, out period, out aperiodicity);
-
-        //        validPeriod = md.CheckIndirectEstimation(estimation, 0.001);
-        //        correctData = period > 50_000;
-        //    } while (!correctData || !validPeriod);
-
-        //    UpdateTextboxes(multiplier, initialValue, divider);
-        //    UpdateView(md, normalizedSequence, stack, estimation, period, aperiodicity);
-        //}
-        #endregion
-
+    {     
         #region INotifyPropertyChanged 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -56,10 +24,11 @@ namespace WpfSaimmodTwo.ViewModels
         #endregion
 
         #region default values
-        private readonly uint _initialValue = 2684222873;
-        private readonly uint _divider = 4291343633;
-        private readonly uint _multiplier = 2595211397;
-        private readonly int _totalValues = 300_000;
+
+        private readonly uint _multiplier = 2093054237;
+        private readonly uint _initialValue = 2667363311;
+        private readonly uint _divider = 4286309017;
+        private readonly int _totalValues = 25_000;
         private readonly int _totalIntervals = 20;
 
         #endregion
@@ -71,7 +40,7 @@ namespace WpfSaimmodTwo.ViewModels
         public InteractCommand InitializeCommand => _initializeCommand ??
             (_initializeCommand = new InteractCommand((o) =>
             {
-                _model = new AppModel(new NormalizedUniformDistribution(), new LehmerGenerator(_multiplier, _initialValue, _divider));
+                _model = new AppModel(new LehmerGenerator(_multiplier, _initialValue, _divider));
                 _model.InitializeModel(_totalValues);
             }));
 
@@ -79,31 +48,25 @@ namespace WpfSaimmodTwo.ViewModels
         public InteractCommand GenerateCommand => _generateCommand ??
             (_generateCommand = new InteractCommand((stack) =>
             {
-                (NotNormalizedDistribution dist, UniformNormalizedBasedGenerator generator) = 
-                    CreateDistributionAndGenerator(
+                 UniformNormalizedBasedGenerator generator = 
+                    CreateDistribution(
                         _selectedDistribution,  
                         _begin, _end, 
                         _expectedValue, _variance,
                         _lambda, _eta);
 
-                if (dist == null || generator == null)
+                if (generator == null)
                 {
-                    HandleError();
+                    MessageBox.Show("check input data");
+                    return;
                 }
 
-                var res = _model.Run(generator, dist, _totalValues, _totalIntervals);
+                var res = _model.Run(generator, _totalValues, _totalIntervals);
                 ViewUpdater.DrawBarChart(stack, res.distribution);
                 ExpectedValueLabel = res.expectedValue.ToString();
                 VarianceLabel = res.variance.ToString();
                 StandardDeviationLabel = res.standardDeviation.ToString();
-
-                // update textboxes here
             }));
-
-        private void HandleError()
-        {
-            
-        }
 
         #endregion
 
@@ -265,45 +228,43 @@ namespace WpfSaimmodTwo.ViewModels
 
         #endregion
 
-        private (NotNormalizedDistribution distribution, UniformNormalizedBasedGenerator generator) CreateDistributionAndGenerator(
+        private UniformNormalizedBasedGenerator CreateDistribution(
             string selectedDistribution,
             double begin, double end,
             double expectedValue, double variance, 
             double lambda, int eta)
         {
-            NotNormalizedDistribution dist = null;
-            UniformNormalizedBasedGenerator gen = null;
-
-            switch (selectedDistribution)
+            UniformNormalizedBasedGenerator generator = null;
+            try
             {
-                case "Exponential":
-                    dist = new ExponentialDistribution(lambda);
-                    gen = new ExponentialDistributionGenerator(dist);
-                    break;
-                case "Gamma":
-                    dist = new GammaDistribution(eta, lambda);
-                    gen = new GammaDistributionGenerator(dist);
-                    break;
-                case "Normal":
-                    dist = new NormalDistribution(expectedValue, variance);
-                    gen = new NormalDistributionGenerator(dist);
-                    break;
-                case "Simpson":
-                    dist = new SimpsonDistribution(begin, end);
-                    gen = new SimpsonDistributionGenerator(dist);
-                    break;
-                case "Triangular":
-                    dist = new TriangularDistribution(begin, end);
-                    gen = new TriangularDistributionGenerator(dist);
-                    break;
-                case "Uniform":
-                    dist = new UniformDistribution(begin, end);
-                    gen = new UniformDistributionGenerator(dist);
-                    break;
-            }            
-
-            return (dist, gen);
+                switch (selectedDistribution)
+                {
+                    case "Exponential":
+                        generator = new ExponentialDistributionGenerator(new ExponentialDistribution(lambda));
+                        break;
+                    case "Gamma":
+                        generator = new GammaDistributionGenerator(new GammaDistribution(eta, lambda));
+                        break;
+                    case "Normal":
+                        generator = new NormalDistributionGenerator(new NormalDistribution(expectedValue, variance));
+                        break;
+                    case "Simpson":
+                        generator = new SimpsonDistributionGenerator(new SimpsonDistribution(begin, end));
+                        break;
+                    case "Triangular":
+                        generator = new TriangularDistributionGenerator(new TriangularDistribution(begin, end));
+                        break;
+                    case "Uniform":
+                        generator = new UniformDistributionGenerator(new UniformDistribution(begin, end));
+                        break;
+                }
+            }
+            catch 
+            {
+                return null;
+            }
+              
+            return generator;
         }
-
     }
 }

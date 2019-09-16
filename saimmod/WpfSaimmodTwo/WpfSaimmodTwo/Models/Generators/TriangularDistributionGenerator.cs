@@ -15,8 +15,8 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            var min = _distribution.MinValue;
-            var max = _distribution.MaxValue;
+            var min = Distribution.MinValue;
+            var max = Distribution.MaxValue;
 
             var length = values.Count();
             var results = new double[length];

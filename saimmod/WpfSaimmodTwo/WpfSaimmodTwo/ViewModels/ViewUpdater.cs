@@ -28,6 +28,7 @@ namespace WpfSaimmodTwo.ViewModels
             for (int i = 0; i < totalItems; i++)
             {
                 string content = values.ElementAt(i).ToString();
+                content = content.Substring(0, content.Length < 8 ? content.Length : 8).PadRight(8, '0');
 
                 if (content.Length > rowLength)
                 {

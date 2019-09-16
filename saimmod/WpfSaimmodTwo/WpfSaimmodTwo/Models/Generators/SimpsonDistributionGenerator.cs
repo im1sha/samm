@@ -16,8 +16,8 @@ namespace WpfSaimmodTwo.Models.Generators
         {
             var length = values.Count();
             var results = new double[length];
-            var min = _distribution.MinValue;
-            var max = _distribution.MaxValue;
+            var min = Distribution.MinValue;
+            var max = Distribution.MaxValue;
 
             for (int i = 0; i < length - 1; i++)
             {

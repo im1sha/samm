@@ -15,10 +15,10 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            var result = values.Select(i => (i <= 0) ? 0.0 : -Math.Log(i) * _distribution.RightExpectedValue);
+            var result = values.Select(i => (i <= 0) ? 0.0 : -Math.Log(i) * Distribution.RightExpectedValue);
             var min = result.Min();
             var max = result.Max();
-            _distribution.OverrideMinMax(min, max);
+            Distribution.OverrideMinMax(min, max);
             return result;
 
         }

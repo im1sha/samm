@@ -16,7 +16,7 @@ namespace WpfSaimmodTwo.Models.Generators
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
         {
-            double stdDeviation = Math.Sqrt(_distribution.RightVariance);        
+            double stdDeviation = Math.Sqrt(Distribution.RightVariance);        
             int length = values.Count();
             double[] results = new double[length];
 
@@ -28,7 +28,7 @@ namespace WpfSaimmodTwo.Models.Generators
             for (int i = 0; i < length - totalTake; i++)
             {             
                 mult = sqrt2 * (values.Skip(i).Take(totalTake).Sum() - 3.0);
-                results[i] = _distribution.RightExpectedValue + (stdDeviation * mult);
+                results[i] = Distribution.RightExpectedValue + (stdDeviation * mult);
             }
 
             int startTake, middleSkip, endTake;
@@ -39,10 +39,10 @@ namespace WpfSaimmodTwo.Models.Generators
                 middleSkip = i;
                 startTake = totalTake - endTake;
                 mult = sqrt2 * (values.Take(startTake).Concat(values.Skip(middleSkip).Take(endTake)).Sum() - 3.0);
-                results[i] = _distribution.RightExpectedValue + (stdDeviation * mult);
+                results[i] = Distribution.RightExpectedValue + (stdDeviation * mult);
             }
 
-            _distribution.OverrideMinMax(results.Min(), results.Max());
+            Distribution.OverrideMinMax(results.Min(), results.Max());
 
             return results;
         }
