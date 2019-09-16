@@ -8,13 +8,13 @@
         Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
     <Grid>
         <Label Content="begin, end" HorizontalAlignment="Left" Margin="25,14,0,0" VerticalAlignment="Top"/>
-        <Label Content="D, M" HorizontalAlignment="Left" Margin="25,43,0,0" VerticalAlignment="Top"/>
+        <Label Content="M,D" HorizontalAlignment="Left" Margin="25,43,0,0" VerticalAlignment="Top"/>
         <Label Content="lambda, eta" HorizontalAlignment="Left" Margin="25,70,0,0" VerticalAlignment="Top"/>
         <!--input-->
         <TextBox Text="{Binding Begin}" HorizontalAlignment="Left" Height="23" Margin="120,16,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox Text="{Binding End}"  HorizontalAlignment="Left" Height="23" Margin="265,16,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-        <TextBox Text="{Binding Variance}"  HorizontalAlignment="Left" Height="23" Margin="120,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
         <TextBox Text="{Binding ExpectedValue}"  HorizontalAlignment="Left" Height="23" Margin="265,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding Variance}"  HorizontalAlignment="Left" Height="23" Margin="120,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
         <TextBox Text="{Binding Lambda}"  HorizontalAlignment="Left" Height="23" Margin="120,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
         <TextBox Text="{Binding Eta}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="265,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
@@ -28,7 +28,9 @@
         <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,115,24.6,25"/>
 
         <ComboBox 
-            ItemsSource="{Binding Distributions}"
+            ItemsSource="{Binding Distributions}"        
+            SelectedItem="{Binding SelectedDistribution}"
+
             Text="Distribution"
             IsEditable="true"
             IsReadOnly="true" Margin="415,15,281.6,371"/>

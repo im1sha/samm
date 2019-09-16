@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WpfSaimmodTwo.Models;
@@ -78,15 +79,31 @@ namespace WpfSaimmodTwo.ViewModels
         public InteractCommand GenerateCommand => _generateCommand ??
             (_generateCommand = new InteractCommand((stack) =>
             {
-                var dist = new UniformDistribution(-100, 500);
-                var generator = new UniformDistributionGenerator(dist);
+                (NotNormalizedDistribution dist, UniformNormalizedBasedGenerator generator) = 
+                    CreateDistributionAndGenerator(
+                        _selectedDistribution,  
+                        _begin, _end, 
+                        _expectedValue, _variance,
+                        _lambda, _eta);
+
+                if (dist == null || generator == null)
+                {
+                    HandleError();
+                }
 
                 var res = _model.Run(generator, dist, _totalValues, _totalIntervals);
                 ViewUpdater.DrawBarChart(stack, res.distribution);
                 ExpectedValueLabel = res.expectedValue.ToString();
                 VarianceLabel = res.variance.ToString();
                 StandardDeviationLabel = res.standardDeviation.ToString();
+
+                // update textboxes here
             }));
+
+        private void HandleError()
+        {
+            
+        }
 
         #endregion
 
@@ -168,7 +185,7 @@ namespace WpfSaimmodTwo.ViewModels
             }
         }
 
-        private double _eta;
+        private int _eta;
         public string Eta
         {
             get => _eta.ToString();
@@ -178,7 +195,7 @@ namespace WpfSaimmodTwo.ViewModels
                 {
                     return;
                 }
-                _eta = Convert.ToDouble(value);
+                _eta = Convert.ToInt32(value);
                 OnPropertyChanged();
             }
         }
@@ -220,12 +237,73 @@ namespace WpfSaimmodTwo.ViewModels
             }
         }
 
-        #endregion        
+        #endregion
 
-        public List<string> Distributions { get; set; } = new List<string>()
+        #region selected distribution
+
+        private string _selectedDistribution = null;
+
+        public ObservableCollection<string> Distributions { get; set; } = new ObservableCollection<string>()
         {
-            "Exponential", "Gamma", "Normal", "Simpson", "Triangular", "Uniform"
+            "Exponential",
+            "Gamma",
+            "Normal",
+            "Simpson",
+            "Triangular",
+            "Uniform"
         };
+
+        public string SelectedDistribution
+        {
+            get { return _selectedDistribution; }
+            set
+            {
+                _selectedDistribution = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        private (NotNormalizedDistribution distribution, UniformNormalizedBasedGenerator generator) CreateDistributionAndGenerator(
+            string selectedDistribution,
+            double begin, double end,
+            double expectedValue, double variance, 
+            double lambda, int eta)
+        {
+            NotNormalizedDistribution dist = null;
+            UniformNormalizedBasedGenerator gen = null;
+
+            switch (selectedDistribution)
+            {
+                case "Exponential":
+                    dist = new ExponentialDistribution(lambda);
+                    gen = new ExponentialDistributionGenerator(dist);
+                    break;
+                case "Gamma":
+                    dist = new GammaDistribution(eta, lambda);
+                    gen = new GammaDistributionGenerator(dist);
+                    break;
+                case "Normal":
+                    dist = new NormalDistribution(expectedValue, variance);
+                    gen = new NormalDistributionGenerator(dist);
+                    break;
+                case "Simpson":
+                    dist = new SimpsonDistribution(begin, end);
+                    gen = new SimpsonDistributionGenerator(dist);
+                    break;
+                case "Triangular":
+                    dist = new TriangularDistribution(begin, end);
+                    gen = new TriangularDistributionGenerator(dist);
+                    break;
+                case "Uniform":
+                    dist = new UniformDistribution(begin, end);
+                    gen = new UniformDistributionGenerator(dist);
+                    break;
+            }            
+
+            return (dist, gen);
+        }
 
     }
 }
