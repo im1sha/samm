@@ -18,7 +18,7 @@ namespace WpfSaimmodTwo.Utils
 
             return result;
         }
-
+      
         public static IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
         {
             if (values == null || totalIntervals <= 0
@@ -43,15 +43,20 @@ namespace WpfSaimmodTwo.Utils
         }
 
         public static IEnumerable<double> GetExpectedProbabilitiesOnIntervals(IEnumerable<double> values, 
-            double minValue, double maxValue, Func<double, double> calculationCallback)
+            double minValue, double maxValue, Func<double, double> calculationCallback, bool withNormalization = true)
         {
             double length = maxValue - minValue;
             double interval = length / values.Count();
 
             var arguments = Enumerable.Range(0, values.Count()).Select(i => (minValue + interval / 2.0) + i * interval);
             var probabilites = arguments.Select(calculationCallback);
-            var probabilitesSum = probabilites.Sum();
-            var expectedProbabilites = probabilites.Select(i => i / probabilitesSum);
+
+            IEnumerable<double> expectedProbabilites = probabilites;
+            if (withNormalization)
+            {
+                var probabilitesSum = probabilites.Sum();
+                expectedProbabilites = probabilites.Select(i => i / probabilitesSum);
+            }
 
             return expectedProbabilites;
         }

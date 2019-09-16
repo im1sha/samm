@@ -102,5 +102,16 @@ namespace UnitTests
                 totalValues, totalIntervals);
         }
 
+        [TestCase(-1421, 2001, 0.05, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS + 1)]
+        public void SimpsonDistributionGeneratorTest(double begin, double end,
+           double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
+        {
+            var dist = new SimpsonDistribution(begin, end);
+            var generator = new SimpsonDistributionGenerator(dist);
+            CheckAssert(
+                generator, dist,
+                distributionEpsilon, statEpsilon,
+                totalValues, totalIntervals);
+        }
     }
 }
