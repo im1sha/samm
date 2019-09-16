@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using WpfSaimmodTwo.Models;
+using WpfSaimmodTwo.ViewModels;
 
 namespace WpfSaimmodTwo
 {
@@ -15,10 +10,12 @@ namespace WpfSaimmodTwo
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly AppViewModel _vm;
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new ViewModels.AppViewModel();
+            DataContext = _vm = new AppViewModel();
+            _vm.InitializeCommand.Execute(null);
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)

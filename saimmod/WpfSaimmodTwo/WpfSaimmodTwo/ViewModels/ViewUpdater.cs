@@ -9,7 +9,7 @@ namespace WpfSaimmodTwo.ViewModels
 {
     public static class ViewUpdater
     {
-        public static void DrawBarChart(object o, IEnumerable<int> values)
+        public static void DrawBarChart(object o, IEnumerable<double> values)
         {
             if (o == null || !(o is Panel))
             {

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Linq;
-using WpfSaimmodTwo.Models;
+using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Models.Distributions;
 using WpfSaimmodTwo.Models.Generators;
 using WpfSaimmodTwo.Utils;

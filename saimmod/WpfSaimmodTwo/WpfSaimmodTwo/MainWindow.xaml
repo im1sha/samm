@@ -7,25 +7,31 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
     <Grid>
-        <!--<Label Content="multiplier" HorizontalAlignment="Left" Margin="25,10,0,0" VerticalAlignment="Top"/>
-        <Label Content="initial Value" HorizontalAlignment="Left" Margin="25,36,0,0" VerticalAlignment="Top" />
-        <Label Content="divider" HorizontalAlignment="Left" Margin="25,64,0,0" VerticalAlignment="Top" />-->
-        
+        <Label Content="begin, end" HorizontalAlignment="Left" Margin="25,14,0,0" VerticalAlignment="Top"/>
+        <Label Content="D, M" HorizontalAlignment="Left" Margin="25,43,0,0" VerticalAlignment="Top"/>
+        <Label Content="lambda, eta" HorizontalAlignment="Left" Margin="25,70,0,0" VerticalAlignment="Top"/>
         <!--input-->
-        <TextBox Text="{Binding Multiplier}"   PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox Text="{Binding InitialValue}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,39,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
-        <TextBox Text="{Binding Divider}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="118,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding Begin}" HorizontalAlignment="Left" Height="23" Margin="120,16,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox Text="{Binding End}"  HorizontalAlignment="Left" Height="23" Margin="265,16,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120"/>
+        <TextBox Text="{Binding Variance}"  HorizontalAlignment="Left" Height="23" Margin="120,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding ExpectedValue}"  HorizontalAlignment="Left" Height="23" Margin="265,46,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding Lambda}"  HorizontalAlignment="Left" Height="23" Margin="120,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
+        <TextBox Text="{Binding Eta}" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Height="23" Margin="265,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" />
 
-        <Button Content="generate" Command="{Binding GenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="270,51,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-                    
+        <Button Content="generate" Command="{Binding GenerateCommand}" CommandParameter="{x:Reference _panel}" HorizontalAlignment="Left" Margin="415,73,0,0" VerticalAlignment="Top" Width="87" Height="23"/>
+
         <!--output-->
-        <Label Content="{Binding ExpectedValue}" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding Variance}" HorizontalAlignment="Left" Margin="390,40,0,0" VerticalAlignment="Top" />
-        <Label Content="{Binding StandardDeviation}" HorizontalAlignment="Left" Margin="390,60,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding Estimation  }" HorizontalAlignment="Left" Margin="580,20,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding Period }" HorizontalAlignment="Left" Margin="580,40,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding Aperiodicity }" HorizontalAlignment="Left" Margin="580,60,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding ExpectedValueLabel}" HorizontalAlignment="Left" Margin="566,19,0,0" VerticalAlignment="Top"/>
+        <Label Content="{Binding VarianceLabel}" HorizontalAlignment="Left" Margin="566,39,0,0" VerticalAlignment="Top" />
+        <Label Content="{Binding StandardDeviationLabel}" HorizontalAlignment="Left" Margin="566,59,0,0" VerticalAlignment="Top"/>
 
         <StackPanel Name="_panel" Orientation="Horizontal" Background="AliceBlue" FlowDirection="LeftToRight"  Margin="25,115,24.6,25"/>
+
+        <ComboBox 
+            ItemsSource="{Binding Distributions}"
+            Text="Distribution"
+            IsEditable="true"
+            IsReadOnly="true" Margin="415,15,281.6,371"/>
+
     </Grid>
 </Window>

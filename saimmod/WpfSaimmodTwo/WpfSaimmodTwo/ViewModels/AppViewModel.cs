@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Models;
+using WpfSaimmodTwo.Models.Core;
+using WpfSaimmodTwo.Models.Distributions;
+using WpfSaimmodTwo.Models.Generators;
 
 namespace WpfSaimmodTwo.ViewModels
 {
@@ -56,70 +58,127 @@ namespace WpfSaimmodTwo.ViewModels
         private readonly uint _initialValue = 2684222873;
         private readonly uint _divider = 4291343633;
         private readonly uint _multiplier = 2595211397;
+        private readonly int _totalValues = 300_000;
+        private readonly int _totalIntervals = 20;
+
         #endregion
+
+        private AppModel _model;
 
         #region commands
         private InteractCommand _initializeCommand;
         public InteractCommand InitializeCommand => _initializeCommand ??
-                    (_initializeCommand = new InteractCommand(stack =>
-                    {
-                        Initialize(_multiplier, _initialValue, _divider);
-                    }));
-        private void Initialize(uint multiplier, uint initialValue, uint divider)
-        {
-            RunCore(out AppModel md, multiplier, initialValue, divider,
-                out IEnumerable<double> normalizedSequence,
-                out double estimation, out int period, out int aperiodicity);
-        }
-
-   
-
-        private void RunCore(out AppModel md, uint multiplier, uint initialValue, uint divider,
-            out IEnumerable<double> normalizedSequence, out double estimation,
-            out int period, out int aperiodicity)
-        {
-            md = new AppModel(
-                new NormalizedUniformDistribution(),
-                new LehmerGenerator(multiplier, initialValue, divider));
-            IEnumerable<uint> seq = md.GenerateSequence(500_000);
-            normalizedSequence = md.Normalize(seq, divider); // [0,1]
-            estimation = md.CalculateIndirectEstimation(normalizedSequence);
-            var (length, start) = md.FindCycle(multiplier, initialValue, divider);
-            period = length;
-            aperiodicity = start + period;
-        }
-
-        private void UpdateView(AppModel md, IEnumerable<double> normalizedSequence, object stack)
-        {
-            void UpdateOutput(double expectedValueParam, double varianceParam,
-                double standardDeviationParam)
+            (_initializeCommand = new InteractCommand((o) =>
             {
-                ExpectedValue = expectedValueParam.ToString();
-                Variance = varianceParam.ToString();
-                StandardDeviation = standardDeviationParam.ToString();
-            }
+                _model = new AppModel(new NormalizedUniformDistribution(), new LehmerGenerator(_multiplier, _initialValue, _divider));
+                _model.InitializeModel(_totalValues);
+            }));
 
-            (double expectedValue, double variance, double standardDeviation) = md.GetStatistics(normalizedSequence);
-            IEnumerable<int> bars = md.GetDistribution(normalizedSequence, 0.0, 1.0, 20);
-            UpdateOutput(expectedValue, variance, standardDeviation);
-            ViewUpdater.DrawBarChart(stack, bars);
-        }
-     
+        private InteractCommand _generateCommand;
+        public InteractCommand GenerateCommand => _generateCommand ??
+            (_generateCommand = new InteractCommand((stack) =>
+            {
+                var dist = new UniformDistribution(-100, 500);
+                var generator = new UniformDistributionGenerator(dist);
+
+                var res = _model.Run(generator, dist, _totalValues, _totalIntervals);
+                ViewUpdater.DrawBarChart(stack, res.distribution);
+                ExpectedValueLabel = res.expectedValue.ToString();
+                VarianceLabel = res.variance.ToString();
+                StandardDeviationLabel = res.standardDeviation.ToString();
+            }));
+
         #endregion
 
-        #region input -unused
+        #region input 
 
-        private uint _val;
-        public string Val
+        private double _begin;
+        public string Begin
         {
-            get => _val.ToString();
+            get => _begin.ToString();
             set
             {
-                if (!uint.TryParse(value, out _))
+                if (!double.TryParse(value, out _))
                 {
                     return;
                 }
-                _val = Convert.ToUInt32(value);
+                _begin = Convert.ToDouble(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _end;
+        public string End
+        {
+            get => _end.ToString();
+            set
+            {
+                if (!double.TryParse(value, out _))
+                {
+                    return;
+                }
+                _end = Convert.ToDouble(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _variance;
+        public string Variance
+        {
+            get => _variance.ToString();
+            set
+            {
+                if (!double.TryParse(value, out _))
+                {
+                    return;
+                }
+                _variance = Convert.ToDouble(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _expectedValue;
+        public string ExpectedValue
+        {
+            get => _expectedValue.ToString();
+            set
+            {
+                if (!double.TryParse(value, out _))
+                {
+                    return;
+                }
+                _expectedValue = Convert.ToDouble(value);
+                OnPropertyChanged();
+            }
+
+        }
+
+        private double _lambda;
+        public string Lambda
+        {
+            get => _lambda.ToString();
+            set
+            {
+                if (!double.TryParse(value, out _))
+                {
+                    return;
+                }
+                _lambda = Convert.ToDouble(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private double _eta;
+        public string Eta
+        {
+            get => _eta.ToString();
+            set
+            {
+                if (!double.TryParse(value, out _))
+                {
+                    return;
+                }
+                _eta = Convert.ToDouble(value);
                 OnPropertyChanged();
             }
         }
@@ -128,39 +187,45 @@ namespace WpfSaimmodTwo.ViewModels
 
         #region statistics labels
 
-        private double _expectedValue;
-        public string ExpectedValue
+        private double _expectedValueLabel;
+        public string ExpectedValueLabel
         {
-            get => $"M: {_expectedValue}";
+            get => $"M: {_expectedValueLabel}";
             set
             {
-                _expectedValue = Convert.ToDouble(value);
+                _expectedValueLabel = Convert.ToDouble(value);
                 OnPropertyChanged();
             }
         }
 
-        private double _variance;
-        public string Variance
+        private double _varianceLabel;
+        public string VarianceLabel
         {
-            get => $"D: {_variance}";
+            get => $"D: {_varianceLabel}";
             set
             {
-                _variance = Convert.ToDouble(value);
+                _varianceLabel = Convert.ToDouble(value);
                 OnPropertyChanged();
             }
         }
 
-        private double _standardDeviation;
-        public string StandardDeviation
+        private double _standardDeviationLabel;
+        public string StandardDeviationLabel
         {
-            get => $"sqrt(D): {_standardDeviation}";
+            get => $"sqrt(D): {_standardDeviationLabel}";
             set
             {
-                _standardDeviation = Convert.ToDouble(value);
+                _standardDeviationLabel = Convert.ToDouble(value);
                 OnPropertyChanged();
             }
         }
 
         #endregion        
+
+        public List<string> Distributions { get; set; } = new List<string>()
+        {
+            "Exponential", "Gamma", "Normal", "Simpson", "Triangular", "Uniform"
+        };
+
     }
 }

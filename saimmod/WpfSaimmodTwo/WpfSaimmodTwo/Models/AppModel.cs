@@ -4,6 +4,7 @@ using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Models.Distributions;
+using WpfSaimmodTwo.Models.Generators;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
@@ -22,26 +23,41 @@ namespace WpfSaimmodTwo.Models
 
         public void InitializeModel(int totalValues)
         {
-
-
             _normalizedUniformDistributedSequence
-                = _aperiodicGenerator.GenerateSequence(totalValues).Select(i => i / (double)_aperiodicGenerator.Divider).ToArray();
+                = SequenceHelper.Normalize(
+                    _aperiodicGenerator.GenerateSequence(totalValues),
+                    _aperiodicGenerator.Divider)
+                .ToArray();
         }
 
-        //public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
-        //{
-        //    return SequenceHelper.GetDistribution(values, begin, end, totalIntervals);
-        //}
+        public (double expectedValue, double variance, double standardDeviation, IEnumerable<double> distribution) Run(
+            UniformNormalizedBasedGenerator generator,
+            NotNormalizedDistribution dist,
+            int totalValues, int totalIntervals)
+        {
+            return Core(
+                generator, dist,
+                totalValues, totalIntervals,
+                _normalizedUniformDistributedSequence);
+        }
 
-        //public (double expectedValue, double variance, double standardDeviation) GetStatistics(
-        //    IEnumerable<double> values)
-        //{
-        //    return StatisticsGenerator.GetStatistics(values);
-        //}
+        private (double expectedValue, double variance, double standardDeviation, IEnumerable<double> distribution) Core(
+            UniformNormalizedBasedGenerator generator, 
+            NotNormalizedDistribution dist,
+            int totalValues,
+            int totalIntervals, 
+            IEnumerable<double> uniformNormalizedSeq)
+        {
+            var newNotNormalizedSeq = generator.GenerateSequence(uniformNormalizedSeq);
+            (double expVal, double variance, double standardDeviation) = StatisticsGenerator.GetStatistics(newNotNormalizedSeq);
 
-        //public IEnumerable<double> Normalize(IEnumerable<uint> seq, uint divider)
-        //{
-        //    return SequenceHelper.Normalize(seq, divider);
-        //}
+            double begin = dist.MinValue;
+            double end = dist.MaxValue;
+
+            var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, begin, end, totalIntervals)
+                .Select(i => i / (double)totalValues).ToArray();
+
+            return (expVal, variance, standardDeviation, distribution);
+        }
     }
 }
