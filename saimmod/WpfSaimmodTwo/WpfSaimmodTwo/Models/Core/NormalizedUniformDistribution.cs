@@ -4,7 +4,7 @@ using System.Linq;
 using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Utils;
 
-namespace WpfSaimmodTwo.Models
+namespace WpfSaimmodTwo.Models.Core
 {
     // Если равномерное распределение в интервале(a, b), то
     // M == (a+b) /2                            // 0.5     

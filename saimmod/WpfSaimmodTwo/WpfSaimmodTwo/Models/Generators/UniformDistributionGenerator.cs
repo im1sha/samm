@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System;
-using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Interfaces.Distributions;
+using WpfSaimmodTwo.Models.Core;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
     public class UniformDistributionGenerator : UniformNormalizedBasedGenerator
     {
-    
+
         public UniformDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)
         {

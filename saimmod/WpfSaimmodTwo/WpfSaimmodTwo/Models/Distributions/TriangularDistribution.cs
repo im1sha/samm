@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WpfSaimmodTwo.Utils;
+using WpfSaimmodTwo.Models.Core;
 
 namespace WpfSaimmodTwo.Models.Distributions
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models.Distributions
@@ -50,10 +51,11 @@ namespace WpfSaimmodTwo.Models.Distributions
                         .Take((totalIntervals / 2) + (totalIntervals % 2)),
                     bounds[1].min, bounds[1].max,
                     i => EstimateEnd(MinValue, MaxValue, i));
+
             var totalSum = startExpectedProbabilites.Sum() + endExpectedProbabilites.Sum();
             var expected = startExpectedProbabilites.Concat(endExpectedProbabilites).Select(i => i / totalSum);
-            return SequenceHelper.CheckEpsilon(values, expected, epsilon);
 
+            return SequenceHelper.CheckEpsilon(values, expected, epsilon);
         }
     }
 }

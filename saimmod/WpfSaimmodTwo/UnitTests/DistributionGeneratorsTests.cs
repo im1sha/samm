@@ -31,7 +31,7 @@ namespace UnitTests
 
             double begin = dist.MinValue;
             double end = dist.MaxValue;
-            
+
             var distribution = SequenceHelper.GetDistribution(newNotNormalizedSeq, begin, end, totalIntervals)
                 .Select(i => i / (double)totalValues).ToArray();
 
@@ -102,7 +102,7 @@ namespace UnitTests
                 totalValues, totalIntervals);
         }
 
-        [TestCase(-1421, 2001, 0.05, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS + 1)]
+        [TestCase(-1421, 2001, 0.05, 0.5, USUAL_TEST_LENGTH, USUAL_INTERVALS)]
         public void SimpsonDistributionGeneratorTest(double begin, double end,
            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
         {

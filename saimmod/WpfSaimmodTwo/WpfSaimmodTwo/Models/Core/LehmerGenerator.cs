@@ -4,7 +4,7 @@ using System.Linq;
 using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Utils;
 
-namespace WpfSaimmodTwo.Models
+namespace WpfSaimmodTwo.Models.Core
 {
     public class LehmerGenerator : IAperiodicGenerator
     {

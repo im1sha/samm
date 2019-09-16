@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Interfaces.Generators;
+using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models

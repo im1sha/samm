@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WpfSaimmodTwo.Models.Core;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models.Distributions
