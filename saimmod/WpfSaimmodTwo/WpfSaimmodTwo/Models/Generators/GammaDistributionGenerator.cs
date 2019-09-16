@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using WpfSaimmodTwo.Interfaces.Distributions;
-using WpfSaimmodTwo.Interfaces.Generators;
 using System.Linq;
+using WpfSaimmodTwo.Interfaces.Distributions;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
@@ -11,6 +10,11 @@ namespace WpfSaimmodTwo.Models.Generators
         public GammaDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)
         {
+            if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
+            {
+                throw new ApplicationException($"Expected {nameof(_distribution.AdditionalParameters)} format: " +
+                    $"double[2] {{ eta, lambda }}");
+            }
         }
 
         public override IEnumerable<double> GenerateSequence(IEnumerable<double> values)
@@ -23,27 +27,33 @@ namespace WpfSaimmodTwo.Models.Generators
                 }
                 return sequence.Skip(startIndex).Take(count).Aggregate((x, y) => x * y);
             }
-
-            if (_distribution.AdditionalParameters == null || _distribution.AdditionalParameters.Length != 2)
+         
+            if (values.Where(i => i < 0).Count() > 0)
             {
-                throw new ApplicationException();
+                throw new ArgumentException($"Gamma-distributed values are non-negative. " +
+                    $"Parameter {nameof(values)} should contain only non-negative values.");
             }
 
             int length = values.Count();
             int eta = (int)_distribution.AdditionalParameters[0];
             double lambda = _distribution.AdditionalParameters[1];
 
-            double[] results = new double[length];
+            double[] multiplications = new double[length];
 
             for (int i = 0; i < length - eta; i++)
             {
-                results[i] = Multiple(values, i, eta);
+                multiplications[i] = Multiple(values, i, eta);
             }
             for (int i = length - eta; i < length; i++)
             {
-                results[i] = Multiple(values, i, (length - i)) * Multiple(values, 0, eta - (length - i));
+                multiplications[i] = Multiple(values, i, (length - i)) * Multiple(values, 0, eta - (length - i));
             }
-            return results.Select(i => -(1 / lambda) * Math.Log(i));
+
+            var results = multiplications.Select(i => -(1 / lambda) * Math.Log(i));
+
+            _distribution.OverrideMinMax(results.Min(), results.Max());
+
+            return results;
         }
     }
 }

@@ -78,6 +78,7 @@
     <Compile Include="Models\NotNormalizedDistribution.cs" />
     <Compile Include="Models\UniformNormalizedBasedGenerator.cs" />
     <Compile Include="Utils\CircleDetector.cs" />
+    <Compile Include="Utils\MathExtensions.cs" />
     <Compile Include="Utils\SequenceHelper.cs" />
     <Compile Include="Utils\PrimeTests.cs" />
     <Compile Include="Utils\StatisticsGenerator.cs" />
