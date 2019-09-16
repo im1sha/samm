@@ -1,51 +1,47 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using WpfSaimmodTwo.Interfaces.Distributions;
 using WpfSaimmodTwo.Interfaces.Generators;
 using WpfSaimmodTwo.Models.Core;
+using WpfSaimmodTwo.Models.Distributions;
 using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models
 {
     public class AppModel
     {
-        private readonly INormalizedDistribution _distribution;
-        private readonly IAperiodicGenerator _algorithm;
+        private IEnumerable<double> _normalizedUniformDistributedSequence;
+        private readonly NormalizedUniformDistribution _normalizedUniformDistribution;
+        private readonly IAperiodicGenerator _aperiodicGenerator;
 
-        public AppModel(INormalizedDistribution distribution, IAperiodicGenerator algorithm)
+        public AppModel(NormalizedUniformDistribution distribution, IAperiodicGenerator generator)
         {
-            _distribution = distribution;
-            _algorithm = algorithm;
+            _normalizedUniformDistribution = distribution;
+            _aperiodicGenerator = generator;
         }
 
-        public IEnumerable<uint> GenerateSequence(int totalValues)
-            => _algorithm.GenerateSequence(totalValues);
-        
+        public void InitializeModel(int totalValues)
+        {
 
-        public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)        
-            => SequenceHelper.GetDistribution(values, begin, end, totalIntervals);
-        
 
-        public (double expectedValue, double variance, double standardDeviation) GetStatistics(
-            IEnumerable<double> values)       
-            => _distribution.GetStatistics(values);
-        
+            _normalizedUniformDistributedSequence
+                = _aperiodicGenerator.GenerateSequence(totalValues).Select(i => i / (double)_aperiodicGenerator.Divider).ToArray();
+        }
 
-        public double CalculateIndirectEstimation(IEnumerable<double> values)       
-            => _distribution.CalculateIndirectEstimation(values);
-        
+        //public IEnumerable<int> GetDistribution(IEnumerable<double> values, double begin, double end, int totalIntervals)
+        //{
+        //    return SequenceHelper.GetDistribution(values, begin, end, totalIntervals);
+        //}
 
-        public bool CheckIndirectEstimation(double estimation, double epsilon)        
-            =>  _distribution.CheckIndirectEstimation(estimation, epsilon);
-        
+        //public (double expectedValue, double variance, double standardDeviation) GetStatistics(
+        //    IEnumerable<double> values)
+        //{
+        //    return StatisticsGenerator.GetStatistics(values);
+        //}
 
-        public (int length, int start) FindCycle(uint multiplier, uint initialValue, uint divider)
-            => _algorithm.FindCycle(multiplier, initialValue, divider);
-        
-
-        public static (uint multiplier, uint initialValue, uint divider) GenerateRandomParameters() 
-            => LehmerGenerator.GenerateRandomParameters();
-
-        public IEnumerable<double> Normalize(IEnumerable<uint>seq, uint divider)
-            => SequenceHelper.Normalize(seq, divider);
+        //public IEnumerable<double> Normalize(IEnumerable<uint> seq, uint divider)
+        //{
+        //    return SequenceHelper.Normalize(seq, divider);
+        //}
     }
 }

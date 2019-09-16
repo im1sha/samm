@@ -63,7 +63,7 @@ namespace WpfSaimmodTwo.ViewModels
         public InteractCommand InitializeCommand => _initializeCommand ??
                     (_initializeCommand = new InteractCommand(stack =>
                     {
-                        Initialize( _multiplier, _initialValue, _divider);
+                        Initialize(_multiplier, _initialValue, _divider);
                     }));
         private void Initialize(uint multiplier, uint initialValue, uint divider)
         {
