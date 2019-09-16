@@ -30,28 +30,12 @@ namespace WpfSaimmodTwo.Models.Distributions
 
             int eta = (int)AdditionalParameters[0];
             double lambda = AdditionalParameters[1];
-          
-            double length = MaxValue - MinValue;
-            double interval = length / values.Count();
 
-            var arguments = Enumerable.Range(0, values.Count()).Select(i => (MinValue + interval / 2.0) + i * interval);
-            var probabilites = arguments.Select(i => Estimate(lambda, eta, i)).ToArray();
-            var probabilitesSum = probabilites.Sum();
-            var expectedProbabilites = probabilites.Select(i => i / probabilitesSum).ToArray();
+            var expectedProbabilites =
+                SequenceHelper.GetExpectedProbabilitiesOnIntervals(values, MinValue, MaxValue, i => Estimate(lambda, eta, i));
 
-            for (int i = 0; i < values.Count(); i++)
-            {
-                if (values.ElementAt(i) < expectedProbabilites.ElementAt(i) + epsilon
-                    && values.ElementAt(i) > expectedProbabilites.ElementAt(i) - epsilon)
-                {
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            return SequenceHelper.CheckEpsilon(values, expectedProbabilites, epsilon);
 
-            return true;
         }
     }
 }

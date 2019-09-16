@@ -6,9 +6,9 @@ using WpfSaimmodTwo.Interfaces.Generators;
 
 namespace WpfSaimmodTwo.Models.Generators
 {
-    public class TriangleDistributionGenerator : UniformNormalizedBasedGenerator
+    public class TriangularDistributionGenerator : UniformNormalizedBasedGenerator
     {
-        public TriangleDistributionGenerator(INotNormalizedDistribution distribution)
+        public TriangularDistributionGenerator(INotNormalizedDistribution distribution)
             : base(distribution)
         {
         }

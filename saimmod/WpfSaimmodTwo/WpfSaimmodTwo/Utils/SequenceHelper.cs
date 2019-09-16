@@ -42,22 +42,34 @@ namespace WpfSaimmodTwo.Utils
             return results;
         }
 
+        public static IEnumerable<double> GetExpectedProbabilitiesOnIntervals(IEnumerable<double> values, 
+            double minValue, double maxValue, Func<double, double> calculationCallback)
+        {
+            double length = maxValue - minValue;
+            double interval = length / values.Count();
 
-        //public static IEnumerable<double> GetAverageOnIntervals(IEnumerable<double> sortedValues, IEnumerable<int> distribution)
-        //{
-        //    if (sortedValues.Count() != distribution.Sum())
-        //    {
-        //        throw new ArgumentException();
-        //    }
-        //    int length = distribution.Count();
-        //    double[] results = new double[length];
+            var arguments = Enumerable.Range(0, values.Count()).Select(i => (minValue + interval / 2.0) + i * interval);
+            var probabilites = arguments.Select(calculationCallback);
+            var probabilitesSum = probabilites.Sum();
+            var expectedProbabilites = probabilites.Select(i => i / probabilitesSum);
 
-        //    for (int i = 0; i < length; i++)
-        //    {
-        //        results[i] = sortedValues.Skip(distribution.Take(i).Sum()).Take(distribution.ElementAt(i)).Average();
-        //    }
+            return expectedProbabilites;
+        }
 
-        //    return results;
-        //}
+        public static bool CheckEpsilon(IEnumerable<double> values, IEnumerable<double> expected, double epsilon) {
+            for (int i = 0; i < values.Count(); i++)
+            {
+                if (values.ElementAt(i) < expected.ElementAt(i) + epsilon
+                    && values.ElementAt(i) > expected.ElementAt(i) - epsilon)
+                {
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WpfSaimmodTwo.Utils;
 
 namespace WpfSaimmodTwo.Models.Distributions
 {
@@ -24,30 +25,10 @@ namespace WpfSaimmodTwo.Models.Distributions
 
             double lambda = 1 / RightExpectedValue;
 
-            double max = MaxValue;
-            double min = MinValue;
+            var expectedProbabilites =
+                SequenceHelper.GetExpectedProbabilitiesOnIntervals(values, MinValue, MaxValue, i => Estimate(lambda, i));
 
-            double length = max - min;
-            double interval = length / values.Count();
-
-            var arguments = Enumerable.Range(0, values.Count()).Select(i => (MinValue + interval / 2.0) + i * interval);
-            var probabilites = arguments.Select(i => Estimate(lambda, i)).ToArray();
-            var probabilitesSum = probabilites.Sum();
-            var expectedProbabilites = probabilites.Select(i => i / probabilitesSum).ToArray();
-
-            for (int i = 0; i < values.Count(); i++)
-            {
-                if (values.ElementAt(i) < expectedProbabilites.ElementAt(i) + epsilon
-                    && values.ElementAt(i) > expectedProbabilites.ElementAt(i) - epsilon)
-                {
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return SequenceHelper.CheckEpsilon(values, expectedProbabilites, epsilon);
         }
     }
 }

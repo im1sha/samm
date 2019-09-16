@@ -49,6 +49,10 @@ namespace WpfSaimmodTwo.Models
 
         public bool EstimateStatistics(double expectedValue, double variance, double epsilon)
         {
+            if (double.IsNaN(RightExpectedValue) || double.IsNaN(RightVariance))
+            {
+                return true;
+            }
             return (RightExpectedValue < expectedValue + epsilon)
                 && (RightExpectedValue > expectedValue - epsilon)
                 && (Math.Sqrt(variance) + epsilon > Math.Sqrt(RightVariance))

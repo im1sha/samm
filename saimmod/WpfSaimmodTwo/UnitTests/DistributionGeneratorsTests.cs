@@ -90,16 +90,17 @@ namespace UnitTests
                 totalValues, totalIntervals);
         }
 
-        //[TestCase(0, 10000, 30_000)]
-        //[TestCase(-5005, 4995, 30_000)]
-        //[TestCase(-10001, -1, 30_000)]
-
-        //public void TriangleDistributionGeneratorTest(double begin, double end, int totalValues)
-        //{
-        //    var dist = new TriangleDistribution(begin, end);
-        //    var generator = new TriangleDistributionGenerator(dist);
-        //    Assert.DoesNotThrow(() => GetStat(generator, totalValues));
-        //}
+        [TestCase(-50, 1555, 0.05, double.NaN, USUAL_TEST_LENGTH, USUAL_INTERVALS * 2)]
+        public void TriangularDistributionGeneratorTest(double begin, double end,
+            double distributionEpsilon, double statEpsilon, int totalValues, int totalIntervals)
+        {
+            var dist = new TriangularDistribution(begin, end);
+            var generator = new TriangularDistributionGenerator(dist);
+            CheckAssert(
+                generator, dist,
+                distributionEpsilon, statEpsilon,
+                totalValues, totalIntervals);
+        }
 
     }
 }
