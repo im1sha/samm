@@ -1,3 +1,13 @@
+; not in use [port a initialization]
+;
+; явно задавать значения для PORTA(B)
+; CLRF PORTA            ; set 0x0
+; BSF STATUS, RP0       ; select bank1
+; MOVLW 0x1E            ; RA0 is in, RA1..RA4 are out
+; MOVWF TRISA           ; copy W to TRISA
+; BCF STATUS, PR0       ; select bank0
+
+
 ;------------------------------------------------------
 ; EMBEDDED SYSTEMS
 ; Practical Work #1
@@ -26,8 +36,14 @@ c_num set 0xA   ; the number of elements in array, a constant
 ; ...................
 ; 0x39      :   array[9]
 
+
 BEGIN:
+
+
+
 	BCF STATUS, 0x5 ; set Bank0 in Data Memory by clearing RP0 bit in STATUS register
+    BCF STATUS, 0x6 ; useful when 4 banks
+    BCF STATUS, 0x7 ; must be 0
 	CLRF v_ptr      ; v_ptr=0
 	CLRF v_max      ; v_max=0
 LOOP1:
