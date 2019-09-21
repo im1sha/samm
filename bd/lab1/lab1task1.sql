@@ -1,5 +1,4 @@
 BACKUP DATABASE [AdventureWorks2012] TO DISK = 'E:\backup.bak'
-WITH FORMAT
 GO
 
 USE [master];
