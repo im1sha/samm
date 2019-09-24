@@ -4,6 +4,7 @@ from signal_generators import *
 
 
 def task_1():
+
     def harmonic():
         variable_initial_phase_parameters = []
         for initial_phase in [0.0, math.pi / 6, math.pi / 4, math.pi / 2, math.pi]:
@@ -30,7 +31,7 @@ def task_1():
 
         chart_data = []
         for harmonic_params in variable_parameters_choice[args.parameter]:
-            signal = list(HarmonicSignalGenerator(harmonic_params).get_signal(args.period))
+            signal = list(HarmonicSignalGenerator(harmonic_params).generate_signal(args.period))
             chart_data.append(LabeledChartData(range(len(signal)), signal,
                                                ', '.join(['A: ' + str(harmonic_params.amplitude),
                                                           'f: ' + str(harmonic_params.frequency),
@@ -45,7 +46,7 @@ def task_1():
         harmonic_parameters = [HarmonicParameters(1, 1, 0), HarmonicParameters(1, 2, math.pi / 4),
                                HarmonicParameters(1, 3, math.pi / 6), HarmonicParameters(1, 4, 2 * math.pi),
                                HarmonicParameters(1, 5, math.pi)]
-        signal = list(PolyHarmonicSignalGenerator(harmonic_parameters).get_signal(period))
+        signal = list(PolyharmonicSignalGenerator(harmonic_parameters).generate_signal(period))
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
     def linear():
@@ -62,9 +63,12 @@ def task_1():
         harmonic_parameters = [HarmonicParameters(1, 1, 0), HarmonicParameters(1, 2, math.pi / 4),
                                HarmonicParameters(1, 3, math.pi / 6), HarmonicParameters(1, 4, 2 * math.pi),
                                HarmonicParameters(1, 5, math.pi)]
-        signal = list(LinearPolyHarmonicSignalGenerator(harmonic_parameters)
-                      .get_signal(args.period, args.period_iterations, args.mutation_per_period,
-                                  MutationType[args.mutation_law]))
+        signal = list(LinearPolyharmonicSignalGenerator(harmonic_parameters)
+                      .generate_signal(args.period,
+                                       args.period_iterations,
+                                       args.mutation_per_period,
+                                       MutationType[args.mutation_law]))
+
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
     sub_tasks_callbacks = {'harmonic': harmonic, 'poly-harmonic': poly_harmonic, 'linear': linear}
