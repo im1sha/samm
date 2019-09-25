@@ -1,4 +1,5 @@
 import math
+import random
 from collections import namedtuple
 from enum import Enum
 from array import array
@@ -6,6 +7,18 @@ from array import array
 HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude',
                                                        'frequency',
                                                        'initial_phase'])
+
+
+class NoiseSignalGenerator:
+    def __init__(self, amplitude):
+        self.__amplitude = amplitude
+
+    def get_discrete_signal(self):
+        return random.uniform(0, self.__amplitude)
+
+    def generate_signal(self, length):
+        for n in range(length):  # 0..period-1
+            yield self.get_discrete_signal()
 
 
 class TriangleSignalGenerator:

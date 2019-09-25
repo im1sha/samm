@@ -236,12 +236,36 @@ def task_1():  # v5
 
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
+    def noise():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-A', '--amplitude',
+                            action='store',
+                            required=False,
+                            help='amplitude',
+                            dest='amplitude',
+                            type=int,
+                            default=5)
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
+        args = parser.parse_known_args()[0]
+        period = args.period
+        amplitude = args.amplitude
+        signal = list(NoiseSignalGenerator(amplitude).generate_signal(period))
+
+        draw_chart(LabeledChartData(range(len(signal)), signal, None))
+
     sub_tasks_callbacks = {'harmonic': harmonic,
                            'polyharmonic': polyharmonic,
                            'linear': linear,
                            'impulse': impulse,
                            'triangle': triangle,
-                           'sawedged': saw_edged}
+                           'sawedged': saw_edged,
+                           'noise': noise}
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--sub-task',
