@@ -4,196 +4,195 @@ from collections import namedtuple
 from enum import Enum
 from array import array
 
-HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude',
-                                                       'frequency',
-                                                       'initial_phase'])
+
+HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude', 'frequency', 'initial_phase'])
 
 
-class NoiseSignalGenerator:
-    def __init__(self, amplitude):
-        self.__amplitude = amplitude
+class SignalGenerator:
+    def __init__(self, length, amplitude):
+        self.length = length
+        self.amplitude = amplitude
 
-    def get_discrete_signal(self):
-        return random.uniform(0, self.__amplitude)
+    def get_discrete_signal(self, n):
+        return 0.0
 
-    def generate_signal(self, length):
-        for n in range(length):  # 0..period-1
-            yield self.get_discrete_signal()
+    def generate_signal(self):
+        for n in range(self.length):  # 0..period-1
+            yield self.get_discrete_signal(n)
 
 
-class TriangleSignalGenerator:
-    def __init__(self, amplitude):
-        self.__amplitude = amplitude
+class NoiseSignalGenerator(SignalGenerator):
+    def __init__(self, length, amplitude):
+        super().__init__(length, amplitude)
 
-    def get_discrete_signal(self, n, period):
-        if n > period / 2:
-            return (1 - math.fabs(n / period)) * self.__amplitude * 2
+    def get_discrete_signal(self, n):
+        return random.uniform(0, self.amplitude)
+
+
+class TriangleSignalGenerator(SignalGenerator):
+    def __init__(self, period, amplitude):
+        super().__init__(period, amplitude)
+
+    def get_discrete_signal(self, n):
+        if n > self.length / 2:
+            return (1 - math.fabs(n / self.length)) * self.amplitude * 2
         else:
-            return (n / period) * self.__amplitude * 2
-
-    def generate_signal(self, period):
-        for n in range(period):  # 0..period-1
-            yield self.get_discrete_signal(n, period)
+            return (n / self.length) * self.amplitude * 2
 
 
-class SawEdgedSignalGenerator:
-    def __init__(self, amplitude):
-        self.__amplitude = amplitude
+class SawEdgedSignalGenerator(SignalGenerator):
+    def __init__(self, length, amplitude, growing):
+        super().__init__(length, amplitude)
+        self.__growing = growing
 
-    def get_discrete_signal(self, n, period, growing):
-        if not growing:
-            return (1 - math.fabs(n / period)) * self.__amplitude
+    def get_discrete_signal(self, n):
+        if self.__growing:
+            return (n / self.length) * self.amplitude
         else:
-            return (n / period) * self.__amplitude
-
-    def generate_signal(self, period, growing):
-        for n in range(period):  # 0..period-1
-            yield self.get_discrete_signal(n, period, growing)
+            return (1 - math.fabs(n / self.length)) * self.amplitude
 
 
-class ImpulseSignalGenerator:
-    def __init__(self, duty_circle, signal_value):
+class ImpulseSignalGenerator(SignalGenerator):
+    def __init__(self, length, amplitude, duty_circle):
+        super().__init__(length, amplitude)
         self.__duty_circle = duty_circle
-        self.__signal_value = signal_value
 
-    def generate_signal(self, period):
-        for n in range(math.ceil(period * self.__duty_circle)):  # 0..period-1
-            yield self.__signal_value
-        for n in range(math.ceil(period * self.__duty_circle), period, 1):
-            yield 0
-
-
-class HarmonicSignalGenerator:
-    def __init__(self, harmonic_params):
-        self.__params = harmonic_params
-
-    def get_discrete_signal(self, n, period):
-        return self.__params.amplitude \
-               * math.sin(2 * math.pi * self.__params.frequency * n / period
-                          + self.__params.initial_phase)
-
-    def generate_signal(self, period):
-        for n in range(period):  # 0..period-1
-            yield self.get_discrete_signal(n, period)
+    def get_discrete_signal(self, n):
+        if n < math.ceil(self.length * self.__duty_circle):
+            return self.amplitude
+        else:
+            return 0
 
 
-class PolyharmonicSignalGenerator:
-    def __init__(self, harmonic_params_collection):
-        self.__harmonic_generators = []
-        for harmonic_params in harmonic_params_collection:
-            self.__harmonic_generators.append(HarmonicSignalGenerator(harmonic_params))
+class HarmonicSignalGenerator(SignalGenerator):
+    def __init__(self, period, harmonic_params):
+        super().__init__(period, harmonic_params.amplitude)
+        self.__frequency = harmonic_params.frequency
+        self.__initial_phase = harmonic_params.initial_phase
 
-    def get_discrete_signal(self, n, period):
-        return sum(list(generator.get_discrete_signal(n, period)
-                        for generator in self.__harmonic_generators))
-
-    def generate_signal(self, period):
-        for n in range(period):
-            yield self.get_discrete_signal(n, period)
+    def get_discrete_signal(self, n):
+        return self.amplitude \
+               * math.sin(2 * math.pi * self.__frequency * n / self.length
+                          + self.__initial_phase)
 
 
-class MutationType(Enum):
-    INCREMENT = 1
-    DECREMENT = -1
-
-
-HarmonicMutations = namedtuple('HarmonicMutations', ['amplitude_mutation',
-                                                     'frequency_mutation',
-                                                     'initial_phase_mutation'])
-
-
-class LinearPolyharmonicSignalGenerator:
-    def __init__(self, harmonic_params_collection):
-        self.__harmonic_params_collection = harmonic_params_collection
-
-    def generate_signal(self, period, period_iterations, mutation_per_period, mutation_type):
-
-        mutation_per_signal_part = mutation_per_period / period
-        mutation_multiplier = mutation_type.value
-        mutations = []
-
-        for harmonic_params in self.__harmonic_params_collection:
-            mutations.append(
-                HarmonicMutations(
-                    harmonic_params.amplitude * mutation_per_signal_part * mutation_multiplier,
-                    harmonic_params.frequency * mutation_per_signal_part * mutation_multiplier,
-                    harmonic_params.initial_phase * mutation_per_signal_part * mutation_multiplier))
-
-        for n in range(period * period_iterations):
-            new_harmonic_params_collection = []
-            for index, harmonic_params in enumerate(self.__harmonic_params_collection):
-                new_harmonic_params_collection.append(
-                    HarmonicParameters(
-                        harmonic_params.amplitude + mutations[index].amplitude_mutation,
-                        harmonic_params.frequency + mutations[index].frequency_mutation,
-                        harmonic_params.initial_phase + mutations[index].initial_phase_mutation))
-
-            self.__harmonic_params_collection = new_harmonic_params_collection
-
-            yield PolyharmonicSignalGenerator(self.__harmonic_params_collection).get_discrete_signal(n, period)
-
-
-class HarmonicSignalGenerator2:
-    def __init__(self, initial_phase, k_generator):
-        self.__initial_phase = initial_phase
-        self.__k_generator = k_generator
-
-    def __get_signal_part(self, n, period):
-        return math.sin(2 * math.pi * n / period + self.__initial_phase)
-
-    def __get_signal(self, m, period):
-        for n in range(m):
-            yield self.__get_signal_part(n, period)
-
-    def get_signals(self, period):
-        m_step = math.floor(period / 4 / 8)
-        m_collection = array('i')
-        k = self.__k_generator(period)
-        for cur_m in range(period, k, -m_step):
-            m_collection.append(cur_m)
-            cur_m -= m_step
-        m_collection.reverse()
-        for cur_m in range(period + m_step, 2 * period, m_step):
-            m_collection.append(cur_m)
-
-        signals = []
-        for m in m_collection:
-            signals.append(self.__get_signal(m, period))
-
-        return signals
-
-
-class HarmonicSignalAnalyzer:
-    def __init__(self, harmonic_signal):
-        self.__signal = harmonic_signal
-
-    def __get_sum(self):
-        return sum(self.__signal)
-
-    def __get_sum_of_squared(self):
-        return sum([signal_part ** 2 for signal_part in self.__signal])
-
-    def get_root_mean_square_value(self):
-        return math.sqrt(self.__get_sum_of_squared() / len(self.__signal))
-
-    def get_standard_deviation(self):
-        signals_count = len(self.__signal)
-        return math.sqrt(self.__get_sum_of_squared() / signals_count - (self.__get_sum() / signals_count) ** 2)
-
-    def get_amplitude(self):
-        max_amplitude = 0
-        signal_length = len(self.__signal)
-        for k in range(math.floor(signal_length / 2)):
-            complex_amplitude = complex()
-            for n, x in enumerate(self.__signal):
-                trigonometric_arg = 2 * math.pi * k * n / signal_length
-                complex_amplitude += x * (math.cos(trigonometric_arg) + 1j * math.sin(trigonometric_arg))
-            max_amplitude = max(max_amplitude, 2 * math.sqrt(complex_amplitude.real ** 2 + complex_amplitude.imag ** 2)
-                                / signal_length)
-        return max_amplitude
-
-    def get_root_mean_square_value_error(self):
-        return 0.707 - self.get_root_mean_square_value()
-
-    def get_amplitude_error(self):
-        return 1 - self.get_amplitude()
+# class PolyharmonicSignalGenerator:
+#     def __init__(self, harmonic_params_collection):
+#         self.__harmonic_generators = []
+#         for harmonic_params in harmonic_params_collection:
+#             self.__harmonic_generators.append(HarmonicSignalGenerator(harmonic_params))
+#
+#     def get_discrete_signal(self, n, period):
+#         return sum(list(generator.get_discrete_signal(n, period)
+#                         for generator in self.__harmonic_generators))
+#
+#     def generate_signal(self, period):
+#         for n in range(period):
+#             yield self.get_discrete_signal(n, period)
+#
+#
+# class MutationType(Enum):
+#     INCREMENT = 1
+#     DECREMENT = -1
+#
+#
+# HarmonicMutations = namedtuple('HarmonicMutations', ['amplitude_mutation',
+#                                                      'frequency_mutation',
+#                                                      'initial_phase_mutation'])
+#
+#
+# class LinearPolyharmonicSignalGenerator:
+#     def __init__(self, harmonic_params_collection):
+#         self.__harmonic_params_collection = harmonic_params_collection
+#
+#     def generate_signal(self, period, period_iterations, mutation_per_period, mutation_type):
+#
+#         mutation_per_signal_part = mutation_per_period / period
+#         mutation_multiplier = mutation_type.value
+#         mutations = []
+#
+#         for harmonic_params in self.__harmonic_params_collection:
+#             mutations.append(
+#                 HarmonicMutations(
+#                     harmonic_params.amplitude * mutation_per_signal_part * mutation_multiplier,
+#                     harmonic_params.frequency * mutation_per_signal_part * mutation_multiplier,
+#                     harmonic_params.initial_phase * mutation_per_signal_part * mutation_multiplier))
+#
+#         for n in range(period * period_iterations):
+#             new_harmonic_params_collection = []
+#             for index, harmonic_params in enumerate(self.__harmonic_params_collection):
+#                 new_harmonic_params_collection.append(
+#                     HarmonicParameters(
+#                         harmonic_params.amplitude + mutations[index].amplitude_mutation,
+#                         harmonic_params.frequency + mutations[index].frequency_mutation,
+#                         harmonic_params.initial_phase + mutations[index].initial_phase_mutation))
+#
+#             self.__harmonic_params_collection = new_harmonic_params_collection
+#
+#             yield PolyharmonicSignalGenerator(self.__harmonic_params_collection).get_discrete_signal(n, period)
+#
+#
+# class HarmonicSignalGenerator2:
+#     def __init__(self, initial_phase, k_generator):
+#         self.__initial_phase = initial_phase
+#         self.__k_generator = k_generator
+#
+#     def __get_signal_part(self, n, period):
+#         return math.sin(2 * math.pi * n / period + self.__initial_phase)
+#
+#     def __get_signal(self, m, period):
+#         for n in range(m):
+#             yield self.__get_signal_part(n, period)
+#
+#     def get_signals(self, period):
+#         m_step = math.floor(period / 4 / 8)
+#         m_collection = array('i')
+#         k = self.__k_generator(period)
+#         for cur_m in range(period, k, -m_step):
+#             m_collection.append(cur_m)
+#             cur_m -= m_step
+#         m_collection.reverse()
+#         for cur_m in range(period + m_step, 2 * period, m_step):
+#             m_collection.append(cur_m)
+#
+#         signals = []
+#         for m in m_collection:
+#             signals.append(self.__get_signal(m, period))
+#
+#         return signals
+#
+#
+# class HarmonicSignalAnalyzer:
+#     def __init__(self, harmonic_signal):
+#         self.__signal = harmonic_signal
+#
+#     def __get_sum(self):
+#         return sum(self.__signal)
+#
+#     def __get_sum_of_squared(self):
+#         return sum([signal_part ** 2 for signal_part in self.__signal])
+#
+#     def get_root_mean_square_value(self):
+#         return math.sqrt(self.__get_sum_of_squared() / len(self.__signal))
+#
+#     def get_standard_deviation(self):
+#         signals_count = len(self.__signal)
+#         return math.sqrt(self.__get_sum_of_squared() / signals_count - (self.__get_sum() / signals_count) ** 2)
+#
+#     def get_amplitude(self):
+#         max_amplitude = 0
+#         signal_length = len(self.__signal)
+#         for k in range(math.floor(signal_length / 2)):
+#             complex_amplitude = complex()
+#             for n, x in enumerate(self.__signal):
+#                 trigonometric_arg = 2 * math.pi * k * n / signal_length
+#                 complex_amplitude += x * (math.cos(trigonometric_arg) + 1j * math.sin(trigonometric_arg))
+#             max_amplitude = max(max_amplitude, 2 * math.sqrt(complex_amplitude.real ** 2 + complex_amplitude.imag ** 2)
+#                                 / signal_length)
+#         return max_amplitude
+#
+#     def get_root_mean_square_value_error(self):
+#         return 0.707 - self.get_root_mean_square_value()
+#
+#     def get_amplitude_error(self):
+#         return 1 - self.get_amplitude()
