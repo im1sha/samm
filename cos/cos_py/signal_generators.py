@@ -52,7 +52,7 @@ class SawEdgedSignalGenerator(SignalGenerator):
         self.__growing = growing
 
     def get_discrete_signal(self, n):
-        if self.__growing:
+        if self.__growing == 1:  # 0 == not growing | 1 == growing
             return (n / self.length()) * self.amplitude()
         else:
             return (1 - math.fabs(n / self.length())) * self.amplitude()
@@ -83,12 +83,12 @@ class HarmonicSignalGenerator(SignalGenerator):
 
 
 class PolyharmonicSignalGenerator(SignalGenerator):
-    def __init__(self, length, amplitude, generators):
-        super().__init__(length, amplitude)
-        self.__generators = generators
+    def __init__(self, length, arrays):
+        super().__init__(length, -1)  # amplitude is not in use
+        self.__arrays = arrays  # [[]] == [[chart1 values], [chart2 values] ...]
 
     def get_discrete_signal(self, n):
-        return sum(list(generator.get_discrete_signal(n) for generator in self.__generators))
+        return sum(arr[n] for arr in self.__arrays)  # takes all values at n-th position
 
 
 

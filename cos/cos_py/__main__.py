@@ -93,12 +93,12 @@ class LocalParser:
         self.__parser.add_argument('-g', '--growing',
                                    action='store',
                                    required=False,
-                                   help='chart direction',
+                                   help='chart direction 0(desc) or 1(asc)',
                                    dest='growing',
-                                   type=str,
+                                   type=int,
                                    nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
-        return (self.__args.growing == 'y') or (self.__args.growing == 'yes')
+        return self.__args.growing
 
     def get_nargs(self):
         self.__parser.add_argument('-z',
@@ -110,6 +110,18 @@ class LocalParser:
                                    default=1)
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.nargs
+
+    def get_is_polyharmonic(self) -> bool:
+        # 0 is usual vs. 1 is polyharmonic
+        self.__parser.add_argument('-y',
+                                   action='store',
+                                   required=False,
+                                   help='whether signal is polyharmonic',
+                                   dest='is_poly',
+                                   type=int,
+                                   default=0)
+        self.__args = self.__parser.parse_known_args()[0]
+        return self.__args.is_poly == 1
 
 
 def harmonic(nargs):
@@ -163,25 +175,10 @@ def noise(nargs):
     return signals
 
 
-# def task_1b():
-#     parser = LocalParser(argparse.ArgumentParser())
-#     parser.add_argument('-N', '--period',
-#                         action='store',
-#                         required=False,
-#                         help='signal period',
-#                         dest='period',
-#                         type=int,
-#                         default=512)
-#     period = parser.parse_known_args()[0].period
-#     harmonic_parameters = [HarmonicParameters(9, 1, math.pi / 2),
-#                            HarmonicParameters(9, 2, 0.0),
-#                            HarmonicParameters(9, 3, math.pi / 4),
-#                            HarmonicParameters(9, 4, math.pi / 3),
-#                            HarmonicParameters(9, 5, math.pi / 6)]
-#
-#     signal = list(PolyharmonicSignalGenerator(harmonic_parameters).generate_signal(period))
-#
-#     draw_chart(LabeledChartData(range(len(signal)), signal, None))
+def poly(task, nargs):
+    parser = LocalParser(argparse.ArgumentParser())
+    arrays = task(nargs)
+    return [PolyharmonicSignalGenerator(len(arrays[0]), arrays).generate_signal()]
 
 
 # def task_1c():
@@ -281,7 +278,13 @@ def main():
     parser = LocalParser(argparse.ArgumentParser())
     iterations = parser.get_iterations()
     nargs = parser.get_nargs()
-    one_signal_arrays = parser.get_task(sub_tasks_callbacks)(nargs)
+    task = parser.get_task(sub_tasks_callbacks)
+
+    # expected that one_signal_arrays is  [[]] == [[chart1 values], [chart2 values] ...]
+    if not parser.get_is_polyharmonic():
+        one_signal_arrays = task(nargs)
+    else:
+        one_signal_arrays = poly(task, nargs)
 
     chart_data = []
     for arr in one_signal_arrays:
