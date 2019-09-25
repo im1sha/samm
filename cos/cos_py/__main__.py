@@ -50,13 +50,22 @@ def task_1():  # v5
 
     def polyharmonic():
         parser = argparse.ArgumentParser()
-        parser.add_argument('-N', '--period', action='store', required=False, help='signal period', dest='period',
-                            type=int, default=512)
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
         period = parser.parse_known_args()[0].period
-        harmonic_parameters = [HarmonicParameters(1, 1, 0), HarmonicParameters(1, 2, math.pi / 4),
-                               HarmonicParameters(1, 3, math.pi / 6), HarmonicParameters(1, 4, 2 * math.pi),
-                               HarmonicParameters(1, 5, math.pi)]
+        harmonic_parameters = [HarmonicParameters(9, 1, math.pi / 2),
+                               HarmonicParameters(9, 2, 0.0),
+                               HarmonicParameters(9, 3, math.pi / 4),
+                               HarmonicParameters(9, 4, math.pi / 3),
+                               HarmonicParameters(9, 5, math.pi / 6)]
+
         signal = list(PolyharmonicSignalGenerator(harmonic_parameters).generate_signal(period))
+
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
     def linear():
