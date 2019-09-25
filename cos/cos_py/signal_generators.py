@@ -10,15 +10,21 @@ HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude', 'frequency',
 
 class SignalGenerator:
     def __init__(self, length, amplitude):
-        self.length = length
-        self.amplitude = amplitude
+        self.__length = length
+        self.__amplitude = amplitude
 
     def get_discrete_signal(self, n):
         return 0.0
 
     def generate_signal(self):
-        for n in range(self.length):  # 0..period-1
+        for n in range(self.__length):  # 0..period-1
             yield self.get_discrete_signal(n)
+
+    def length(self):
+        return self.__length
+
+    def amplitude(self):
+        return self.__amplitude
 
 
 class NoiseSignalGenerator(SignalGenerator):
@@ -26,7 +32,7 @@ class NoiseSignalGenerator(SignalGenerator):
         super().__init__(length, amplitude)
 
     def get_discrete_signal(self, n):
-        return random.uniform(0, self.amplitude)
+        return random.uniform(0, self.amplitude())
 
 
 class TriangleSignalGenerator(SignalGenerator):
@@ -34,10 +40,10 @@ class TriangleSignalGenerator(SignalGenerator):
         super().__init__(period, amplitude)
 
     def get_discrete_signal(self, n):
-        if n > self.length / 2:
-            return (1 - math.fabs(n / self.length)) * self.amplitude * 2
+        if n > self.length() / 2:
+            return (1 - math.fabs(n / self.length())) * self.amplitude() * 2
         else:
-            return (n / self.length) * self.amplitude * 2
+            return (n / self.length()) * self.amplitude() * 2
 
 
 class SawEdgedSignalGenerator(SignalGenerator):
@@ -47,9 +53,9 @@ class SawEdgedSignalGenerator(SignalGenerator):
 
     def get_discrete_signal(self, n):
         if self.__growing:
-            return (n / self.length) * self.amplitude
+            return (n / self.length()) * self.amplitude()
         else:
-            return (1 - math.fabs(n / self.length)) * self.amplitude
+            return (1 - math.fabs(n / self.length())) * self.amplitude()
 
 
 class ImpulseSignalGenerator(SignalGenerator):
@@ -58,8 +64,8 @@ class ImpulseSignalGenerator(SignalGenerator):
         self.__duty_circle = duty_circle
 
     def get_discrete_signal(self, n):
-        if n < math.ceil(self.length * self.__duty_circle):
-            return self.amplitude
+        if n < math.ceil(self.length() * self.__duty_circle):
+            return self.amplitude()
         else:
             return 0
 
@@ -71,26 +77,21 @@ class HarmonicSignalGenerator(SignalGenerator):
         self.__initial_phase = harmonic_params.initial_phase
 
     def get_discrete_signal(self, n):
-        return self.amplitude \
-               * math.sin(2 * math.pi * self.__frequency * n / self.length
+        return self.amplitude() \
+               * math.sin(2 * math.pi * self.__frequency * n / self.length()
                           + self.__initial_phase)
 
 
-# class PolyharmonicSignalGenerator:
-#     def __init__(self, harmonic_params_collection):
-#         self.__harmonic_generators = []
-#         for harmonic_params in harmonic_params_collection:
-#             self.__harmonic_generators.append(HarmonicSignalGenerator(harmonic_params))
-#
-#     def get_discrete_signal(self, n, period):
-#         return sum(list(generator.get_discrete_signal(n, period)
-#                         for generator in self.__harmonic_generators))
-#
-#     def generate_signal(self, period):
-#         for n in range(period):
-#             yield self.get_discrete_signal(n, period)
-#
-#
+class PolyharmonicSignalGenerator(SignalGenerator):
+    def __init__(self, length, amplitude, generators):
+        super().__init__(length, amplitude)
+        self.__generators = generators
+
+    def get_discrete_signal(self, n):
+        return sum(list(generator.get_discrete_signal(n) for generator in self.__generators))
+
+
+
 # class MutationType(Enum):
 #     INCREMENT = 1
 #     DECREMENT = -1
