@@ -8,6 +8,18 @@ HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude',
                                                        'initial_phase'])
 
 
+class ImpulsSignalGenerator:
+    def __init__(self, duty_circle, signal_value):
+        self.__duty_circle = duty_circle
+        self.__signal_value = signal_value
+
+    def generate_signal(self, period):
+        for n in range(math.ceil(period * self.__duty_circle)):  # 0..period-1
+            yield self.__signal_value
+        for n in range(math.ceil(period * self.__duty_circle), period, 1):
+            yield 0
+
+
 class HarmonicSignalGenerator:
     def __init__(self, harmonic_params):
         self.__params = harmonic_params

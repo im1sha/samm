@@ -115,11 +115,62 @@ def task_1():  # v5
 
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
-    sub_tasks_callbacks = {'harmonic': harmonic, 'polyharmonic': polyharmonic, 'linear': linear}
+    def impulse():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-N', '--total-period-length',
+                            action='store',
+                            required=False,
+                            help='total length',
+                            dest='total_period_length',
+                            type=int,
+                            default=512)
+        parser.add_argument('-i', '--period-iterations',
+                            action='store',
+                            required=False,
+                            help='period iterations',
+                            dest='period_iterations',
+                            type=int,
+                            default=5)
+        parser.add_argument('-A', '--amplitude',
+                            action='store',
+                            required=False,
+                            help='amplitude',
+                            dest='amplitude',
+                            type=int,
+                            default=1)
+        parser.add_argument('-D', '--duty-circle',
+                            action='store',
+                            required=False,
+                            help='signal length percentage',
+                            dest='duty_circle',
+                            type=float,
+                            default=0.25)
+        args = parser.parse_known_args()[0]
+        duty_circle = args.duty_circle
+        period_iterations = args.period_iterations
+        amplitude = args.amplitude
+        one_signal = list(ImpulsSignalGenerator(duty_circle, amplitude)
+                          .generate_signal(args.total_period_length))
+
+        signal = []
+        for _ in range(period_iterations):
+            signal += one_signal
+
+        draw_chart(LabeledChartData(range(len(signal)), signal, None))
+
+    sub_tasks_callbacks = {'harmonic': harmonic,
+                           'polyharmonic': polyharmonic,
+                           'linear': linear,
+                           'impulse': impulse}
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-st', '--sub-task', action='store', required=True, help='first tasks sub task',
-                        choices=sub_tasks_callbacks.keys(), dest='sub_task', type=str)
+    parser.add_argument('-st', '--sub-task',
+                        action='store',
+                        required=True,
+                        help='first tasks sub task',
+                        choices=sub_tasks_callbacks.keys(),
+                        dest='sub_task',
+                        type=str)
     sub_tasks_callbacks[parser.parse_known_args()[0].sub_task]()
 
 
