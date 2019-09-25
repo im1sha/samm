@@ -70,18 +70,43 @@ def task_1():  # v5
 
     def linear():
         parser = argparse.ArgumentParser()
-        parser.add_argument('-N', '--period', action='store', required=False, help='signal period', dest='period',
-                            type=int, default=512)
-        parser.add_argument('-i', '--period-iterations', action='store', required=False, help='period iterations',
-                            dest='period_iterations', type=int, default=1)
-        parser.add_argument('-m', '--mutation', action='store', required=False, help='mutation per period',
-                            dest='mutation_per_period', type=float, default=0.2)
-        parser.add_argument('-ml', '--mutation-law', action='store', required=True, help='mutation law', type=str,
-                            dest='mutation_law', choices=[MutationType.DECREMENT.name, MutationType.INCREMENT.name])
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
+        parser.add_argument('-i', '--period-iterations',
+                            action='store',
+                            required=False,
+                            help='period iterations',
+                            dest='period_iterations',
+                            type=int,
+                            default=1)
+        parser.add_argument('-m', '--mutation',
+                            action='store',
+                            required=False,
+                            help='mutation per period',
+                            dest='mutation_per_period',
+                            type=float,
+                            default=0.2)
+        parser.add_argument('-ml', '--mutation-law',
+                            action='store',
+                            required=True,
+                            help='mutation law',
+                            type=str,
+                            dest='mutation_law',
+                            choices=[MutationType.DECREMENT.name,
+                                     MutationType.INCREMENT.name])
         args = parser.parse_known_args()[0]
-        harmonic_parameters = [HarmonicParameters(1, 1, 0), HarmonicParameters(1, 2, math.pi / 4),
-                               HarmonicParameters(1, 3, math.pi / 6), HarmonicParameters(1, 4, 2 * math.pi),
-                               HarmonicParameters(1, 5, math.pi)]
+
+        harmonic_parameters = [HarmonicParameters(9, 1, math.pi / 2),
+                               HarmonicParameters(9, 2, 0.0),
+                               HarmonicParameters(9, 3, math.pi / 4),
+                               HarmonicParameters(9, 4, math.pi / 3),
+                               HarmonicParameters(9, 5, math.pi / 6)]
+
         signal = list(LinearPolyharmonicSignalGenerator(harmonic_parameters)
                       .generate_signal(args.period,
                                        args.period_iterations,
