@@ -9,7 +9,7 @@ class LocalParser:
         self.__args = []
         self.__tasks_callbacks = {}
 
-    def get_length(self) -> int:
+    def get_length(self):
         self.__parser.add_argument('-N', '--length',
                                    action='store',
                                    required=False,
@@ -20,14 +20,16 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.length
 
-    def get_amplitude(self) -> float:
+    def get_amplitudes(self, same=1):
+        # total parameters passed after -A:
+        #   -A 1 2 .. same-1 same
         self.__parser.add_argument('-A', '--amplitude',
                                    action='store',
                                    required=False,
                                    help='signal amplitude',
                                    dest='amplitude',
                                    type=float,
-                                   default=10)
+                                   nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.amplitude
 
@@ -43,29 +45,29 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         return self.__tasks_callbacks[self.__args.task]
 
-    def get_frequency(self) -> float:
+    def get_frequencies(self, same=1):
         self.__parser.add_argument('-f', '--frequency',
                                    action='store',
                                    required=False,
                                    help='frequency',
                                    dest='frequency',
                                    type=float,
-                                   default=1.0)
+                                   nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.frequency
 
-    def get_initial_phase(self) -> float:
+    def get_initial_phases(self, same=1):
         self.__parser.add_argument('-p', '--initial-phase',
                                    action='store',
                                    required=False,
                                    help='initial phase',
                                    dest='initial_phase',
                                    type=float,
-                                   default=0.0)
+                                   nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.initial_phase
 
-    def get_iterations(self) -> int:
+    def get_iterations(self):
         self.__parser.add_argument('-i', '--iterations',
                                    action='store',
                                    required=False,
@@ -76,81 +78,93 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.iterations
 
-    def get_duty_circle(self) -> float:
+    def get_duty_circles(self, same=1):
         self.__parser.add_argument('-D', '--duty-circle',
                                    action='store',
                                    required=False,
                                    help='signal length percentage',
                                    dest='duty_circle',
                                    type=float,
-                                   default=0.25)
+                                   nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
         return self.__args.duty_circle
 
-    def get_growing(self) -> bool:
+    def get_growings(self, same=1):
         self.__parser.add_argument('-g', '--growing',
                                    action='store',
                                    required=False,
                                    help='chart direction',
                                    dest='growing',
                                    type=str,
-                                   default='yes')
+                                   nargs=same)
         self.__args = self.__parser.parse_known_args()[0]
         return (self.__args.growing == 'y') or (self.__args.growing == 'yes')
 
+    def get_nargs(self):
+        self.__parser.add_argument('-z',
+                                   action='store',
+                                   required=False,
+                                   help='same args total',
+                                   dest='nargs',
+                                   type=int,
+                                   default=1)
+        self.__args = self.__parser.parse_known_args()[0]
+        return self.__args.nargs
 
-def harmonic():
+
+def harmonic(nargs):
     parser = LocalParser(argparse.ArgumentParser())
     period = parser.get_length()
-    amplitude = parser.get_amplitude()
-    frequency = parser.get_frequency()
-    initial_phase = parser.get_initial_phase()
 
-    signal = list(HarmonicSignalGenerator(period, HarmonicParameters(amplitude, frequency, initial_phase))
-                  .generate_signal())
-    return signal
+    # lists
+    amplitudes = parser.get_amplitudes(nargs)  # []
+    frequencies = parser.get_frequencies(nargs)  # []
+    initial_phases = parser.get_initial_phases(nargs)  # []
+
+    signals = list(list(HarmonicSignalGenerator(period, HarmonicParameters(a, f, i))
+                        .generate_signal()) for a, f, i in zip(amplitudes, frequencies, initial_phases))
+    return signals
 
 
-def impulse():
+def impulse(nargs):
     parser = LocalParser(argparse.ArgumentParser())
     length = parser.get_length()
-    amplitude = parser.get_amplitude()
-    duty_circle = parser.get_duty_circle()
+    amplitudes = parser.get_amplitudes(nargs)
+    duty_circles = parser.get_duty_circles(nargs)
 
-    signal = list(ImpulseSignalGenerator(length, amplitude, duty_circle)
-                  .generate_signal())
-    return signal
+    signals = list(list(ImpulseSignalGenerator(length, a, d)
+                        .generate_signal()) for a, d in zip(amplitudes, duty_circles))
+    return signals
 
 
-def triangle():
+def triangle(nargs):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitude = parser.get_amplitude()
+    amplitudes = parser.get_amplitudes(nargs)
     period = parser.get_length()
 
-    signal = list(TriangleSignalGenerator(period, amplitude).generate_signal())
-    return signal
+    signals = list(list(TriangleSignalGenerator(period, a).generate_signal()) for a in amplitudes)
+    return signals
 
 
-def saw_edged():
+def saw_edged(nargs):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitude = parser.get_amplitude()
+    amplitudes = parser.get_amplitudes(nargs)
     length = parser.get_length()
-    growing = parser.get_growing()
-    return list(SawEdgedSignalGenerator(length, amplitude, growing).generate_signal())
+    growings = parser.get_growings(nargs)
+    signals = list(list(SawEdgedSignalGenerator(length, a, g).generate_signal()) for a, g in zip(amplitudes, growings))
+    return signals
 
 
-def noise():
+def noise(nargs):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitude = parser.get_amplitude()
+    amplitudes = parser.get_amplitudes(nargs)
     length = parser.get_length()
-    signal = list(NoiseSignalGenerator(length, amplitude).generate_signal())
-    return signal
+    signals = list(list(NoiseSignalGenerator(length, a).generate_signal()) for a in amplitudes)
+    return signals
 
 
 # def task_1b():
-#
-#     # todo add ability of signal generation based on 1a
-#     parser = argparse.ArgumentParser()
+#     parser = LocalParser(argparse.ArgumentParser())
 #     parser.add_argument('-N', '--period',
 #                         action='store',
 #                         required=False,
@@ -261,21 +275,24 @@ def main():
                            'impulse': impulse,
                            'triangle': triangle,
                            'sawedged': saw_edged,
-                           'noise': noise}
+                           'noise': noise
+                           }
 
     parser = LocalParser(argparse.ArgumentParser())
     iterations = parser.get_iterations()
+    nargs = parser.get_nargs()
+    one_signal_arrays = parser.get_task(sub_tasks_callbacks)(nargs)
 
-    one_signal = parser.get_task(sub_tasks_callbacks)()
+    chart_data = []
+    for arr in one_signal_arrays:
+        to_append = []
+        for _ in range(iterations):
+            to_append += arr
+        chart_data += [LabeledChartData(
+            range(len(to_append)),
+            to_append,
+            None)]
 
-    signal = []
-    for _ in range(iterations):
-        signal += one_signal
-
-    chart_data = [LabeledChartData(
-        range(len(signal)),
-        signal,
-        None)]
     draw_charts(chart_data)
 
 
