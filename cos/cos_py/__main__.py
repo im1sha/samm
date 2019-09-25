@@ -149,8 +149,86 @@ def task_1():  # v5
         duty_circle = args.duty_circle
         period_iterations = args.period_iterations
         amplitude = args.amplitude
-        one_signal = list(ImpulsSignalGenerator(duty_circle, amplitude)
+        one_signal = list(ImpulseSignalGenerator(duty_circle, amplitude)
                           .generate_signal(args.total_period_length))
+
+        signal = []
+        for _ in range(period_iterations):
+            signal += one_signal
+
+        draw_chart(LabeledChartData(range(len(signal)), signal, None))
+
+    def triangle():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-A', '--amplitude',
+                            action='store',
+                            required=False,
+                            help='amplitude',
+                            dest='amplitude',
+                            type=int,
+                            default=5)
+        parser.add_argument('-i', '--period-iterations',
+                            action='store',
+                            required=False,
+                            help='period iterations',
+                            dest='period_iterations',
+                            type=int,
+                            default=10)
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
+        args = parser.parse_known_args()[0]
+        period = args.period
+        amplitude = args.amplitude
+        period_iterations = args.period_iterations
+        one_signal = list(TriangleSignalGenerator(amplitude).generate_signal(period))
+
+        signal = []
+        for _ in range(period_iterations):
+            signal += one_signal
+
+        draw_chart(LabeledChartData(range(len(signal)), signal, None))
+
+    def saw_edged():
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-A', '--amplitude',
+                            action='store',
+                            required=False,
+                            help='amplitude',
+                            dest='amplitude',
+                            type=int,
+                            default=5)
+        parser.add_argument('-i', '--period-iterations',
+                            action='store',
+                            required=False,
+                            help='period iterations',
+                            dest='period_iterations',
+                            type=int,
+                            default=10)
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
+        parser.add_argument('-g', '--growing',
+                            action='store',
+                            required=False,
+                            help='chart direction',
+                            dest='growing',
+                            type=str,
+                            default='yes')
+        args = parser.parse_known_args()[0]
+        period = args.period
+        amplitude = args.amplitude
+        period_iterations = args.period_iterations
+        growing = (args.growing == 'y') or (args.growing == 'yes')
+        one_signal = list(SawEdgedSignalGenerator(amplitude).generate_signal(period, growing))
 
         signal = []
         for _ in range(period_iterations):
@@ -161,10 +239,12 @@ def task_1():  # v5
     sub_tasks_callbacks = {'harmonic': harmonic,
                            'polyharmonic': polyharmonic,
                            'linear': linear,
-                           'impulse': impulse}
+                           'impulse': impulse,
+                           'triangle': triangle,
+                           'sawedged': saw_edged}
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-st', '--sub-task',
+    parser.add_argument('-s', '--sub-task',
                         action='store',
                         required=True,
                         help='first tasks sub task',

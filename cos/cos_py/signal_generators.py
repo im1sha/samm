@@ -8,7 +8,37 @@ HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude',
                                                        'initial_phase'])
 
 
-class ImpulsSignalGenerator:
+class TriangleSignalGenerator:
+    def __init__(self, amplitude):
+        self.__amplitude = amplitude
+
+    def get_discrete_signal(self, n, period):
+        if n > period / 2:
+            return (1 - math.fabs(n / period)) * self.__amplitude * 2
+        else:
+            return (n / period) * self.__amplitude * 2
+
+    def generate_signal(self, period):
+        for n in range(period):  # 0..period-1
+            yield self.get_discrete_signal(n, period)
+
+
+class SawEdgedSignalGenerator:
+    def __init__(self, amplitude):
+        self.__amplitude = amplitude
+
+    def get_discrete_signal(self, n, period, growing):
+        if not growing:
+            return (1 - math.fabs(n / period)) * self.__amplitude
+        else:
+            return (n / period) * self.__amplitude
+
+    def generate_signal(self, period, growing):
+        for n in range(period):  # 0..period-1
+            yield self.get_discrete_signal(n, period, growing)
+
+
+class ImpulseSignalGenerator:
     def __init__(self, duty_circle, signal_value):
         self.__duty_circle = duty_circle
         self.__signal_value = signal_value
