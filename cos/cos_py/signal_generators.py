@@ -74,6 +74,7 @@ class LinearPolyharmonicSignalGenerator:
                         harmonic_params.initial_phase + mutations[index].initial_phase_mutation))
 
             self.__harmonic_params_collection = new_harmonic_params_collection
+
             yield PolyharmonicSignalGenerator(self.__harmonic_params_collection).get_discrete_signal(n, period)
 
 

@@ -3,42 +3,52 @@ from chart_drawer import *
 from signal_generators import *
 
 
-def task_1():
-
+def task_1():  # v5
     def harmonic():
         variable_initial_phase_parameters = []
-        for initial_phase in [0.0, math.pi / 6, math.pi / 4, math.pi / 2, math.pi]:
-            variable_initial_phase_parameters.append(HarmonicParameters(10, 2, initial_phase))
+        for initial_phase in [math.pi, 0.0, math.pi / 3, math.pi / 6, math.pi / 2]:
+            variable_initial_phase_parameters.append(HarmonicParameters(7, 5, initial_phase))
 
         variable_frequency_parameters = []
-        for frequency in [5, 4, 2, 6, 3]:
-            variable_frequency_parameters.append(HarmonicParameters(3, frequency, math.pi / 2))
+        for frequency in [1, 5, 11, 6, 3]:
+            variable_frequency_parameters.append(HarmonicParameters(5, frequency, 3 * math.pi / 4))
 
         variable_amplitude_parameters = []
-        for amplitude in [2, 3, 6, 5, 1]:
-            variable_amplitude_parameters.append(HarmonicParameters(amplitude, 1, math.pi / 2))
+        for amplitude in [1, 2, 11, 4, 2]:
+            variable_amplitude_parameters.append(HarmonicParameters(amplitude, 3, 3 * math.pi / 4))
 
         variable_parameters_choice = {'initial-phase': variable_initial_phase_parameters,
                                       'frequency': variable_frequency_parameters,
                                       'amplitude': variable_amplitude_parameters}
         parser = argparse.ArgumentParser()
-        parser.add_argument('-v', '--variable-parameter', action='store', required=True,
-                            help='what parameter should vary', choices=variable_parameters_choice.keys(),
-                            dest='parameter', type=str)
-        parser.add_argument('-N', '--period', action='store', required=False, help='signal period', dest='period',
-                            type=int, default=512)
+        parser.add_argument('-v', '--variable-parameter',
+                            action='store',
+                            required=True,
+                            help='what parameter should vary',
+                            choices=variable_parameters_choice.keys(),
+                            dest='parameter',
+                            type=str)
+        parser.add_argument('-N', '--period',
+                            action='store',
+                            required=False,
+                            help='signal period',
+                            dest='period',
+                            type=int,
+                            default=512)
         args = parser.parse_known_args()[0]
 
         chart_data = []
         for harmonic_params in variable_parameters_choice[args.parameter]:
             signal = list(HarmonicSignalGenerator(harmonic_params).generate_signal(args.period))
-            chart_data.append(LabeledChartData(range(len(signal)), signal,
-                                               ', '.join(['A: ' + str(harmonic_params.amplitude),
-                                                          'f: ' + str(harmonic_params.frequency),
-                                                          'phi: ' + str(harmonic_params.initial_phase)])))
+            chart_data.append(LabeledChartData(
+                range(len(signal)),
+                signal,
+                ', '.join(['A: ' + str(harmonic_params.amplitude),
+                           'f: ' + str(harmonic_params.frequency),
+                           'phi: ' + str(harmonic_params.initial_phase)])))
         draw_charts(chart_data)
 
-    def poly_harmonic():
+    def polyharmonic():
         parser = argparse.ArgumentParser()
         parser.add_argument('-N', '--period', action='store', required=False, help='signal period', dest='period',
                             type=int, default=512)
@@ -71,7 +81,7 @@ def task_1():
 
         draw_chart(LabeledChartData(range(len(signal)), signal, None))
 
-    sub_tasks_callbacks = {'harmonic': harmonic, 'poly-harmonic': poly_harmonic, 'linear': linear}
+    sub_tasks_callbacks = {'harmonic': harmonic, 'polyharmonic': polyharmonic, 'linear': linear}
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-st', '--sub-task', action='store', required=True, help='first tasks sub task',
@@ -115,13 +125,11 @@ def task_2():
 
 
 def main():
-    # ### action:store_const
-
     tasks_callbacks = {1: task_1, 2: task_2}
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--task',
-                        action='store',  # default value (store in namespace)
+                        action='store',
                         required=True,
                         help='task number',
                         choices=tasks_callbacks.keys(),

@@ -1,7 +1,9 @@
 from matplotlib import pyplot
 from collections import namedtuple
 
-LabeledChartData = namedtuple('LabeledChartData', ['indexes', 'values', 'label'])
+LabeledChartData = namedtuple('LabeledChartData', ['indexes',
+                                                   'values',
+                                                   'label'])
 
 
 def draw_charts(chart_data_collection):
