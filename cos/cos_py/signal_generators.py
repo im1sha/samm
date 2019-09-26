@@ -7,37 +7,34 @@ from array import array
 HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude', 'frequency', 'initial_phase'])
 
 
-class SignalGenerator:
-    def __init__(self, length, amplitude):
-        self.__length = length
-        self.__amplitude = amplitude
+# for all defaults returns
+# frequency == 1
+# y_min == 0
+# amplitude == 1
+# height == 2
+# width == 1024
 
+class DefaultSignalGenerator:
     def get_discrete_signal(self, n):
         return 0.0
 
     def generate_signal(self):
-        for n in range(self.__length):  # 0..period-1
+        for n in range(self.length()):  # 0..period-1
             yield self.get_discrete_signal(n)
 
     def length(self):
-        return self.__length
+        return 1024
 
     def amplitude(self):
-        return self.__amplitude
+        return 1
 
 
-class NoiseSignalGenerator(SignalGenerator):
-    def __init__(self, length, amplitude):
-        super().__init__(length, amplitude)
-
+class NoiseSignalGenerator(DefaultSignalGenerator):
     def get_discrete_signal(self, n):
-        return random.uniform(0, self.amplitude())
+        return random.uniform(0, self.amplitude() * 2)
 
 
-class TriangleSignalGenerator(SignalGenerator):
-    def __init__(self, period, amplitude):
-        super().__init__(period, amplitude)
-
+class TriangleSignalGenerator(DefaultSignalGenerator):
     def get_discrete_signal(self, n):
         if n > self.length() / 2:
             return (1 - math.fabs(n / self.length())) * self.amplitude() * 2
@@ -45,45 +42,38 @@ class TriangleSignalGenerator(SignalGenerator):
             return (n / self.length()) * self.amplitude() * 2
 
 
-class SawEdgedSignalGenerator(SignalGenerator):
-    def __init__(self, length, amplitude, growing):
-        super().__init__(length, amplitude)
+class SawEdgedSignalGenerator(DefaultSignalGenerator):
+    def __init__(self, growing):
         self.__growing = growing
 
     def get_discrete_signal(self, n):
         if self.__growing == 1:  # 0 == not growing | 1 == growing
-            return (n / self.length()) * self.amplitude()
+            return (n / self.length()) * self.amplitude() * 2
         else:
-            return (1 - math.fabs(n / self.length())) * self.amplitude()
+            return (1 - math.fabs(n / self.length())) * self.amplitude() * 2
 
 
-class ImpulseSignalGenerator(SignalGenerator):
+class ImpulseSignalGenerator(DefaultSignalGenerator):
     def __init__(self, length, amplitude, duty_circle):
-        super().__init__(length, amplitude)
         self.__duty_circle = duty_circle
 
     def get_discrete_signal(self, n):
         if n < math.ceil(self.length() * self.__duty_circle):
-            return self.amplitude()
+            return self.amplitude() * 2
         else:
             return 0
 
 
-class HarmonicSignalGenerator(SignalGenerator):
-    def __init__(self, period, harmonic_params):
-        super().__init__(period, harmonic_params.amplitude)
-        self.__frequency = harmonic_params.frequency
-        self.__initial_phase = harmonic_params.initial_phase
+class HarmonicSignalGenerator(DefaultSignalGenerator):
+    def __init__(self, initial_phase):
+        self.__initial_phase = initial_phase
 
     def get_discrete_signal(self, n):
-        return (self.amplitude()
-                * math.sin(2 * math.pi * self.__frequency * n / self.length()
-                           + self.__initial_phase)) + self.amplitude()
+        return (self.amplitude() * math.sin(2 * math.pi * n / self.length() + self.__initial_phase)) + self.amplitude()
 
 
-class PolyharmonicSignalGenerator(SignalGenerator):
-    def __init__(self, length, arrays):
-        super().__init__(length, -1)  # amplitude is not in use
+class PolyharmonicSignalGenerator(DefaultSignalGenerator):
+    def __init__(self, arrays):
         self.__arrays = arrays  # [[]] == [[chart1 values], [chart2 values] ...]
 
     def get_discrete_signal(self, n):
@@ -93,9 +83,8 @@ class PolyharmonicSignalGenerator(SignalGenerator):
 # m_array - [information signal]
 # c_array - [carrier signal]
 
-class AmplitudeModulator(SignalGenerator):
-    def __init__(self, length, m_array, c_array, modulation_coefficient=1.0):
-        super().__init__(length, -1)
+class AmplitudeModulator(DefaultSignalGenerator):
+    def __init__(self, m_array, c_array, modulation_coefficient=1.0):
         self.__m_array = m_array
         self.__c_array = c_array
         self.__modulation_coefficient = modulation_coefficient
@@ -105,10 +94,9 @@ class AmplitudeModulator(SignalGenerator):
         return self.__c_array[n] * (1 + (self.__modulation_coefficient * self.__m_array[n] / self.__m_max_abs))
 
 
-class FrequencyModulator(SignalGenerator):
-    def __init__(self, length, arrays):
-        super().__init__(length, -1)
-        self.__arrays = arrays  # [[]] == [[chart1 values], [chart2 values] ...]
+class FrequencyModulator(DefaultSignalGenerator):
+    def __init__(self, arrays):
+        self.__arrays = arrays
 
     def get_discrete_signal(self, n):
         return 0

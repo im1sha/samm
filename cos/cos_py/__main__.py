@@ -4,61 +4,73 @@ from signal_generators import *
 from local_parser import LocalParser
 
 
-def harmonic(nargs, store=True, only_last=False):
-    parser = LocalParser(argparse.ArgumentParser())
-    period = parser.get_length(nargs, store, only_last)
+# harmonic| impulse| triangle| saw_edged| noise functions handles exact Nargs signals
+# and returns [[signal1], [signal2], [signalNargs]]
+# DEFAULTS: store=True, only_last=False, exact_at=-1
 
-    # lists
-    amplitudes = parser.get_amplitudes(nargs, store, only_last)  # []
-    frequencies = parser.get_frequencies(nargs, store, only_last)  # []
-    initial_phases = parser.get_initial_phases(nargs, store, only_last)  # []
+def harmonic(nargs, store_last_group=True, only_last=False, exact_at=-1):
+    parser = LocalParser(argparse.ArgumentParser())
+
+    period = parser.get_length(nargs, store_last_group, only_last, exact_at)
+    amplitudes = parser.get_amplitudes(nargs, store_last_group, only_last, exact_at)  # []
+
+    frequencies = [1]
+    __repeat(frequencies, nargs)
+    # parser.get_frequencies(nargs, store_last_group, only_last, exact_at)  # []
+
+    initial_phases = parser.get_initial_phases(nargs, store_last_group, only_last, exact_at)  # []
 
     signals = list(list(HarmonicSignalGenerator(p, HarmonicParameters(a, f, i))
                         .generate_signal()) for p, a, f, i in zip(period, amplitudes, frequencies, initial_phases))
     return signals
 
 
-def impulse(nargs, store=True, only_last=False):
+def impulse(nargs, store_last_group=True, only_last=False, exact_at=-1):
     parser = LocalParser(argparse.ArgumentParser())
-    length = parser.get_length(nargs, store, only_last)
-    amplitudes = parser.get_amplitudes(nargs, store, only_last)
-    duty_circles = parser.get_duty_circles(nargs, store, only_last)
+
+    length = parser.get_length(nargs, store_last_group, only_last, exact_at)
+    amplitudes = parser.get_amplitudes(nargs, store_last_group, only_last, exact_at)
+
+    duty_circles = parser.get_duty_circles(nargs, store_last_group, only_last, exact_at)
 
     signals = list(list(ImpulseSignalGenerator(p, a, d)
                         .generate_signal()) for p, a, d in zip(length, amplitudes, duty_circles))
     return signals
 
 
-def triangle(nargs, store=True, only_last=False):
+def triangle(nargs, store_last_group=True, only_last=False, exact_at=-1):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs, store, only_last)
-    period = parser.get_length(nargs, store, only_last)
+
+    amplitudes = parser.get_amplitudes(nargs, store_last_group, only_last, exact_at)
+    period = parser.get_length(nargs, store_last_group, only_last, exact_at)
 
     signals = list(list(TriangleSignalGenerator(p, a).generate_signal()) for p, a in zip(period, amplitudes))
     return signals
 
 
-def saw_edged(nargs, store=True, only_last=False):
+def saw_edged(nargs, store_last_group=True, only_last=False, exact_at=-1):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs, store, only_last)
-    length = parser.get_length(nargs, store, only_last)
-    growings = parser.get_growings(nargs, store, only_last)
+    amplitudes = parser.get_amplitudes(nargs, store_last_group, only_last, exact_at)
+    length = parser.get_length(nargs, store_last_group, only_last, exact_at)
+    growings = parser.get_growings(nargs, store_last_group, only_last, exact_at)
     signals = list(list(SawEdgedSignalGenerator(p, a, g).generate_signal())
                    for p, a, g in zip(length, amplitudes, growings))
     return signals
 
 
-def noise(nargs, store=True, only_last=False):
+def noise(nargs, store_last_group=True, only_last=False, exact_at=-1):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs, store, only_last)
-    length = parser.get_length(nargs, store, only_last)
+    amplitudes = parser.get_amplitudes(nargs, store_last_group, only_last, exact_at)
+    length = parser.get_length(nargs, store_last_group, only_last, exact_at)
     signals = list(list(NoiseSignalGenerator(p, a).generate_signal()) for p, a in zip(length, amplitudes))
     return signals
 
 
+# only calls appropriate signal creation function
+
 def poly(task, nargs):
     arrays = task(nargs)
-    return [PolyharmonicSignalGenerator(len(arrays[0]), arrays).generate_signal()]
+    return [list(PolyharmonicSignalGenerator(len(arrays[0]), arrays).generate_signal())]
 
 
 def f_modulate(tasks):
@@ -73,7 +85,7 @@ def a_modulate(m_task, c_task):
     c_values = c_task(1, False, True)[0]
     if len(m_values) != len(c_values):
         raise Exception()
-    return [AmplitudeModulator(len(m_values), m_values, c_values).generate_signal(), m_values, c_values]
+    return [list(AmplitudeModulator(len(m_values), m_values, c_values).generate_signal()), m_values, c_values]
 
 
 # def task_2():

@@ -2,22 +2,22 @@ import itertools
 
 
 class LocalParser:
+    # common
+    #   -N length
+
     # use for single signal generation
     # __main__.py -t SIGNAL_NAME_HERE --arg1-key ARG1_VALUE
     #                                 --arg2-key ARG2_VALUE
     #                                 --argm-key ARGM_VALUE
-    #                                 -i TOTAL_ITERATIONS
     # use for multiple signal generation
     # __main__.py -t SIGNAL_NAME_HERE --arg1-key ARG1_VALUE_1 ARG1_VALUE_2 ARG1_VALUE_N
     #                                 --arg2-key ARG2_VALUE_1 ARG2_VALUE_2 ARG2_VALUE_N
     #                                 --argm-key ARGM_VALUE_1 ARGM_VALUE_2 ARGM_VALUE_N
-    #                                 -i TOTAL_ITERATIONS
     #                                 -z TOTAL_SIGNALS_N
     # use for polysignal generation
     # __main__.py -t SIGNAL_NAME_HERE --arg1-key ARG1_VALUE_1 ARG1_VALUE_2 ARG1_VALUE_N
     #                                 --arg2-key ARG1_VALUE_1 ARG1_VALUE_2 ARG1_VALUE_N
     #                                 --argm-key ARGM_VALUE_1 ARGM_VALUE_2 ARGM_VALUE_N
-    #                                 -i TOTAL_ITERATIONS
     #                                 -z TOTAL_SIGNALS_N
     #                                 -y 1
     # use for modulation
@@ -27,7 +27,6 @@ class LocalParser:
     #             -t SIGNAL_NAME_2 --arg1-key ARG1_VALUE
     #                              --arg2-key ARG1_VALUE
     #                              --argl-key ARGL_VALUE
-    #                              -i TOTAL_ITERATIONS
     #                              -z TOTAL_SIGNALS_N
     #                              -m fm | am
 
@@ -53,7 +52,7 @@ class LocalParser:
         else:
             return list(itertools.chain.from_iterable(value))
 
-    def __get_value_at(self, value, pos=0):
+    def __get_value_at(self, value, pos):
         return self.__to_1d_array(value)[pos]
 
     # [val]
@@ -72,7 +71,7 @@ class LocalParser:
                                    default=1,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_value_at(self.__args.nargs)
+        return self.__get_value_at(self.__args.nargs, 0)
 
     # store == False, same == 1
     # [[value1], [value2], [valueN]]
@@ -84,12 +83,12 @@ class LocalParser:
     #           --nargs N
 
     def __get_param(self, short_call, long_call, help_str, arg_type, dest_unique_name, required,
-                    total_same_params=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
-        if (total_same_params != 1) and not store:
+                    total_same_params=1, store_last_group=True, only_last_to_take=False, exact_position_to_take=-1):
+        if (total_same_params != 1) and not store_last_group:
             raise Exception()
         self.__parser.add_argument(short_call,
                                    long_call,
-                                   action='store' if store else 'append',
+                                   action='store' if store_last_group else 'append',
                                    required=required,
                                    help=help_str,
                                    dest=dest_unique_name,
@@ -109,16 +108,16 @@ class LocalParser:
         return self.__get_param('-N', '--length', 'signal length', int, 'length', False,
                                 same, store, only_last_to_take, exact_position_to_take)
 
-    def get_iterations(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
-        return self.__get_param('-i', '--iterations', 'total iterations', int, 'iterations', False,
-                                same, store, only_last_to_take, exact_position_to_take)
+    # def get_iterations(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+    #     return self.__get_param('-i', '--iterations', 'total iterations', int, 'iterations', False,
+    #                             same, store, only_last_to_take, exact_position_to_take)
 
     def get_amplitudes(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
-        return self.__get_param('-A', '--amplitude', 'signal amplitude', float, 'amplitude', False,
+        return self.__get_param('-A', '--amplitude', 'signal amplitude', float, 'amplitude', True,
                                 same, store, only_last_to_take, exact_position_to_take)
 
     def get_frequencies(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
-        return self.__get_param('-f', '--frequency', 'signal frequency', float, 'frequency', False,
+        return self.__get_param('-f', '--frequency', 'signal frequency', float, 'frequency', True,
                                 same, store, only_last_to_take, exact_position_to_take)
 
     def get_initial_phases(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
@@ -131,6 +130,17 @@ class LocalParser:
 
     def get_growings(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
         return self.__get_param('-g', '--growing', 'chart direction 0(desc) or 1(asc)', int, 'growing', False,
+                                same, store, only_last_to_take, exact_position_to_take)
+
+    def get_const_x_shifts(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-b', '--const-x-shift', 'chart x shift (lowest point of chart located at 0)',
+                                float, 'shift_x', False,
+                                same, store, only_last_to_take, exact_position_to_take)
+
+    def get_const_y_shifts(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-c', '--const-y-shift-part',
+                                'chart y-shift (single item shift from 0.0 to 1.0 relative to single signal element)',
+                                float, 'shift_y', False,
                                 same, store, only_last_to_take, exact_position_to_take)
 
     def get_tasks(self, tasks_callbacks, store=True):
@@ -164,7 +174,7 @@ class LocalParser:
                                    default=0,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_value_at(self.__args.is_poly) == 1
+        return self.__get_value_at(self.__args.is_poly, 0) == 1
 
     def get_modulation(self, modulation_callbacks):
         self.__parser.add_argument('-m', '--modulation',
@@ -177,5 +187,5 @@ class LocalParser:
                                    default='none',
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        self.__modulation = modulation_callbacks[self.__get_value_at(self.__args.modulation)]
+        self.__modulation = modulation_callbacks[self.__get_value_at(self.__args.modulation, 0)]
         return self.__modulation
