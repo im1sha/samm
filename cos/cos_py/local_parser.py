@@ -29,7 +29,7 @@ class LocalParser:
     #                              --argl-key ARGL_VALUE
     #                              -i TOTAL_ITERATIONS
     #                              -z TOTAL_SIGNALS_N
-    #                              -m 1
+    #                              -m fm | am
 
     def __init__(self, parser):
         self.__parser = parser
@@ -196,9 +196,9 @@ class LocalParser:
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
         results = []
-        for key, value in tasks_callbacks:
-            if key in self.__to_1d_array(self.__args.task):
-                results.append(value)
+        for i in self.__to_1d_array(self.__args.task):
+            if i in tasks_callbacks.keys():
+                results.append(tasks_callbacks.get(i))
 
         return results
 
