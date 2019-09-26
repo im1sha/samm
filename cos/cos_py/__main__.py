@@ -60,6 +60,14 @@ def poly(task, nargs):
     return [PolyharmonicSignalGenerator(len(arrays[0]), arrays).generate_signal()]
 
 
+def f_modulate():
+    print()
+
+
+def a_modulate():
+    print()
+
+
 # def task_1c():
 #
 #     # todo add ability of signal modulation based on 1a
@@ -147,35 +155,57 @@ def poly(task, nargs):
 
 
 def main():
-    sub_tasks_callbacks = {'harmonic': harmonic,
-                           'impulse': impulse,
-                           'triangle': triangle,
-                           'sawedged': saw_edged,
-                           'noise': noise
-                           }
+    signals_callbacks = {
+        'harmonic': harmonic,
+        'impulse': impulse,
+        'triangle': triangle,
+        'sawedged': saw_edged,
+        'noise': noise
+    }
+    modulate_callbacks = {
+        'fm': f_modulate,
+        'am': a_modulate,
+        'none': None
+    }
 
     parser = LocalParser(argparse.ArgumentParser())
-    iterations = parser.get_iterations()
-    nargs = parser.get_nargs()
-    task = parser.get_task(sub_tasks_callbacks)
 
-    # expected that one_signal_arrays is  [[]] == [[chart1 values], [chart2 values] ...]
-    if not parser.get_is_polyharmonic():
-        one_signal_arrays = task(nargs)
-    else:
-        one_signal_arrays = poly(task, nargs)
+    print(parser.get_length())
 
-    chart_data = []
-    for arr in one_signal_arrays:
-        to_append = []
-        for _ in range(iterations):
-            to_append += arr
-        chart_data += [LabeledChartData(
-            range(len(to_append)),
-            to_append,
-            None)]
 
-    draw_charts(chart_data)
+
+
+
+    # modulation = parser.get_modulation(modulate_callbacks)
+    # iterations = parser.get_iterations()
+    #
+    # # if (modulation != None) then values from CLI stores
+    # # as appended([[value1, value2, valueNargs], [value2, value2, valueNargs], [value3, value2, valueNargs]])
+    # # else as stored([value1, value2, valueNargs])
+    # if modulation is None:
+    #     nargs = parser.get_nargs()
+    #     task = parser.get_task(signals_callbacks)[0]
+    # else:
+    #     nargs = 1
+    #     task = parser.get_task(signals_callbacks, False)
+    #
+    # # expected that one_signal_arrays is  [[]] == [[chart1 values], [chart2 values] ...]
+    # if not parser.get_is_polyharmonic():
+    #     one_signal_arrays = task(nargs)
+    # else:
+    #     one_signal_arrays = poly(task, nargs)
+    #
+    # chart_data = []
+    # for arr in one_signal_arrays:
+    #     to_append = []
+    #     for _ in range(iterations):
+    #         to_append += arr
+    #     chart_data += [LabeledChartData(
+    #         range(len(to_append)),
+    #         to_append,
+    #         None)]
+    #
+    # draw_charts(chart_data)
 
 
 if __name__ == "__main__":
