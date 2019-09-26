@@ -83,134 +83,55 @@ class LocalParser:
     # USE       --key VALUE_1 VALUE_2 VALUE_N
     #           --nargs N
 
-    def get_length(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
+    def __get_param(self, short_call, long_call, help_str, arg_type, dest_unique_name, required,
+                    total_same_params=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        if (total_same_params != 1) and not store:
             raise Exception()
-        self.__parser.add_argument('-N', '--length',
+        self.__parser.add_argument(short_call,
+                                   long_call,
                                    action='store' if store else 'append',
-                                   required=False,
-                                   help='signal length',
-                                   dest='length',
-                                   type=int,
-                                   nargs=same)
+                                   required=required,
+                                   help=help_str,
+                                   dest=dest_unique_name,
+                                   type=arg_type,
+                                   nargs=total_same_params)
         self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.length is None:
+        if getattr(self.__args, dest_unique_name) is None:
             raise Exception()
-        result = self.__to_1d_array(self.__args.length)
+        result = self.__to_1d_array(getattr(self.__args, dest_unique_name))
         if only_last_to_take:
             return [result[len(result) - 1]]
+        if exact_position_to_take != -1:
+            return [result[exact_position_to_take]]
         return result
 
-    def get_iterations(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-i', '--iterations',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='total iterations',
-                                   dest='iterations',
-                                   type=int,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.iterations is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.iterations)
-        if only_last_to_take:
-            return [result[len(result) - 1]]
-        return result
+    def get_length(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-N', '--length', 'signal length', int, 'length', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
-    def get_amplitudes(self, same=1, store=True, only_last_to_take=False):
-        # total parameters passed after -A:
-        #   -A 1 2 .. same-1 same
-        # item_to_take is number of satisfying item (-1: take all)
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-A', '--amplitude',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='signal amplitude',
-                                   dest='amplitude',
-                                   type=float,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.amplitude is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.amplitude)
-        if only_last_to_take:
-            return [result[len(result)-1]]
-        return result
+    def get_iterations(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-i', '--iterations', 'total iterations', int, 'iterations', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
-    def get_frequencies(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-f', '--frequency',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='frequency',
-                                   dest='frequency',
-                                   type=float,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.frequency is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.frequency)
-        if only_last_to_take:
-            return [result[len(result) - 1]]
-        return result
+    def get_amplitudes(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-A', '--amplitude', 'signal amplitude', float, 'amplitude', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
-    def get_initial_phases(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-p', '--initial-phase',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='initial phase',
-                                   dest='initial_phase',
-                                   type=float,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.initial_phase is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.initial_phase)
-        if only_last_to_take:
-            return [result[len(result) - 1]]
-        return result
+    def get_frequencies(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-f', '--frequency', 'signal frequency', float, 'frequency', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
-    def get_duty_circles(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-D', '--duty-circle',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='signal length percentage',
-                                   dest='duty_circle',
-                                   type=float,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.duty_circle is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.duty_circle)
-        if only_last_to_take:
-            return [result[len(result) - 1]]
-        return result
+    def get_initial_phases(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-p', '--initial-phase', 'signal initial phase', float, 'initial_phase', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
-    def get_growings(self, same=1, store=True, only_last_to_take=False):
-        if (same != 1) and not store:
-            raise Exception()
-        self.__parser.add_argument('-g', '--growing',
-                                   action='store' if store else 'append',
-                                   required=False,
-                                   help='chart direction 0(desc) or 1(asc)',
-                                   dest='growing',
-                                   type=int,
-                                   nargs=same)
-        self.__args = self.__parser.parse_known_args()[0]
-        if self.__args.growing is None:
-            raise Exception()
-        result = self.__to_1d_array(self.__args.growing)
-        if only_last_to_take:
-            return [result[len(result) - 1]]
-        return result
+    def get_duty_circles(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-D', '--duty-circle', 'signal length percentage', float, 'duty_circle', False,
+                                same, store, only_last_to_take, exact_position_to_take)
+
+    def get_growings(self, same=1, store=True, only_last_to_take=False, exact_position_to_take=-1):
+        return self.__get_param('-g', '--growing', 'chart direction 0(desc) or 1(asc)', int, 'growing', False,
+                                same, store, only_last_to_take, exact_position_to_take)
 
     def get_tasks(self, tasks_callbacks, store=True):
         self.__tasks_callbacks = tasks_callbacks
