@@ -78,7 +78,7 @@ class HarmonicSignalGenerator(SignalGenerator):
     def get_discrete_signal(self, n):
         return (self.amplitude()
                 * math.sin(2 * math.pi * self.__frequency * n / self.length()
-                           + self.__initial_phase))
+                           + self.__initial_phase)) + self.amplitude()
 
 
 class PolyharmonicSignalGenerator(SignalGenerator):

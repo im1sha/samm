@@ -61,30 +61,6 @@ class LocalParser:
 
     # def __arg(self):
 
-    def get_length(self):
-        self.__parser.add_argument('-N', '--length',
-                                   action='store',
-                                   required=False,
-                                   help='signal length',
-                                   dest='length',
-                                   type=int,
-                                   default=512,
-                                   nargs=1)
-        self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_value_at(self.__args.length)
-
-    def get_iterations(self):
-        self.__parser.add_argument('-i', '--iterations',
-                                   action='store',
-                                   required=False,
-                                   help='total iterations',
-                                   dest='iterations',
-                                   type=int,
-                                   default=1,
-                                   nargs=1)
-        self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_value_at(self.__args.iterations)
-
     def get_nargs(self):
         # for multiple signals generation
         self.__parser.add_argument('-z', '--nargs',
@@ -106,6 +82,42 @@ class LocalParser:
     # [value1, value2, valueN]
     # USE       --key VALUE_1 VALUE_2 VALUE_N
     #           --nargs N
+
+    def get_length(self, same=1, store=True, only_last_to_take=False):
+        if (same != 1) and not store:
+            raise Exception()
+        self.__parser.add_argument('-N', '--length',
+                                   action='store' if store else 'append',
+                                   required=False,
+                                   help='signal length',
+                                   dest='length',
+                                   type=int,
+                                   nargs=same)
+        self.__args = self.__parser.parse_known_args()[0]
+        if self.__args.length is None:
+            raise Exception()
+        result = self.__to_1d_array(self.__args.length)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
+
+    def get_iterations(self, same=1, store=True, only_last_to_take=False):
+        if (same != 1) and not store:
+            raise Exception()
+        self.__parser.add_argument('-i', '--iterations',
+                                   action='store' if store else 'append',
+                                   required=False,
+                                   help='total iterations',
+                                   dest='iterations',
+                                   type=int,
+                                   nargs=same)
+        self.__args = self.__parser.parse_known_args()[0]
+        if self.__args.iterations is None:
+            raise Exception()
+        result = self.__to_1d_array(self.__args.iterations)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
 
     def get_amplitudes(self, same=1, store=True, only_last_to_take=False):
         # total parameters passed after -A:
