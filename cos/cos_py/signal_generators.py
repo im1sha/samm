@@ -54,7 +54,7 @@ class SawEdgedSignalGenerator(DefaultSignalGenerator):
 
 
 class ImpulseSignalGenerator(DefaultSignalGenerator):
-    def __init__(self, length, amplitude, duty_circle):
+    def __init__(self, duty_circle):
         self.__duty_circle = duty_circle
 
     def get_discrete_signal(self, n):
