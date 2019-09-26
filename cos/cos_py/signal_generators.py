@@ -4,7 +4,6 @@ from collections import namedtuple
 from enum import Enum
 from array import array
 
-
 HarmonicParameters = namedtuple('HarmonicParameters', ['amplitude', 'frequency', 'initial_phase'])
 
 
@@ -77,9 +76,9 @@ class HarmonicSignalGenerator(SignalGenerator):
         self.__initial_phase = harmonic_params.initial_phase
 
     def get_discrete_signal(self, n):
-        return self.amplitude() \
-               * math.sin(2 * math.pi * self.__frequency * n / self.length()
-                          + self.__initial_phase)
+        return (self.amplitude()
+                * math.sin(2 * math.pi * self.__frequency * n / self.length()
+                           + self.__initial_phase))
 
 
 class PolyharmonicSignalGenerator(SignalGenerator):
@@ -91,6 +90,28 @@ class PolyharmonicSignalGenerator(SignalGenerator):
         return sum(arr[n] for arr in self.__arrays)  # takes all values at n-th position
 
 
+# m_array - [information signal]
+# c_array - [carrier signal]
+
+class AmplitudeModulator(SignalGenerator):
+    def __init__(self, length, m_array, c_array, modulation_coefficient=1.0):
+        super().__init__(length, -1)
+        self.__m_array = m_array
+        self.__c_array = c_array
+        self.__modulation_coefficient = modulation_coefficient
+        self.__m_max_abs = max(list(map(lambda x: math.fabs(x), self.__m_array)))
+
+    def get_discrete_signal(self, n):
+        return self.__c_array[n] * (1 + (self.__modulation_coefficient * self.__m_array[n] / self.__m_max_abs))
+
+
+class FrequencyModulator(SignalGenerator):
+    def __init__(self, length, arrays):
+        super().__init__(length, -1)
+        self.__arrays = arrays  # [[]] == [[chart1 values], [chart2 values] ...]
+
+    def get_discrete_signal(self, n):
+        return 0
 
 # class MutationType(Enum):
 #     INCREMENT = 1

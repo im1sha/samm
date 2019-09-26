@@ -4,52 +4,52 @@ from signal_generators import *
 from local_parser import LocalParser
 
 
-def harmonic(nargs):
+def harmonic(nargs, only_last=False, store=True):
     parser = LocalParser(argparse.ArgumentParser())
     period = parser.get_length()
 
     # lists
-    amplitudes = parser.get_amplitudes(nargs)  # []
-    frequencies = parser.get_frequencies(nargs)  # []
-    initial_phases = parser.get_initial_phases(nargs)  # []
+    amplitudes = parser.get_amplitudes(nargs, store, only_last)  # []
+    frequencies = parser.get_frequencies(nargs, store, only_last)  # []
+    initial_phases = parser.get_initial_phases(nargs, store, only_last)  # []
 
     signals = list(list(HarmonicSignalGenerator(period, HarmonicParameters(a, f, i))
                         .generate_signal()) for a, f, i in zip(amplitudes, frequencies, initial_phases))
     return signals
 
 
-def impulse(nargs):
+def impulse(nargs, only_last=False, store=True):
     parser = LocalParser(argparse.ArgumentParser())
     length = parser.get_length()
-    amplitudes = parser.get_amplitudes(nargs)
-    duty_circles = parser.get_duty_circles(nargs)
+    amplitudes = parser.get_amplitudes(nargs, store, only_last)
+    duty_circles = parser.get_duty_circles(nargs, store, only_last)
 
     signals = list(list(ImpulseSignalGenerator(length, a, d)
                         .generate_signal()) for a, d in zip(amplitudes, duty_circles))
     return signals
 
 
-def triangle(nargs):
+def triangle(nargs, only_last=False, store=True):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs)
+    amplitudes = parser.get_amplitudes(nargs, store, only_last)
     period = parser.get_length()
 
     signals = list(list(TriangleSignalGenerator(period, a).generate_signal()) for a in amplitudes)
     return signals
 
 
-def saw_edged(nargs):
+def saw_edged(nargs, only_last=False, store=True):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs)
+    amplitudes = parser.get_amplitudes(nargs, store, only_last)
     length = parser.get_length()
-    growings = parser.get_growings(nargs)
+    growings = parser.get_growings(nargs, store, only_last)
     signals = list(list(SawEdgedSignalGenerator(length, a, g).generate_signal()) for a, g in zip(amplitudes, growings))
     return signals
 
 
-def noise(nargs):
+def noise(nargs, only_last=False, store=True):
     parser = LocalParser(argparse.ArgumentParser())
-    amplitudes = parser.get_amplitudes(nargs)
+    amplitudes = parser.get_amplitudes(nargs, store, only_last)
     length = parser.get_length()
     signals = list(list(NoiseSignalGenerator(length, a).generate_signal()) for a in amplitudes)
     return signals
@@ -60,63 +60,19 @@ def poly(task, nargs):
     return [PolyharmonicSignalGenerator(len(arrays[0]), arrays).generate_signal()]
 
 
-def f_modulate():
+def f_modulate(tasks):
     print('fm')
 
 
-def a_modulate():
-    print('am')
+# m_task values - [information signal]
+# c_task values - [carrier signal]
 
-
-# def task_1c():
-#
-#     # todo add ability of signal modulation based on 1a
-#
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('-N', '--period',
-#                         action='store',
-#                         required=False,
-#                         help='signal period',
-#                         dest='period',
-#                         type=int,
-#                         default=512)
-#     parser.add_argument('-i', '--period-iterations',
-#                         action='store',
-#                         required=False,
-#                         help='period iterations',
-#                         dest='period_iterations',
-#                         type=int,
-#                         default=1)
-#     parser.add_argument('-m', '--mutation',
-#                         action='store',
-#                         required=False,
-#                         help='mutation per period',
-#                         dest='mutation_per_period',
-#                         type=float,
-#                         default=0.2)
-#     parser.add_argument('-ml', '--mutation-law',
-#                         action='store',
-#                         required=True,
-#                         help='mutation law',
-#                         type=str,
-#                         dest='mutation_law',
-#                         choices=[MutationType.DECREMENT.name,
-#                                  MutationType.INCREMENT.name])
-#     args = parser.parse_known_args()[0]
-#
-#     harmonic_parameters = [HarmonicParameters(9, 1, math.pi / 2),
-#                            HarmonicParameters(9, 2, 0.0),
-#                            HarmonicParameters(9, 3, math.pi / 4),
-#                            HarmonicParameters(9, 4, math.pi / 3),
-#                            HarmonicParameters(9, 5, math.pi / 6)]
-#
-#     signal = list(LinearPolyharmonicSignalGenerator(harmonic_parameters)
-#                   .generate_signal(args.period,
-#                                    args.period_iterations,
-#                                    args.mutation_per_period,
-#                                    MutationType[args.mutation_law]))
-#
-#     draw_chart(LabeledChartData(range(len(signal)), signal, None))
+def a_modulate(m_task, c_task):
+    m_values = m_task(1, False, False)[0]
+    c_values = c_task(1, True, False)[0]
+    if len(m_values) != len(c_values):
+        raise Exception()
+    return [AmplitudeModulator(len(m_values), m_values, c_values).generate_signal(), m_values, c_values]
 
 
 # def task_2():
@@ -182,11 +138,12 @@ def main():
     else:
         nargs = 1
         tasks = parser.get_tasks(signals_callbacks, False)
+        if len(tasks) != 2:
+            raise Exception('It should be 2 signals for modeling')
 
     # expected that one_signal_arrays is  [[]] == [[chart1 values], [chart2 values] ...]
     if modulation is not None:
-        one_signal_arrays = modulation()
-        return
+        one_signal_arrays = modulation(tasks[0], tasks[1])  # tasks == [m_task, c_task]
     elif not parser.get_is_polyharmonic():
         one_signal_arrays = tasks[0](nargs)
     else:

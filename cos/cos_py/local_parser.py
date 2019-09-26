@@ -53,8 +53,8 @@ class LocalParser:
         else:
             return list(itertools.chain.from_iterable(value))
 
-    def __get_first_value(self, value):
-        return self.__to_1d_array(value)[0]
+    def __get_value_at(self, value, pos=0):
+        return self.__to_1d_array(value)[pos]
 
     # [val]
     # USE: --key VALUE
@@ -71,7 +71,7 @@ class LocalParser:
                                    default=512,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_first_value(self.__args.length)
+        return self.__get_value_at(self.__args.length)
 
     def get_iterations(self):
         self.__parser.add_argument('-i', '--iterations',
@@ -83,7 +83,7 @@ class LocalParser:
                                    default=1,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_first_value(self.__args.iterations)
+        return self.__get_value_at(self.__args.iterations)
 
     def get_nargs(self):
         # for multiple signals generation
@@ -96,7 +96,7 @@ class LocalParser:
                                    default=1,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_first_value(self.__args.nargs)
+        return self.__get_value_at(self.__args.nargs)
 
     # store == False, same == 1
     # [[value1], [value2], [valueN]]
@@ -107,9 +107,10 @@ class LocalParser:
     # USE       --key VALUE_1 VALUE_2 VALUE_N
     #           --nargs N
 
-    def get_amplitudes(self, same=1, store=True):
+    def get_amplitudes(self, same=1, store=True, only_last_to_take=False):
         # total parameters passed after -A:
         #   -A 1 2 .. same-1 same
+        # item_to_take is number of satisfying item (-1: take all)
         if (same != 1) and not store:
             raise Exception()
         self.__parser.add_argument('-A', '--amplitude',
@@ -122,9 +123,12 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         if self.__args.amplitude is None:
             raise Exception()
-        return self.__to_1d_array(self.__args.amplitude)
+        result = self.__to_1d_array(self.__args.amplitude)
+        if only_last_to_take:
+            return [result[len(result)-1]]
+        return result
 
-    def get_frequencies(self, same=1, store=True):
+    def get_frequencies(self, same=1, store=True, only_last_to_take=False):
         if (same != 1) and not store:
             raise Exception()
         self.__parser.add_argument('-f', '--frequency',
@@ -137,9 +141,12 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         if self.__args.frequency is None:
             raise Exception()
-        return self.__to_1d_array(self.__args.frequency)
+        result = self.__to_1d_array(self.__args.frequency)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
 
-    def get_initial_phases(self, same=1, store=True):
+    def get_initial_phases(self, same=1, store=True, only_last_to_take=False):
         if (same != 1) and not store:
             raise Exception()
         self.__parser.add_argument('-p', '--initial-phase',
@@ -152,9 +159,12 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         if self.__args.initial_phase is None:
             raise Exception()
-        return self.__to_1d_array(self.__args.initial_phase)
+        result = self.__to_1d_array(self.__args.initial_phase)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
 
-    def get_duty_circles(self, same=1, store=True):
+    def get_duty_circles(self, same=1, store=True, only_last_to_take=False):
         if (same != 1) and not store:
             raise Exception()
         self.__parser.add_argument('-D', '--duty-circle',
@@ -167,9 +177,12 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         if self.__args.duty_circle is None:
             raise Exception()
-        return self.__to_1d_array(self.__args.duty_circle)
+        result = self.__to_1d_array(self.__args.duty_circle)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
 
-    def get_growings(self, same=1, store=True):
+    def get_growings(self, same=1, store=True, only_last_to_take=False):
         if (same != 1) and not store:
             raise Exception()
         self.__parser.add_argument('-g', '--growing',
@@ -182,7 +195,10 @@ class LocalParser:
         self.__args = self.__parser.parse_known_args()[0]
         if self.__args.growing is None:
             raise Exception()
-        return self.__to_1d_array(self.__args.growing)
+        result = self.__to_1d_array(self.__args.growing)
+        if only_last_to_take:
+            return [result[len(result) - 1]]
+        return result
 
     def get_tasks(self, tasks_callbacks, store=True):
         self.__tasks_callbacks = tasks_callbacks
@@ -215,7 +231,7 @@ class LocalParser:
                                    default=0,
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        return self.__get_first_value(self.__args.is_poly) == 1
+        return self.__get_value_at(self.__args.is_poly) == 1
 
     def get_modulation(self, modulation_callbacks):
         self.__parser.add_argument('-m', '--modulation',
@@ -228,6 +244,5 @@ class LocalParser:
                                    default='none',
                                    nargs=1)
         self.__args = self.__parser.parse_known_args()[0]
-        self.__modulation = modulation_callbacks[self.__get_first_value(self.__args.modulation)]
+        self.__modulation = modulation_callbacks[self.__get_value_at(self.__args.modulation)]
         return self.__modulation
-
