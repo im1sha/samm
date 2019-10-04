@@ -103,7 +103,6 @@ JOIN [Person].[Person] [person]
 	AND ([dept].[Name] != N'Executive')
 	AND (([hist].[EndDate] IS NULL) OR ([hist].[EndDate] > GETDATE()));
 	
-SELECT * FROM [dbo].[Person];
 --SELECT * FROM [HumanResources].[Department] WHERE [Name]=N'Executive';
 
 -------------------------------------------------
@@ -114,3 +113,9 @@ SELECT * FROM [dbo].[Person];
 
 ALTER TABLE [dbo].[Person]
 ALTER COLUMN [Suffix] NVARCHAR (5) NULL;
+
+
+
+
+SELECT * FROM [dbo].[Person];
+
