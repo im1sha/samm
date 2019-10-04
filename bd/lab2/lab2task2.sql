@@ -1,7 +1,7 @@
 -- a) 
 -- создайте таблицу dbo.Person с такой же структурой 
 -- как Person.Person, кроме полей xml, uniqueidentifier, 
--- не включа¤ индексы, ограничени¤ и триггеры;
+-- не включая индексы, ограничения и триггеры;
 
 IF OBJECT_ID('[dbo].[Person]', 'U') IS NOT NULL 
 DROP TABLE [dbo].[Person];
@@ -25,11 +25,11 @@ CREATE TABLE [dbo].[Person]
 
 
 -- b) 
--- использу¤ инструкцию ALTER TABLE, 
+-- используя инструкцию ALTER TABLE, 
 -- добавьте в таблицу dbo.Person новое поле ID, 
--- которое ¤вл¤етс¤ первичным ключом типа bigint и 
+-- которое является первичным ключом типа bigint и 
 -- имеет свойство identity.
--- Ќачальное значение дл¤ пол¤ identity задайте 10 и 
+-- Начальное значение для поля identity задайте 10 и 
 -- приращение задайте 10;
 
 ALTER TABLE [dbo].[Person]
@@ -38,9 +38,9 @@ ADD [ID] BIGINT IDENTITY(10, 10) PRIMARY KEY;
 
 -------------------------------------------------
 
--- c) использу¤ инструкцию ALTER TABLE, 
--- создайте дл¤ таблицы dbo.Person ограничение дл¤ пол¤ Title, 
--- чтобы заполнить его можно было только значени¤ми СMr.Т или СMs.Т;
+-- c) используя инструкцию ALTER TABLE, 
+-- создайте для таблицы dbo.Person ограничение для поля Title, 
+-- чтобы заполнить его можно было только значениями 'Mr.' или 'Ms.';
 
 
 ALTER TABLE [dbo].[Person]
@@ -51,9 +51,9 @@ CHECK ([Title] IN ('Mr.', 'Ms.'));
 -------------------------------------------------
 
 -- d) 
--- использу¤ инструкцию ALTER TABLE, 
--- создайте дл¤ таблицы dbo.Person ограничение DEFAULT 
--- дл¤ пол¤ Suffix, задайте значение по умолчанию СN/AТ;
+-- используя инструкцию ALTER TABLE, 
+-- создайте для таблицы dbo.Person ограничение DEFAULT 
+-- для поля Suffix, задайте значение по умолчанию 'N/A';
 
 
 ALTER TABLE [dbo].[Person]
@@ -64,44 +64,53 @@ DEFAULT N'N/A' FOR [Suffix];
 -------------------------------------------------
 
 -- e) заполните новую таблицу данными из Person.Person 
--- только дл¤ тех сотрудников, которые существуют 
+-- только для тех сотрудников, которые существуют 
 -- в таблице HumanResources.Employee, 
--- исключив сотрудников из отдела СExecutiveТ;
+-- исключив сотрудников из отдела 'Executive';
 
 
---INSERT INTO [dbo].[Person]
---(
---    [BusinessEntityID] 
---,   [PersonType] 
---,	[NameStyle]
---,	[Title] 
---,	[FirstName] 
---,	[MiddleName] 
---,	[LastName] 
---,	[Suffix] 
---,	[EmailPromotion]
---,	[ModifiedDate] 
---)
---SELECT
---	[person].[BusinessEntityID] 
---,   [person].[PersonType] 
---,	[person].[NameStyle]
---,	[person].[Title] 
---,	[person].[FirstName] 
---,	[person].[MiddleName] 
---,	[person].[LastName] 
---,	[person].[Suffix] 
---,	[person].[EmailPromotion]
---,	[person].[ModifiedDate] 
---FROM [HumanResources].[Employee] [emp]
---JOIN [Person].[Person] [person]
---    ON emp.[BusinessEntityID] = [person].[BusinessEntityID]
+INSERT INTO [dbo].[Person]
+(
+    [BusinessEntityID] 
+,   [PersonType] 
+,	[NameStyle]
+,	[Title] 
+,	[FirstName] 
+,	[MiddleName] 
+,	[LastName] 
+,	[Suffix] 
+,	[EmailPromotion]
+,	[ModifiedDate] 
+)
+SELECT
+	[person].[BusinessEntityID] 
+,   [person].[PersonType] 
+,	[person].[NameStyle]
+,	[person].[Title] 
+,	[person].[FirstName] 
+,	[person].[MiddleName] 
+,	[person].[LastName] 
+,	[person].[Suffix] 
+,	[person].[EmailPromotion]
+,	[person].[ModifiedDate] 
+FROM [HumanResources].[Employee] [emp]
+JOIN [HumanResources].[EmployeeDepartmentHistory] [hist]
+	ON [emp].[BusinessEntityID] = [hist].[BusinessEntityID]
+JOIN [HumanResources].[Department] [dept]
+	ON [hist].[DepartmentID] = [dept].[DepartmentID]
+JOIN [Person].[Person] [person]
+    ON ([emp].[BusinessEntityID] = [person].[BusinessEntityID])
+	AND ([dept].[Name] != N'Executive')
+	AND (([hist].[EndDate] IS NULL) OR ([hist].[EndDate] > GETDATE()));
 	
-	
---	;
+SELECT * FROM [dbo].[Person];
+--SELECT * FROM [HumanResources].[Department] WHERE [Name]=N'Executive';
 
 -------------------------------------------------
 
 -- f) 
--- измените размерность пол¤ Suffix, 
--- уменьшите размер пол¤ до 5-ти символов.
+-- измените размерность поля Suffix, 
+-- уменьшите размер поля до 5-ти символов.
+
+ALTER TABLE [dbo].[Person]
+ALTER COLUMN [Suffix] NVARCHAR (5) NULL;
