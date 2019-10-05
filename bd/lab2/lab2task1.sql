@@ -3,16 +3,14 @@
 -- с указанием максимальной ставки, 
 -- по которой им выплачивали денежные средства.
 
-SELECT 
-    [emp].[BusinessEntityID]
-,   [emp].[JobTitle]
-,   MAX([payhist].[Rate]) AS [MaxRate]
+SELECT [emp].[BusinessEntityID]
+	,[emp].[JobTitle]
+	,MAX([payhist].[Rate]) AS [MaxRate]
 FROM [HumanResources].[Employee] [emp]
 INNER JOIN [HumanResources].[EmployeePayHistory] [payhist]
-    ON [emp].[BusinessEntityID] = [payhist].[BusinessEntityID]
-	GROUP BY [emp].[BusinessEntityID], [emp].[JobTitle]
-
-
+	ON [emp].[BusinessEntityID] = [payhist].[BusinessEntityID]
+GROUP BY [emp].[BusinessEntityID]
+	,[emp].[JobTitle]
 
 -------------------------------------
 
@@ -24,16 +22,15 @@ INNER JOIN [HumanResources].[EmployeePayHistory] [payhist]
 -- Номера групп должны быть распределены по возрастанию ставок. 
 -- Назовите столбец [RankRate].
 
-SELECT
-    [emp].[BusinessEntityID]
-,   [emp].[JobTitle]
-,   [payhist].[Rate]
-,   DENSE_RANK() OVER (ORDER BY [payhist].[Rate] ASC) AS [RankRate]
+SELECT [emp].[BusinessEntityID]
+	,[emp].[JobTitle]
+	,[payhist].[Rate]
+	,DENSE_RANK() OVER (
+		ORDER BY [payhist].[Rate] ASC
+		) AS [RankRate]
 FROM [HumanResources].[Employee] [emp]
 JOIN [HumanResources].[EmployeePayHistory] [payhist]
-    ON [emp].[BusinessEntityID] = [payhist].[BusinessEntityID]
-
-
+	ON [emp].[BusinessEntityID] = [payhist].[BusinessEntityID]
 
 ------------------------------------------
 
@@ -45,19 +42,22 @@ JOIN [HumanResources].[EmployeePayHistory] [payhist]
 -- во всех остальных отделах
 
 
-SELECT
-    [dept].[Name] as [DepName]
-,   [emp].[BusinessEntityID]
-,   [emp].[JobTitle]
-,   [edh].[ShiftID]
+SELECT [dept].[Name] AS [DepName]
+	,[emp].[BusinessEntityID]
+	,[emp].[JobTitle]
+	,[edh].[ShiftID]
 FROM [HumanResources].[Department] [dept]
 JOIN [HumanResources].[EmployeeDepartmentHistory] [edh]
-    ON [dept].[DepartmentID] = [edh].[DepartmentID]
+	ON [dept].[DepartmentID] = [edh].[DepartmentID]
 JOIN [HumanResources].[Employee] [emp]
-    ON [edh].[BusinessEntityID] = [emp].[BusinessEntityID]
-ORDER BY [dept].[Name] ASC,
-    CASE 
-        WHEN [dept].[Name] = N'Document Control' THEN [edh].[ShiftID]
-        ELSE [emp].[BusinessEntityID]
-    END ASC
+	ON [edh].[BusinessEntityID] = [emp].[BusinessEntityID]
+WHERE ([edh].[EndDate] IS NULL)
+	OR ([edh].[EndDate] > GETDATE())			
+ORDER BY [dept].[Name] ASC
+	,CASE 
+		WHEN [dept].[Name] = N'Document Control'
+			THEN [edh].[ShiftID]
+		ELSE [emp].[BusinessEntityID]
+		END ASC
+
 
