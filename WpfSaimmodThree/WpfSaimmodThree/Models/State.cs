@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace WpfSaimmodThree.Models
 {
-    internal class State
+    public class State 
     {
         public bool ChannelIsBusy1 { get; }
         public bool ChannelIsBusy2 { get; }
@@ -37,5 +37,18 @@ namespace WpfSaimmodThree.Models
             : this(state.TactsToNewItem, state.CurrentQueueLength, state.ChannelIsBusy1, state.ChannelIsBusy2)
         {             
         }
+
+        public State(int TactsToNewItem, int CurrentQueueLength, int ChannelIsBusy1, int ChannelIsBusy2)
+            : this(TactsToNewItem, CurrentQueueLength, Convert.ToBoolean(ChannelIsBusy1), Convert.ToBoolean(ChannelIsBusy2))
+        { 
+        }
+
+        public State(int state) 
+            : this((int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[0]),
+                  (int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[1]),
+                  (int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[2]),
+                  (int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[3]))
+        { 
+        }       
     }
 }
