@@ -92,25 +92,19 @@ namespace WpfSaimmodThree.Models
 
             //currentQueueLength={0, 1, 2}
             //currentTacts={1,2}
-            (int Length, bool Failed) GetNextQueueLength(bool IsBusyChannel1,
-                int currentQueueLength, int currentTacts, int maxQueueLength = 2)
+            (int Length, bool Failed) GetNextQueueLength(
+                bool generatedIsBusyChannel1, 
+                bool previousIsBusyChannel1,
+                int currentQueueLength,
+                int currentTacts,
+                int maxQueueLength = 2)
             {
                 if (maxQueueLength < currentQueueLength)
                 {
                     throw new ArgumentException();
                 }
-                if (IsBusyChannel1 && currentTacts == 1 && currentQueueLength == maxQueueLength)
-                {
-                    return (maxQueueLength, true);
-                }
-                else if (IsBusyChannel1 && currentTacts == 1)
-                {
-                    return (++currentQueueLength, false);
-                }
-                else
-                {
-                    return (currentQueueLength, false);
-                }
+
+                throw new Exception();                
             }
 
             //
@@ -122,7 +116,11 @@ namespace WpfSaimmodThree.Models
 
             for (int i = 0; i < TotalTacts; i++)
             {
-                SystemStates.Add(new State(tactsToNewItem, currentQueueLength, channelIsBusy1, channelIsBusy2));
+                SystemStates.Add(new State(
+                    tactsToNewItem, 
+                    currentQueueLength, 
+                    channelIsBusy1, 
+                    channelIsBusy2));
 
                 bool isFailed = false;
 
@@ -146,123 +144,140 @@ namespace WpfSaimmodThree.Models
                         // -> (x, x, false, false)
                         break;
                     case (1, 0, false, false):
-                        channelIsBusy1 = true;
-                        // -> (x, x, true, false)
-                        break;
+                        {
+                            channelIsBusy1 = true;
+                            // -> (x, x, true, false)
+                            break;
+                        }
                     case (2, 0, true, false):
                     case (1, 0, true, false):
                     case (2, 1, true, false):
                     case (1, 1, true, false):
                     case (2, 2, true, false):
-                        // IsBusy: true == 1
-                        if (generatedIsBusy.Item1)
                         {
-                            // no channels changed
-                            // -> (x, x, true, false)
+                            // IsBusy: true == 1
+                            if (generatedIsBusy.Item1)
+                            {
+                                // no channels changed
+                                // -> (x, x, true, false)
+                            }
+                            else
+                            {
+                                channelIsBusy2 = true;
+                                if (currentQueueLength == 0 && tactsToNewItem == 2)
+                                {
+                                    channelIsBusy1 = false;
+                                    // -> (x, x, false, true)
+                                }
+                                else
+                                {
+                                    channelIsBusy1 = true;
+                                    // -> (x, x, true, true)
+                                }
+                            }
+                            break;
                         }
-                        else
+                    case (1, 2, true, false):
                         {
-                            channelIsBusy2 = true;
-                            if (currentQueueLength == 0 && tactsToNewItem == 2)
+                            if (generatedIsBusy.Item1)
+                            {
+                                // no channels changed
+                                // -> (x, x, true, false)
+                            }
+                            else
+                            {
+                                channelIsBusy2 = true;
+                                // -> (x, x, true, true)
+                            }
+                            break;
+                        }
+                    case (1, 0, false, true):
+                        {
+                            channelIsBusy1 = true;
+                            if (generatedIsBusy.Item2)
+                            {
+                                channelIsBusy2 = true;
+                                // -> (x, x, true, true)
+                            }
+                            else
+                            {
+                                channelIsBusy2 = false;
+                                // -> (x, x, true, false)
+                            }
+                            break;
+                        }
+                    case (2, 0, true, true):
+                        {
+                            if (!generatedIsBusy.Item1)
                             {
                                 channelIsBusy1 = false;
                                 // -> (x, x, false, true)
                             }
-                            else
+                            else if (generatedIsBusy.Item1 && generatedIsBusy.Item2)
                             {
-                                channelIsBusy1 = true;
+                                // no channels changed
                                 // -> (x, x, true, true)
                             }
+                            else
+                            {
+                                channelIsBusy2 = false;
+                                // -> (x, x, true, false)
+                            }
+                            break;
                         }
-                        break;
-                    case (1, 2, true, false):
-                        if (generatedIsBusy.Item1)
-                        {
-                            // no channels changed
-                            // -> (x, x, true, false)
-                        }
-                        else
-                        {
-                            channelIsBusy2 = true;
-                            // -> (x, x, true, true)
-                        }
-                        break;
-                    case (1, 0, false, true):
-                        channelIsBusy1 = true;
-                        if (generatedIsBusy.Item2)
-                        {
-                            channelIsBusy2 = true;
-                            // -> (x, x, true, true)
-                        }
-                        else
-                        {
-                            channelIsBusy2 = false;
-                            // -> (x, x, true, false)
-                        }
-                        break;
-                    case (2, 0, true, true):
-                        if (!generatedIsBusy.Item1)
-                        {
-                            channelIsBusy1 = false;
-                            // -> (x, x, false, true)
-                        }
-                        else if (generatedIsBusy.Item1 && generatedIsBusy.Item2)
-                        {
-                            // no channels changed
-                            // -> (x, x, true, true)
-                        }
-                        else
-                        {
-                            channelIsBusy2 = false;
-                            // -> (x, x, true, true)
-                        }
-                        break;
                     case (1, 0, true, true):
                     case (2, 1, true, true):
                     case (1, 1, true, true):
-                        if ((!generatedIsBusy.Item1)
-                            || (generatedIsBusy.Item1 && generatedIsBusy.Item2))
                         {
-                            // no channels changed
-                            // -> (x, x, true, true)
+                            if ((!generatedIsBusy.Item1)
+                                || (generatedIsBusy.Item1 && generatedIsBusy.Item2))
+                            {
+                                // no channels changed
+                                // -> (x, x, true, true)
+                            }
+                            else
+                            {
+                                channelIsBusy2 = false;
+                                // -> (x, x, true, true)
+                            }
+                            break;
                         }
-                        else
-                        {
-                            channelIsBusy2 = false;
-                            // -> (x, x, true, true)
-                        }
-                        break;
                     case (2, 2, true, true):
-                        if ((generatedIsBusy.Item1 && generatedIsBusy.Item2)
-                            || (!generatedIsBusy.Item1))
                         {
-                            // no channels changed
-                            // -> (x, x, true, true)
+                            if ((generatedIsBusy.Item1 && generatedIsBusy.Item2)
+                                || (!generatedIsBusy.Item1))
+                            {
+                                // no channels changed
+                                // -> (x, x, true, true)
+                            }
+                            else
+                            {
+                                channelIsBusy2 = false;
+                                // -> (x, x, true, false)
+                            }
+                            break;
                         }
-                        else
-                        {
-                            channelIsBusy2 = false;
-                            // -> (x, x, true, false)
-                        }
-                        break;
                     case (1, 2, true, true):
-                        if (generatedIsBusy.Item1 && !generatedIsBusy.Item2)
                         {
-                            channelIsBusy2 = false;
-                            // -> (x, x, true, false)
+                            if (generatedIsBusy.Item1 && !generatedIsBusy.Item2)
+                            {
+                                channelIsBusy2 = false;
+                                // -> (x, x, true, false)
+                            }
+                            else
+                            {
+                                // no channels changed
+                                // -> (x, x, true, true)
+                            }
+                            break;
                         }
-                        else
-                        {
-                            // no channels changed
-                            // -> (x, x, true, true)
-                        }
-                        break;
                     default:
                         break;
                 }
 
                 // update currentQueueLength
-                (currentQueueLength, isFailed) = GetNextQueueLength(savedChannelIsBusy.Item1,
+                (currentQueueLength, isFailed) = GetNextQueueLength(
+                    generatedIsBusy.Item1, savedChannelIsBusy.Item1, 
                     currentQueueLength, tactsToNewItem);
 
                 //if (isFailed)
@@ -272,7 +287,6 @@ namespace WpfSaimmodThree.Models
 
                 // update tactsToNewItem
                 tactsToNewItem = GetNextTacts(tactsToNewItem);
-
             }
         }
     }
