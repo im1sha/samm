@@ -14,13 +14,14 @@ namespace WpfSaimmodThree.Models
         public double BusyProbability2 { get; }
         public int TotalTacts { get; }
 
+        //public static readonly double ITEMS_GENERATION_FREQUENCY = 0.5;
+
         #endregion
 
         #region stored statistics
 
-        public int TotalGenerated { get; private set; }
         public int TotalProcessed { get; private set; }
-        public int TotalFailures { get; private set; }
+        public int TotalDropped { get; private set; }
 
         public IList<State> SystemStates { get; } = new List<State>();
 
@@ -69,7 +70,7 @@ namespace WpfSaimmodThree.Models
         // Pfail
         public double GetFailureProbability()
         {
-            return TotalFailures / (double)TotalGenerated;
+            return TotalDropped / (double)(TotalDropped + TotalProcessed);
         }
 
         #endregion
@@ -77,29 +78,31 @@ namespace WpfSaimmodThree.Models
         public void Run()
         {
 #if DEBUG
-            StringBuilder deb_output = new StringBuilder( string.Empty );
+            StringBuilder deb_output = new StringBuilder(string.Empty);
 #endif
-            static int GetNextTacts(int currentTacts)
+            static int GetNextTacts(int previousTacts)
             {
-                if (currentTacts == 2)
+                if (previousTacts == 2)
                 {
                     return 1;
                 }
-                else if (currentTacts == 1)
+                else if (previousTacts == 1)
                 {
                     return 2;
                 }
                 else
                 {
-                    throw new ArgumentException(nameof(currentTacts));
+                    throw new ArgumentException(nameof(previousTacts));
                 }
             }
 
             //currentQueueLength={0, 1, 2}
             //currentTacts={1,2}
-            static (int Length, bool Failed) GetNextQueueLength(
-                bool generatedIsBusyChannel1, bool previousIsBusyChannel1,
-                int previousQueueLength, int tacts,
+            static (int Length, bool Dropped) GetNextQueueLength(
+                bool generatedSignalChannelIsBusy1,
+                bool previousChannelIsBusy1,
+                int previousQueueLength,
+                int previousTacts,
                 int maxQueueLength = 2)
             {
                 if (maxQueueLength < previousQueueLength)
@@ -107,15 +110,15 @@ namespace WpfSaimmodThree.Models
                     throw new ArgumentException();
                 }
                 int delta = 0;
-                
+
                 // channel has finished processing 
                 // or
                 // channel was empty
-                if (!generatedIsBusyChannel1 || !previousIsBusyChannel1)
+                if (!generatedSignalChannelIsBusy1 || !previousChannelIsBusy1)
                 {
                     delta--;
                 }
-                if (tacts == 1)
+                if (previousTacts == 1)
                 {
                     delta++;
                 }
@@ -133,29 +136,41 @@ namespace WpfSaimmodThree.Models
                 return (resultLength, false);
             }
 
+            static bool IsChannelDropped(
+                bool previousChannelIsBusy1,
+                bool previousChannelIsBusy2,
+                bool generatedSignalChannelIsBusy1,
+                bool generatedSignalChannelIsBusy2)
+            {
+                if (previousChannelIsBusy1 && previousChannelIsBusy2
+                    && !generatedSignalChannelIsBusy1 && generatedSignalChannelIsBusy2)
+                {
+                    return true;
+                }
+                return false;
+            }
+
             //
             bool channelIsBusy1 = false;
             bool channelIsBusy2 = false;
-            int currentQueueLength = 0;
+            int queueLength = 0;
             int tactsToNewItem = 2;
             //
 
             for (int i = 0; i < TotalTacts; i++)
             {
                 SystemStates.Add(new State(
-                    tactsToNewItem, currentQueueLength, 
+                    tactsToNewItem, queueLength,
                     channelIsBusy1, channelIsBusy2));
-
-                bool isFailed = false;
-
 
                 // save current channels state
                 (bool, bool) previousChannelIsBusy = (channelIsBusy1, channelIsBusy2);
 
-                (bool, bool) generatedIsBusy = (GetChannelIsBusy1(), GetChannelIsBusy2());
+                // generate random signals for state changing
+                (bool, bool) generatedSignals = (GetChannelIsBusy1(), GetChannelIsBusy2());
 
                 // update channelIsBusy1, channelIsBusy2
-                switch ((tactsToNewItem, currentQueueLength, channelIsBusy1, channelIsBusy2))
+                switch ((tactsToNewItem, queueLength, channelIsBusy1, channelIsBusy2))
                 {
                     case (2, 0, false, false):
                         // no channels changed
@@ -174,7 +189,7 @@ namespace WpfSaimmodThree.Models
                     case (2, 2, true, false):
                         {
                             // IsBusy: true == 1
-                            if (generatedIsBusy.Item1)
+                            if (generatedSignals.Item1)
                             {
                                 // no channels changed
                                 // -> (x, x, true, false)
@@ -182,7 +197,7 @@ namespace WpfSaimmodThree.Models
                             else
                             {
                                 channelIsBusy2 = true;
-                                if (currentQueueLength == 0 && tactsToNewItem == 2)
+                                if (queueLength == 0 && tactsToNewItem == 2)
                                 {
                                     channelIsBusy1 = false;
                                     // -> (x, x, false, true)
@@ -197,7 +212,7 @@ namespace WpfSaimmodThree.Models
                         }
                     case (1, 2, true, false):
                         {
-                            if (generatedIsBusy.Item1)
+                            if (generatedSignals.Item1)
                             {
                                 // no channels changed
                                 // -> (x, x, true, false)
@@ -212,7 +227,7 @@ namespace WpfSaimmodThree.Models
                     case (1, 0, false, true):
                         {
                             channelIsBusy1 = true;
-                            if (generatedIsBusy.Item2)
+                            if (generatedSignals.Item2)
                             {
                                 channelIsBusy2 = true;
                                 // -> (x, x, true, true)
@@ -226,12 +241,12 @@ namespace WpfSaimmodThree.Models
                         }
                     case (2, 0, true, true):
                         {
-                            if (!generatedIsBusy.Item1)
+                            if (!generatedSignals.Item1)
                             {
                                 channelIsBusy1 = false;
                                 // -> (x, x, false, true)
                             }
-                            else if (generatedIsBusy.Item1 && generatedIsBusy.Item2)
+                            else if (generatedSignals.Item1 && generatedSignals.Item2)
                             {
                                 // no channels changed
                                 // -> (x, x, true, true)
@@ -247,8 +262,8 @@ namespace WpfSaimmodThree.Models
                     case (2, 1, true, true):
                     case (1, 1, true, true):
                         {
-                            if ((!generatedIsBusy.Item1)
-                                || (generatedIsBusy.Item1 && generatedIsBusy.Item2))
+                            if ((!generatedSignals.Item1)
+                                || (generatedSignals.Item1 && generatedSignals.Item2))
                             {
                                 // no channels changed
                                 // -> (x, x, true, true)
@@ -262,8 +277,8 @@ namespace WpfSaimmodThree.Models
                         }
                     case (2, 2, true, true):
                         {
-                            if ((generatedIsBusy.Item1 && generatedIsBusy.Item2)
-                                || (!generatedIsBusy.Item1))
+                            if ((generatedSignals.Item1 && generatedSignals.Item2)
+                                || (!generatedSignals.Item1))
                             {
                                 // no channels changed
                                 // -> (x, x, true, true)
@@ -277,7 +292,7 @@ namespace WpfSaimmodThree.Models
                         }
                     case (1, 2, true, true):
                         {
-                            if (generatedIsBusy.Item1 && !generatedIsBusy.Item2)
+                            if (generatedSignals.Item1 && !generatedSignals.Item2)
                             {
                                 channelIsBusy2 = false;
                                 // -> (x, x, true, false)
@@ -294,25 +309,52 @@ namespace WpfSaimmodThree.Models
                 }
 
                 // save queue length & tactsToNewItem
-                int previousQueueLength = currentQueueLength;
+                int previousQueueLength = queueLength;
                 int previousTactsToNewItem = tactsToNewItem;
 
+                #region drop counter update
+
+                bool isDropppedNow;
+
+                #region queue length update
+
                 // update currentQueueLength
-                (currentQueueLength, isFailed) = GetNextQueueLength(
-                    generatedIsBusy.Item1, previousChannelIsBusy.Item1, 
+                // and
+                // check whether new generated queue item 've been dropped due to queue overflow
+                (queueLength, isDropppedNow) = GetNextQueueLength(
+                    generatedSignals.Item1, previousChannelIsBusy.Item1,
                     previousQueueLength, previousTactsToNewItem);
 
-                //if (isFailed)
-                //{
-                //    ++TotalFailures;
-                //}
+                #endregion
+
+                if (isDropppedNow)
+                {
+                    ++TotalDropped;
+                }
+                // check whether item in 1st channel 've been dropped due to 2nd channel is busy
+                isDropppedNow = IsChannelDropped(previousChannelIsBusy.Item1,
+                    previousChannelIsBusy.Item2, generatedSignals.Item1,
+                    generatedSignals.Item2);
+                if (isDropppedNow)
+                {
+                    ++TotalDropped;
+                }
+
+                #endregion
+
+                #region processed counter update
+                if (!generatedSignals.Item2 && previousChannelIsBusy.Item2)
+                {
+                    ++TotalProcessed;
+                }
+                #endregion
 
                 // update tactsToNewItem
                 tactsToNewItem = GetNextTacts(previousTactsToNewItem);
 #if DEBUG
-                deb_output.Append( $"({previousTactsToNewItem}{previousQueueLength}{Convert.ToInt32(previousChannelIsBusy.Item1)}{Convert.ToInt32(previousChannelIsBusy.Item2)})" +
-                    $"({tactsToNewItem}{currentQueueLength}{Convert.ToInt32(channelIsBusy1)}{Convert.ToInt32(channelIsBusy2)})" +
-                    $"<{Convert.ToInt32(generatedIsBusy.Item1)}{Convert.ToInt32(generatedIsBusy.Item2)}>\n" );
+                deb_output.Append($"({previousTactsToNewItem}{previousQueueLength}{Convert.ToInt32(previousChannelIsBusy.Item1)}{Convert.ToInt32(previousChannelIsBusy.Item2)})" +
+                    $"({tactsToNewItem}{queueLength}{Convert.ToInt32(channelIsBusy1)}{Convert.ToInt32(channelIsBusy2)})" +
+                    $"<{Convert.ToInt32(generatedSignals.Item1)}{Convert.ToInt32(generatedSignals.Item2)}>\n");
 #endif
             }
 

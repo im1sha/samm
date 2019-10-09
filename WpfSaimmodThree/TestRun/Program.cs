@@ -63,6 +63,10 @@ namespace TestRun
             }
 
             Console.WriteLine($"counted {counted}");
+
+            Console.WriteLine($"A {model.GetBandwidth()}");
+            Console.WriteLine($"Lqueue {model.GetAverageQueueLength()}");
+            Console.WriteLine($"Pfail {model.GetFailureProbability()}");
         }
 
         static void CheckErrors(IEnumerable<State> states, Dictionary<int, int[]> dict) {
