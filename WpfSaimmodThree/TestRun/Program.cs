@@ -28,7 +28,7 @@ namespace TestRun
                 { 1211, new[] { 2210, 2211 } }
             };
 
-            AppModel model = new AppModel(0.5, 0.5);
+            AppModel model = new AppModel(0.2, 0.9);
 
             model.Run();
             Console.WriteLine("run() finished");
@@ -36,7 +36,7 @@ namespace TestRun
             states = states.OrderBy(i => i.AsInt).ToArray();
             var len = states.Count();
             Console.WriteLine(model.TotalTacts);
-           
+
             //expected probabilities from analytical model
             //0
             //0
@@ -66,11 +66,15 @@ namespace TestRun
 
             Console.WriteLine($"A {model.GetBandwidth()}");
             Console.WriteLine($"Lqueue {model.GetAverageQueueLength()}");
+            Console.WriteLine($"Drop in Channel {model.DroppedInChannel / (double)(model.TotalProcessed + model.GetTotalDropped())}");
+            Console.WriteLine($"Drop in Queue {model.DroppedDueToQueueOverflow / (double) (model.TotalProcessed + model.GetTotalDropped())}");
+            Console.WriteLine($"Processed {model.TotalProcessed }");
             Console.WriteLine($"Pfail {model.GetFailureProbability()}");
         }
 
-        static void CheckErrors(IEnumerable<State> states, Dictionary<int, int[]> dict) {
-          
+        private static void CheckErrors(IEnumerable<State> states, Dictionary<int, int[]> dict)
+        {
+
             var errors = 0;
             var processed = 0;
             var stringErrors = new List<string>();

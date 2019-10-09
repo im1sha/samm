@@ -21,9 +21,12 @@ namespace WpfSaimmodThree.Models
         #region stored statistics
 
         public int TotalProcessed { get; private set; }
-        public int TotalDropped { get; private set; }
 
         public IList<State> SystemStates { get; } = new List<State>();
+
+        public int DroppedDueToQueueOverflow { get; private set; }
+
+        public int DroppedInChannel { get; private set; }
 
         #endregion
 
@@ -70,8 +73,10 @@ namespace WpfSaimmodThree.Models
         // Pfail
         public double GetFailureProbability()
         {
-            return TotalDropped / (double)(TotalDropped + TotalProcessed);
+            return GetTotalDropped() / (double)(GetTotalDropped() + TotalProcessed);
         }
+
+        public int GetTotalDropped() => DroppedDueToQueueOverflow + DroppedInChannel;
 
         #endregion
 
@@ -136,7 +141,7 @@ namespace WpfSaimmodThree.Models
                 return (resultLength, false);
             }
 
-            static bool IsChannelDropped(
+            static bool IsItemDroppedInChannel(
                 bool previousChannelIsBusy1,
                 bool previousChannelIsBusy2,
                 bool generatedSignalChannelIsBusy1,
@@ -167,6 +172,8 @@ namespace WpfSaimmodThree.Models
                 (bool, bool) previousChannelIsBusy = (channelIsBusy1, channelIsBusy2);
 
                 // generate random signals for state changing
+                // true == channel is in process with previous item
+                // false == channel processed item
                 (bool, bool) generatedSignals = (GetChannelIsBusy1(), GetChannelIsBusy2());
 
                 // update channelIsBusy1, channelIsBusy2
@@ -305,7 +312,7 @@ namespace WpfSaimmodThree.Models
                             break;
                         }
                     default:
-                        break;
+                        throw new NotImplementedException();
                 }
 
                 // save queue length & tactsToNewItem
@@ -314,30 +321,30 @@ namespace WpfSaimmodThree.Models
 
                 #region drop counter update
 
-                bool isDropppedNow;
+                bool isDroppedNow;
 
                 #region queue length update
 
                 // update currentQueueLength
                 // and
                 // check whether new generated queue item 've been dropped due to queue overflow
-                (queueLength, isDropppedNow) = GetNextQueueLength(
+                (queueLength, isDroppedNow) = GetNextQueueLength(
                     generatedSignals.Item1, previousChannelIsBusy.Item1,
                     previousQueueLength, previousTactsToNewItem);
 
                 #endregion
 
-                if (isDropppedNow)
+                if (isDroppedNow)
                 {
-                    ++TotalDropped;
+                    ++DroppedDueToQueueOverflow;
                 }
                 // check whether item in 1st channel 've been dropped due to 2nd channel is busy
-                isDropppedNow = IsChannelDropped(previousChannelIsBusy.Item1,
+                isDroppedNow = IsItemDroppedInChannel(previousChannelIsBusy.Item1,
                     previousChannelIsBusy.Item2, generatedSignals.Item1,
                     generatedSignals.Item2);
-                if (isDropppedNow)
+                if (isDroppedNow)
                 {
-                    ++TotalDropped;
+                    ++DroppedInChannel;
                 }
 
                 #endregion
