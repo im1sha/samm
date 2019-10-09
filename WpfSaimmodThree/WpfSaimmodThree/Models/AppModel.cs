@@ -20,7 +20,7 @@ namespace WpfSaimmodThree.Models
         public int TotalProcessed { get; private set; }
         public int TotalFailures { get; private set; }
 
-        public List<State> SystemStates { get; } = new List<State>();
+        public IList<State> SystemStates { get; } = new List<State>();
 
         #endregion
 
@@ -35,8 +35,8 @@ namespace WpfSaimmodThree.Models
 
         #region current channel state genetation
 
-        private readonly Random _random1 = new Random();
-        private readonly Random _random2 = new Random(42);
+        private readonly Random _random1 = new Random(67432311);
+        private readonly Random _random2 = new Random(78541137);
 
         private bool GetChannelIsBusy1()
         {

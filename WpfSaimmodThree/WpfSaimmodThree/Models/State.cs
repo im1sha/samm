@@ -5,6 +5,8 @@ namespace WpfSaimmodThree.Models
 {
     public class State 
     {
+        public int AsInt { get; }
+
         public bool ChannelIsBusy1 { get; }
         public bool ChannelIsBusy2 { get; }
 
@@ -31,6 +33,7 @@ namespace WpfSaimmodThree.Models
             ChannelIsBusy2 = channelIsBusy2;
             CurrentQueueLength = currentQueueLength;
             TactsToNewItem = tactsToNewItem;
+            AsInt = int.Parse(ToString());
         }
 
         public State((int TactsToNewItem, int CurrentQueueLength, bool ChannelIsBusy1, bool ChannelIsBusy2) state) 
@@ -49,6 +52,11 @@ namespace WpfSaimmodThree.Models
                   (int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[2]),
                   (int)Char.GetNumericValue(state.ToString().PadLeft(4, '0')[3]))
         { 
-        }       
+        }
+
+        public override string ToString()
+        {
+            return $"{TactsToNewItem}{CurrentQueueLength}{Convert.ToInt32(ChannelIsBusy1)}{Convert.ToInt32(ChannelIsBusy2)}";
+        }
     }
 }
