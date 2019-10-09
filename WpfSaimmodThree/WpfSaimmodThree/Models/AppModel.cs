@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace WpfSaimmodThree.Models
 {
@@ -35,7 +37,7 @@ namespace WpfSaimmodThree.Models
 
         #region current channel state genetation
 
-        private readonly Random _random1 = new Random(67432311);
+        private readonly Random _random1 = new Random();
         private readonly Random _random2 = new Random(78541137);
 
         private bool GetChannelIsBusy1()
@@ -74,6 +76,9 @@ namespace WpfSaimmodThree.Models
 
         public void Run()
         {
+#if DEBUG
+            StringBuilder deb_output = new StringBuilder( string.Empty );
+#endif
             static int GetNextTacts(int currentTacts)
             {
                 if (currentTacts == 2)
@@ -143,12 +148,6 @@ namespace WpfSaimmodThree.Models
 
                 bool isFailed = false;
 
-                #region unused
-                //currentState = new State(channelIsFree1, channelIsFree2, 
-                //    currentQueueLength, tactsToNewItem);
-                //_systemStates.Add(currentState);
-                //++TotalGenerated;
-                #endregion
 
                 // save current channels state
                 (bool, bool) previousChannelIsBusy = (channelIsBusy1, channelIsBusy2);
@@ -310,7 +309,16 @@ namespace WpfSaimmodThree.Models
 
                 // update tactsToNewItem
                 tactsToNewItem = GetNextTacts(previousTactsToNewItem);
+#if DEBUG
+                deb_output.Append( $"({previousTactsToNewItem}{previousQueueLength}{Convert.ToInt32(previousChannelIsBusy.Item1)}{Convert.ToInt32(previousChannelIsBusy.Item2)})" +
+                    $"({tactsToNewItem}{currentQueueLength}{Convert.ToInt32(channelIsBusy1)}{Convert.ToInt32(channelIsBusy2)})" +
+                    $"<{Convert.ToInt32(generatedIsBusy.Item1)}{Convert.ToInt32(generatedIsBusy.Item2)}>\n" );
+#endif
             }
+
+#if DEBUG
+            File.WriteAllText(DateTime.Now.ToBinary().ToString(), deb_output.ToString());
+#endif
         }
     }
 }
