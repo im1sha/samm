@@ -35,7 +35,7 @@ namespace WpfSaimmodThree.Models
 
         #region current channel state genetation
 
-        private readonly Random _random1 = new Random(123456);
+        private readonly Random _random1 = new Random();
         private readonly Random _random2 = new Random(42);
 
         private bool GetChannelIsBusy1()
@@ -74,7 +74,7 @@ namespace WpfSaimmodThree.Models
 
         public void Run()
         {
-            int GetNextTacts(int currentTacts)
+            static int GetNextTacts(int currentTacts)
             {
                 if (currentTacts == 2)
                 {
@@ -92,19 +92,40 @@ namespace WpfSaimmodThree.Models
 
             //currentQueueLength={0, 1, 2}
             //currentTacts={1,2}
-            (int Length, bool Failed) GetNextQueueLength(
-                bool generatedIsBusyChannel1, 
-                bool previousIsBusyChannel1,
-                int currentQueueLength,
-                int currentTacts,
+            static (int Length, bool Failed) GetNextQueueLength(
+                bool generatedIsBusyChannel1, bool previousIsBusyChannel1,
+                int previousQueueLength, int tacts,
                 int maxQueueLength = 2)
             {
-                if (maxQueueLength < currentQueueLength)
+                if (maxQueueLength < previousQueueLength)
                 {
                     throw new ArgumentException();
                 }
+                int delta = 0;
+                
+                // channel has finished processing 
+                // or
+                // channel was empty
+                if (!generatedIsBusyChannel1 || !previousIsBusyChannel1)
+                {
+                    delta--;
+                }
+                if (tacts == 1)
+                {
+                    delta++;
+                }
 
-                throw new Exception();                
+                int resultLength = previousQueueLength + delta;
+
+                if (resultLength < 0)
+                {
+                    return (0, false);
+                }
+                if (resultLength > maxQueueLength)
+                {
+                    return (maxQueueLength, true);
+                }
+                return (resultLength, false);
             }
 
             //
@@ -117,10 +138,8 @@ namespace WpfSaimmodThree.Models
             for (int i = 0; i < TotalTacts; i++)
             {
                 SystemStates.Add(new State(
-                    tactsToNewItem, 
-                    currentQueueLength, 
-                    channelIsBusy1, 
-                    channelIsBusy2));
+                    tactsToNewItem, currentQueueLength, 
+                    channelIsBusy1, channelIsBusy2));
 
                 bool isFailed = false;
 
@@ -132,7 +151,7 @@ namespace WpfSaimmodThree.Models
                 #endregion
 
                 // save current channels state
-                (bool, bool) savedChannelIsBusy = (channelIsBusy1, channelIsBusy2);
+                (bool, bool) previousChannelIsBusy = (channelIsBusy1, channelIsBusy2);
 
                 (bool, bool) generatedIsBusy = (GetChannelIsBusy1(), GetChannelIsBusy2());
 
@@ -275,10 +294,14 @@ namespace WpfSaimmodThree.Models
                         break;
                 }
 
+                // save queue length & tactsToNewItem
+                int previousQueueLength = currentQueueLength;
+                int previousTactsToNewItem = tactsToNewItem;
+
                 // update currentQueueLength
                 (currentQueueLength, isFailed) = GetNextQueueLength(
-                    generatedIsBusy.Item1, savedChannelIsBusy.Item1, 
-                    currentQueueLength, tactsToNewItem);
+                    generatedIsBusy.Item1, previousChannelIsBusy.Item1, 
+                    previousQueueLength, previousTactsToNewItem);
 
                 //if (isFailed)
                 //{
@@ -286,7 +309,7 @@ namespace WpfSaimmodThree.Models
                 //}
 
                 // update tactsToNewItem
-                tactsToNewItem = GetNextTacts(tactsToNewItem);
+                tactsToNewItem = GetNextTacts(previousTactsToNewItem);
             }
         }
     }
