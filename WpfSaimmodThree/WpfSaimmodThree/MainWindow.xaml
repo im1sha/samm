@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfSaimmodThree"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="300" Width="450">
     <Grid>
         <Button Content="Calculate" Command="{Binding CalculateCommand}" HorizontalAlignment="Left" Margin="271,61,0,0" VerticalAlignment="Top" Width="75"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="91,42,0,0" TextWrapping="Wrap" Text="{Binding Probability1}" VerticalAlignment="Top" Width="120"/>

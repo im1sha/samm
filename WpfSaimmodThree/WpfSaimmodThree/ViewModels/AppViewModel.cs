@@ -97,15 +97,17 @@ namespace WpfSaimmodThree.ViewModels
 
         #region commands
 
-        private InteractCommand _initializeCommand;
-        public InteractCommand InitializeCommand => _initializeCommand ??
-            (_initializeCommand = new InteractCommand((o) =>
+        private InteractCommand _calculateCommand;
+        public InteractCommand CalculateCommand => _calculateCommand ??
+            (_calculateCommand = new InteractCommand((o) =>
             {
-                var model = new AppModel(_probability1, _probability2);
+                AppModel model = new AppModel(_probability1, _probability2);
 
-                // 
-                //
-                //
+                model.Run();
+
+                Bandwidth = model.GetBandwidth().ToString(APP_LOCALIZATION);
+                QueueLength = model.GetAverageQueueLength().ToString(APP_LOCALIZATION);
+                FailProbability = model.GetFailureProbability().ToString(APP_LOCALIZATION);
             }));
 
         #endregion

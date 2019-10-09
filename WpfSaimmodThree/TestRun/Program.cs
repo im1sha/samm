@@ -72,7 +72,7 @@ namespace TestRun
             Console.WriteLine($"Pfail {model.GetFailureProbability()}");
         }
 
-        private static void CheckErrors(IEnumerable<State> states, Dictionary<int, int[]> dict)
+        private static void CheckErrorStates(IEnumerable<State> states, Dictionary<int, int[]> dict)
         {
 
             var errors = 0;
