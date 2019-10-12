@@ -28,7 +28,7 @@ namespace TestRun
                 { 1211, new[] { 2210, 2211 } }
             };
 
-            AppModel model = new AppModel(0.2, 0.9);
+            AppModel model = new AppModel(0.1, 0.1, 2_000_000);
 
             model.Run();
             Console.WriteLine("run() finished");
