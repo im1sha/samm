@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -95,6 +97,13 @@ namespace WpfSaimmodThree.ViewModels
 
         #endregion
 
+        #region list
+
+        public ObservableCollection<ProbabilityItem> States { get; set; }
+            = new ObservableCollection<ProbabilityItem>();
+
+        #endregion
+
         #region commands
 
         private InteractCommand _calculateCommand;
@@ -108,6 +117,13 @@ namespace WpfSaimmodThree.ViewModels
                 Bandwidth = model.GetBandwidth().ToString(APP_LOCALIZATION);
                 QueueLength = model.GetAverageQueueLength().ToString(APP_LOCALIZATION);
                 FailProbability = model.GetFailureProbability().ToString(APP_LOCALIZATION);
+
+                IEnumerable<ProbabilityItem> newItems = model.StatesProbabilities;
+                States.Clear();
+                foreach (var item in newItems)
+                {
+                    States.Add(item);
+                }
             }));
 
         #endregion
