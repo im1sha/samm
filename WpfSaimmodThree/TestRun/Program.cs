@@ -28,15 +28,6 @@ namespace TestRun
                 { 1211, new[] { 2210, 2211 } }
             };
 
-            AppModel model = new AppModel(0.1, 0.1, 2_000_000);
-
-            model.Run();
-            Console.WriteLine("run() finished");
-            var states = model.SystemStates;
-            states = states.OrderBy(i => i.AsInt).ToArray();
-            var len = states.Count();
-            Console.WriteLine(model.TotalTacts);
-
             //expected probabilities from analytical model
             //0
             //0
@@ -54,21 +45,32 @@ namespace TestRun
             //0.074131944444444444444
             //0.018532986111111111111
 
-            var counted = 0;
+            AppModel model = new AppModel(0.5, 0.5, 2_000_000);
+
+            model.Run();
+
+            Console.WriteLine($"finished: " +
+                $"p1={model.BusyProbability1}, " +
+                $"p2={model.BusyProbability2}, " +
+                $"tacts={model.TotalTacts}");
+
+            IList<State> states = model.SystemStates;
+            states = states.OrderBy(i => i.AsInt).ToArray();
+            int len = states.Count();
+          
             foreach (var k in dict.Keys)
             {
                 var newCount = states.Count(i => k == i.AsInt);
-                counted += newCount;
                 Console.WriteLine($"{k}  {newCount / (double)len}");
             }
 
-            Console.WriteLine($"counted {counted}");
-
+            Console.WriteLine();
             Console.WriteLine($"A {model.GetBandwidth()}");
             Console.WriteLine($"Lqueue {model.GetAverageQueueLength()}");
-            Console.WriteLine($"Drop in Channel {model.DroppedInChannel / (double)(model.TotalProcessed + model.GetTotalDropped())}");
-            Console.WriteLine($"Drop in Queue {model.DroppedDueToQueueOverflow / (double) (model.TotalProcessed + model.GetTotalDropped())}");
-            Console.WriteLine($"Processed {model.TotalProcessed }");
+            Console.WriteLine();
+            Console.WriteLine($"Drop at Channel {model.DroppedInChannel / (double)(model.TotalProcessed + model.GetTotalDropped())}");
+            Console.WriteLine($"Drop at Source {model.DroppedDueToQueueOverflow / (double) (model.TotalProcessed + model.GetTotalDropped())}");
+            Console.WriteLine();
             Console.WriteLine($"Pfail {model.GetFailureProbability()}");
         }
 

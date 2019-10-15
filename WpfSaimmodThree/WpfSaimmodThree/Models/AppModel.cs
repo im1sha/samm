@@ -14,8 +14,6 @@ namespace WpfSaimmodThree.Models
         public double BusyProbability2 { get; }
         public int TotalTacts { get; }
 
-        //public static readonly double ITEMS_GENERATION_FREQUENCY = 0.5;
-
         #endregion
 
         #region stored statistics
@@ -27,6 +25,8 @@ namespace WpfSaimmodThree.Models
         public int DroppedDueToQueueOverflow { get; private set; }
 
         public int DroppedInChannel { get; private set; }
+
+        public List<ProbabilityItem> StatesProbabilities { get; private set; }
 
         #endregion
 
@@ -64,6 +64,7 @@ namespace WpfSaimmodThree.Models
             return TotalProcessed / (double)TotalTacts;
         }
 
+
         // Lqueue in [0.0, 2.0]
         public double GetAverageQueueLength()
         {
@@ -76,7 +77,10 @@ namespace WpfSaimmodThree.Models
             return GetTotalDropped() / (double)(GetTotalDropped() + TotalProcessed);
         }
 
-        public int GetTotalDropped() => DroppedDueToQueueOverflow + DroppedInChannel;
+        public int GetTotalDropped()
+        {
+            return DroppedDueToQueueOverflow + DroppedInChannel;
+        }
 
         #endregion
 
@@ -368,6 +372,24 @@ namespace WpfSaimmodThree.Models
 #if DEBUG
             File.WriteAllText(DateTime.Now.ToBinary().ToString(), deb_output.ToString());
 #endif
+
+            #region update states probabilites
+
+            State[] orderedStates = SystemStates.OrderBy(i => i.AsInt).ToArray();
+            int totalTacts = orderedStates.Length;
+            int[] statesNames = orderedStates.Select(i => i.AsInt).Distinct().ToArray();
+
+            var probabilitiesDictionary = new List<ProbabilityItem>();
+            int stateCount;
+            foreach (int stateName in statesNames)
+            {
+                stateCount = orderedStates.Count(i => stateName == i.AsInt);
+                probabilitiesDictionary.Add(new ProbabilityItem(stateName.ToString().PadLeft(4, '0'), stateCount / (double)totalTacts));
+            }
+
+            StatesProbabilities = probabilitiesDictionary;
+
+            #endregion
         }
     }
 }
