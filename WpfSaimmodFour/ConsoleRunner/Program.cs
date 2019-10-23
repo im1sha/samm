@@ -13,7 +13,16 @@ namespace ConsoleRunner
             const double p = 0.4;
             const double timeApprox = 1_000_000;
 
-            Console.WriteLine(new AppModel(lambda, mu, p, timeApprox).Run());
+            var model = new AppModel(lambda, mu, p, timeApprox);
+
+            Console.WriteLine(model.Run());
+
+            foreach (var item in model.StatesProbabilities)
+            {
+                Console.WriteLine(item.Key+ ": " +item.Value);
+                Console.WriteLine();
+            }
+
         }
     }
 }

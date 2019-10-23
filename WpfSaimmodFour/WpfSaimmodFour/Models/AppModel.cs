@@ -13,6 +13,8 @@ namespace WpfSaimmodFour.Models
         public double HighPriorityItemPorbability { get; }
         public double TimeApproximation { get; }
 
+        public Dictionary<(bool? Queue, bool? Channel), double> StatesProbabilities { get; private set; }
+
         #endregion
 
         #region calculated properties
@@ -32,6 +34,7 @@ namespace WpfSaimmodFour.Models
             ChannelIntesivity = channelIntesivity;
             HighPriorityItemPorbability = highPriorityItemPorbability;
             TimeApproximation = timeApproximation;
+            StatesProbabilities = new Dictionary<(bool? Queue, bool? Channel), double>();
         }
 
         #endregion
@@ -40,7 +43,10 @@ namespace WpfSaimmodFour.Models
 
         public (double RelativeProbabilityOfPriorityItems, double RelativeProbabilityOfUsualItems) Run()
         {
-            var (generatorData, channelIntervals, time) = GetReady(
+            Dictionary<(bool? Queue, bool? Channel), int> statesCounter
+                = new Dictionary<(bool? Queue, bool? Channel), int>();
+
+            var(generatorData, channelIntervals, time) = GetReady(
                 GeneratorIntensivity, ChannelIntesivity,
                 HighPriorityItemPorbability, TimeApproximation);
 
@@ -85,6 +91,14 @@ namespace WpfSaimmodFour.Models
 
                 currentTime = Math.Min(nextGeneratorTime, nextChannelTime);
 
+                #region states counter
+                if (!statesCounter.ContainsKey(systemState))
+                {
+                    statesCounter.Add(systemState, 0);
+                }
+                statesCounter[systemState]++;
+                #endregion
+
                 if (ShouldDropItem(systemState, currentEvent))
                 {
                     if (IsPriorityDroppedItem(systemState, currentEvent.IsPriority))
@@ -100,10 +114,17 @@ namespace WpfSaimmodFour.Models
                 systemState = ChangeState(systemState, currentEvent);
             }
 
+            # region states probabilities
+            StatesProbabilities.Clear();
+            foreach (var item in statesCounter)
+            {
+                StatesProbabilities.Add(item.Key, item.Value / (double)statesCounter.Sum(i => i.Value));
+            }
+            #endregion
+
             int totalEmitted = lastGeneratorEventDesription.Index;
             int totalPriorityItemsEmitted = generatorData.Take(totalEmitted).Count(i => i.IsPriorityItem);
             int totalUsualItemsEmitted = totalEmitted - totalPriorityItemsEmitted;
-
             return ((totalPriorityItemsEmitted - dropCount.PriorityItem) / (double)totalPriorityItemsEmitted,
                 (totalUsualItemsEmitted - dropCount.UsualItem) / (double)totalUsualItemsEmitted);
         }
