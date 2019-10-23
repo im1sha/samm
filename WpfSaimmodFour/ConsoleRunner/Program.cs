@@ -13,13 +13,7 @@ namespace ConsoleRunner
             const double p = 0.4;
             const double timeApprox = 1_000_000;
 
-            new AppModel(lambda, mu, p, timeApprox).Run();
-
-            //Console.WriteLine(res.generatorData.Average(i => i.Interval));
-            //Console.WriteLine(1 / lambda);
-            //Console.WriteLine(res.channelIntervals.Average());
-            //Console.WriteLine(1 / mu);
-            //Console.WriteLine(res.time);
+            Console.WriteLine(new AppModel(lambda, mu, p, timeApprox).Run());
         }
     }
 }

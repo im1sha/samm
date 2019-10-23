@@ -15,6 +15,12 @@ namespace WpfSaimmodFour.Models
 
         #endregion
 
+        #region calculated properties
+
+        //
+
+        #endregion
+
         #region ctor
 
         public AppModel(double generatorIntensivity,
@@ -32,37 +38,38 @@ namespace WpfSaimmodFour.Models
 
         #region public methods
 
-        public void Run()
+        public (double RelativeProbabilityOfPriorityItems, double RelativeProbabilityOfUsualItems) Run()
         {
             var (generatorData, channelIntervals, time) = GetReady(
                 GeneratorIntensivity, ChannelIntesivity,
                 HighPriorityItemPorbability, TimeApproximation);
 
-            double currentTime = 0.0;
+            double currentTime = 0.0;        
+            (int PriorityItem, int UsualItem) dropCount = (0, 0);
+
             (int Index, double EventTime, bool IsPriority) lastGeneratorEventDesription 
                 = (-1, 0, false);
             (int Index, double EventTime) lastChannelEventDesription = (-1, 0);
             // null is free
             // true is high priority item
             // false is low priority item
-            (bool? Generator, bool? Channel) systemState = (null, null);
-
+            (bool? Queue, bool? Channel) systemState = (null, null);
             (bool IsGeneratorEvent, bool IsPriority) currentEvent;
+ 
             double nextGeneratorTime;
             double nextChannelTime;
             int nextChannelIndex;
-            int nextGeneratorIndex;
+            int nextGeneratorIndex;         
             while (currentTime < time)
             {
                 nextGeneratorIndex = lastGeneratorEventDesription.Index + 1;
                 nextChannelIndex = lastChannelEventDesription.Index + 1;
-
                 nextGeneratorTime = generatorData.ElementAt(nextGeneratorIndex).Interval
                     + lastGeneratorEventDesription.EventTime;
                 nextChannelTime = channelIntervals.ElementAt(nextChannelIndex)
                     + lastChannelEventDesription.EventTime;
 
-                // ignore nextGeneratorTime == nextChannelTime due to its porbability -> 0
+                // ignore nextGeneratorTime == nextChannelTime due to its porbability -> 0               
                 if (nextGeneratorTime < nextChannelTime)
                 {
                     lastGeneratorEventDesription = (nextGeneratorIndex,
@@ -75,18 +82,38 @@ namespace WpfSaimmodFour.Models
                     lastChannelEventDesription = (nextChannelIndex, nextChannelTime);
                     currentEvent = (false, false);
                 }
+
                 currentTime = Math.Min(nextGeneratorTime, nextChannelTime);
+
+                if (ShouldDropItem(systemState, currentEvent))
+                {
+                    if (IsPriorityDroppedItem(systemState, currentEvent.IsPriority))
+                    {
+                        dropCount.PriorityItem++;
+                    }
+                    else
+                    {
+                        dropCount.UsualItem++;
+                    }
+                } 
 
                 systemState = ChangeState(systemState, currentEvent);
             }
+
+            int totalEmitted = lastGeneratorEventDesription.Index;
+            int totalPriorityItemsEmitted = generatorData.Take(totalEmitted).Count(i => i.IsPriorityItem);
+            int totalUsualItemsEmitted = totalEmitted - totalPriorityItemsEmitted;
+
+            return ((totalPriorityItemsEmitted - dropCount.PriorityItem) / (double)totalPriorityItemsEmitted,
+                (totalUsualItemsEmitted - dropCount.UsualItem) / (double)totalUsualItemsEmitted);
         }
 
         #endregion
 
         #region private methods
 
-        private static (bool? Generator, bool? Channel) ChangeState(
-            (bool? Generator, bool? Channel) systemState, 
+        private static (bool? Queue, bool? Channel) ChangeState(
+            (bool? Queue, bool? Channel) systemState, 
             (bool IsGeneratorEvent, bool IsPriority) lastEvent)
         {
             switch (systemState)
@@ -181,12 +208,14 @@ namespace WpfSaimmodFour.Models
             double highPriorityItemPorbability,
             double timeApproximation)
         {
-            IEnumerable<double> generatorDistribution = new ExponentialGeneratorWrapper(
-                generatorIntensivity, new Random(1), timeApproximation).Generate();
-            IEnumerable<double> channelDistribution = new ExponentialGeneratorWrapper(
-                channelIntesivity, new Random(2), timeApproximation).Generate();
+            var initilizationRandom = new Random();
 
-            var boolRandom = new Random(3);
+            IEnumerable<double> generatorDistribution = new ExponentialGeneratorWrapper(
+                generatorIntensivity, new Random(initilizationRandom.Next()), timeApproximation).Generate();
+            IEnumerable<double> channelDistribution = new ExponentialGeneratorWrapper(
+                channelIntesivity, new Random(initilizationRandom.Next()), timeApproximation).Generate();
+
+            var boolRandom = new Random();
 
             double time = Math.Min(generatorDistribution.Sum(), channelDistribution.Sum());
 
@@ -199,7 +228,34 @@ namespace WpfSaimmodFour.Models
             return (generatorData, channelDistribution, time);
         }
 
-    
+        private static bool ShouldDropItem(
+            (bool? Queue, bool? Channel) systemState,
+            (bool IsGeneratorEvent, bool IsPriority) lastEvent)
+        {
+            if (systemState.Channel != null 
+                && systemState.Queue != null 
+                && lastEvent.IsGeneratorEvent)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // use if ShouldDropItem returns true =>
+        // systemStates in {(true, true), (false, false), (false, true)}
+        private static bool IsPriorityDroppedItem(
+            (bool? Queue, bool? Channel) systemState,
+            bool IsPriorityItem)
+        {
+            if (systemState.Queue == true
+                && systemState.Channel == true 
+                && IsPriorityItem)
+            {
+                return true;
+            }      
+            return false;
+        }
+
         #endregion
 
     }
