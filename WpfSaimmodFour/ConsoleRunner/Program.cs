@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using WpfSaimmodFour.Models;
-using WpfSaimmodTwo.Models.Distributions;
-using WpfSaimmodTwo.Models.Generators;
 
 namespace ConsoleRunner
 {
@@ -13,15 +11,15 @@ namespace ConsoleRunner
             //const double lambda = 0.45;
             //const double mu = 0.5;
             //const double p = 0.4;
+            //const double timeApprox = 1_000_000;
 
-            //Random random = new Random();
+            //var res = new AppModel(lambda, mu, p, timeApprox).Run();
 
-            //var res = new AppModel(lambda, mu, p).Meth(
-            //    new ExponentialDistributionGenerator(new ExponentialDistribution(0.45)),
-            //    Enumerable.Range(0, 1_000_000).Select(i => random.NextDouble()).ToArray());
-
-            //Console.WriteLine(res.Average());
-
+            //Console.WriteLine(res.generatorData.Average(i => i.Interval));
+            //Console.WriteLine(1 / lambda);
+            //Console.WriteLine(res.channelIntervals.Average());
+            //Console.WriteLine(1 / mu);
+            //Console.WriteLine(res.time);
         }
     }
 }

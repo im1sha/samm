@@ -34,18 +34,146 @@ namespace WpfSaimmodFour.Models
 
         public void Run()
         {
-             (IEnumerable<(double Interval, bool IsPriorityItem)> generatorData,
-                IEnumerable<double> channelIntervals,
-                double time)  
-                = GetReady(GeneratorIntensivity, ChannelIntesivity, HighPriorityItemPorbability, TimeApproximation);
+            var (generatorData, channelIntervals, time) = GetReady(
+                GeneratorIntensivity, ChannelIntesivity,
+                HighPriorityItemPorbability, TimeApproximation);
+
+            double currentTime = 0.0;
+            (int Index, double EventTime, bool IsPriority) lastGeneratorEventDesription 
+                = (-1, 0, false);
+            (int Index, double EventTime) lastChannelEventDesription = (-1, 0);
+            // null is free
+            // true is high priority item
+            // false is low priority item
+            (bool? Generator, bool? Channel) systemState = (null, null);
+
+            (bool IsGeneratorEvent, bool IsPriority) currentEvent;
+            double nextGeneratorTime;
+            double nextChannelTime;
+            int nextChannelIndex;
+            int nextGeneratorIndex;
+            while (currentTime < time)
+            {
+                nextGeneratorIndex = lastGeneratorEventDesription.Index + 1;
+                nextChannelIndex = lastChannelEventDesription.Index + 1;
+
+                nextGeneratorTime = generatorData.ElementAt(nextGeneratorIndex).Interval
+                    + lastGeneratorEventDesription.EventTime;
+                nextChannelTime = channelIntervals.ElementAt(nextChannelIndex)
+                    + lastChannelEventDesription.EventTime;
+
+                // ignore nextGeneratorTime == nextChannelTime due to its porbability -> 0
+                if (nextGeneratorTime < nextChannelTime)
+                {
+                    lastGeneratorEventDesription = (nextGeneratorIndex,
+                        nextGeneratorTime,
+                        generatorData.ElementAt(nextGeneratorIndex).IsPriorityItem);
+                    currentEvent = (true, generatorData.ElementAt(nextGeneratorIndex).IsPriorityItem);
+                }
+                else
+                {
+                    lastChannelEventDesription = (nextChannelIndex, nextChannelTime);
+                    currentEvent = (false, false);
+                }
+                time = Math.Min(nextGeneratorTime, nextChannelTime);
+
+                systemState = ChangeState(systemState, currentEvent);
+            }
         }
 
         #endregion
 
         #region private methods
 
-        private (IEnumerable<(double Interval, bool IsPriorityItem)> generatorData,
-            IEnumerable<double> channelIntervals, double time) GetReady(
+        private static (bool? Generator, bool? Channel) ChangeState(
+            (bool? Generator, bool? Channel) systemState, 
+            (bool IsGeneratorEvent, bool IsPriority) lastEvent)
+        {
+            switch (systemState)
+            {
+                case (null, null):
+                    {
+                        if (lastEvent.IsGeneratorEvent && !lastEvent.IsPriority)
+                        {
+                            return (null, false);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && lastEvent.IsPriority)
+                        {
+                            return (null, true);
+                        }
+                        break;
+                    }
+                case (null, false):
+                    {
+                        if (!lastEvent.IsGeneratorEvent)
+                        {
+                            return (null, null);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && lastEvent.IsPriority)
+                        {
+                            return (false, true);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && !lastEvent.IsPriority)
+                        {
+                            return (false, false);
+                        }
+                        break;
+                    }
+                case (false, false):
+                    {
+                        if (!lastEvent.IsGeneratorEvent)
+                        {
+                            return (null, false);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && lastEvent.IsPriority)
+                        {
+                            return (false, true);
+                        }
+
+                        break;
+                    }
+                case (null, true):
+                    {
+                        if (!lastEvent.IsGeneratorEvent)
+                        {
+                            return (null, null);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && lastEvent.IsPriority)
+                        {
+                            return (true, true);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && !lastEvent.IsPriority)
+                        {
+                            return (false, true);
+                        }
+                        break;
+                    }
+                case (false, true):
+                    {
+                        if (!lastEvent.IsGeneratorEvent)
+                        {
+                            return (null, false);
+                        }
+                        else if (lastEvent.IsGeneratorEvent && lastEvent.IsPriority)
+                        {
+                            return (true, true);
+                        }
+                        break;
+                    }
+                case (true, true):
+                    {
+                        if (!lastEvent.IsGeneratorEvent)
+                        {
+                            return (null, true);
+                        }
+                        break;
+                    }
+            }         
+            return systemState;
+        }
+
+        private static (IEnumerable<(double Interval, bool IsPriorityItem)> GeneratorData,
+            IEnumerable<double> ChannelIntervals, double Time) GetReady(
             double generatorIntensivity,
             double channelIntesivity,
             double highPriorityItemPorbability,
@@ -62,24 +190,14 @@ namespace WpfSaimmodFour.Models
 
             IEnumerable<(double Interval, bool IsPriorityItem)> generatorData
                 = Enumerable.Range(0, generatorDistribution.Count())
-                .Select((item, index) => 
+                .Select((item, index) =>
                     (generatorDistribution.ElementAt(index),
                     boolRandom.NextDouble() < highPriorityItemPorbability)).ToArray();
-         
+
             return (generatorData, channelDistribution, time);
         }
 
-        private void Generator()
-        {
-
-        }
-
-        private void Channel()
-        {
-
-        }
-
-
+    
         #endregion
 
     }
