@@ -33,7 +33,7 @@ namespace WpfSaimmodFour.Models
         /// Generates sequence that has exponential distribution
         /// </summary>
         /// <returns>Sequence that has exponential distribution</returns>
-        public IEnumerable<double> Generate()
+        public IEnumerable<double> GenerateDistribution()
         {
             var generator = new ExponentialDistributionGenerator(new ExponentialDistribution(Lambda));
 
@@ -42,6 +42,21 @@ namespace WpfSaimmodFour.Models
                 ).Select(i => _random.NextDouble()).ToArray();
 
             return generator.GenerateSequence(uniformNormalizedSequence).ToArray();
+        }
+
+        public IEnumerable<double> AccumulateDistribution(IEnumerable<double> distribution)
+        {
+            List<double> result = new List<double>();
+
+            var sum = 0.0;
+
+            foreach (var item in distribution)
+            {
+                sum += item;
+                result.Add(sum);
+            }
+
+            return result;
         }
     }
 }
