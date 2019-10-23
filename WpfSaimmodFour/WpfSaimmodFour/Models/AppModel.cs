@@ -75,7 +75,7 @@ namespace WpfSaimmodFour.Models
                     lastChannelEventDesription = (nextChannelIndex, nextChannelTime);
                     currentEvent = (false, false);
                 }
-                time = Math.Min(nextGeneratorTime, nextChannelTime);
+                currentTime = Math.Min(nextGeneratorTime, nextChannelTime);
 
                 systemState = ChangeState(systemState, currentEvent);
             }
@@ -168,6 +168,8 @@ namespace WpfSaimmodFour.Models
                         }
                         break;
                     }
+                default: 
+                    throw new ArgumentException(nameof(systemState));
             }         
             return systemState;
         }
