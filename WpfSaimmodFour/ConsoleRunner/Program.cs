@@ -17,10 +17,15 @@ namespace ConsoleRunner
 
             Console.WriteLine(model.Run());
 
-            foreach (var item in model.StatesProbabilities)
+
+            var res = model.StatesProbabilities.OrderBy(i => i.Key.Queue).ThenBy(i => i.Key.Channel);
+            foreach (var item in res)
             {
-                Console.WriteLine(item.Key+ ": " +item.Value);
-                Console.WriteLine();
+                Console.WriteLine(
+                    $"{((item.Key.Queue == null) ? 0.ToString() : (item.Key.Queue == true ? 2.ToString() : 1.ToString()))}" +
+                    $"{((item.Key.Channel == null) ? 0.ToString() : (item.Key.Channel == true ? 2.ToString() : 1.ToString()))}: " +
+                    $": {item.Value}\n"
+                );
             }
 
         }
