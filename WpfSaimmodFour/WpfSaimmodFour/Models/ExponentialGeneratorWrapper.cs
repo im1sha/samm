@@ -41,6 +41,12 @@ namespace WpfSaimmodFour.Models
                 0, (int)(LengthApproximation / generator.Distribution.RightExpectedValue)
                 ).Select(i => _random.NextDouble()).ToArray();
 
+            if (uniformNormalizedSequence == null || uniformNormalizedSequence.Length == 0)
+            {
+                // never to reach this value
+                return Array.Empty<double>();
+            }
+
             return generator.GenerateSequence(uniformNormalizedSequence).ToArray();
         }
 
@@ -49,6 +55,11 @@ namespace WpfSaimmodFour.Models
             if (distribution == null)
             {
                 throw new ArgumentNullException(nameof(distribution));
+            }
+
+            if (!distribution.Any())
+            {
+                return Array.Empty<double>();
             }
 
             List<double> result = new List<double>();

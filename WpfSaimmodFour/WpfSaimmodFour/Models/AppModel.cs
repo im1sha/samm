@@ -49,7 +49,7 @@ namespace WpfSaimmodFour.Models
             Dictionary<(bool? Queue, bool? Channel), double> statesTimeCounter
                 = new Dictionary<(bool? Queue, bool? Channel), double>();
 
-            // generatorData[i].Time & channelTime store moments of time (NOT deltas)
+            // generatorData[i].Time & channelTimeWhenActiveList store moments of time (NOT deltas)
             var (generatorDataList, channelTimeWhenActiveList, maxTimeBound) = GetReady(
                 GeneratorIntensivity, ChannelIntesivity,
                 HighPriorityItemPorbability, TimeApproximation);
@@ -77,17 +77,28 @@ namespace WpfSaimmodFour.Models
             (int Index, double Time) storedChannelWhenActiveEvent = (-1, 0);
             (int Index, double Time, bool IsPriority) storedGeneratorEvent = (-1, 0, false);
 
-            (double Total, double Generator, double Channel) nextTime;
+            (double Total, double Generator, double? Channel) nextTime;
             (int Generator, int Channel) nextIndex;
 
+#if DEBUG
+            int deb_generated = 0;
+#endif
+            // handles empty generatorDataList
             while (time.Total < maxTimeBound)
             {
                 nextIndex.Generator = storedGeneratorEvent.Index + 1;
                 nextIndex.Channel = storedChannelWhenActiveEvent.Index + 1;
 
                 nextTime.Generator = generatorDataList.ElementAt(nextIndex.Generator).Time;
-                nextTime.Channel = (channelTimeWhenActiveList.ElementAt(nextIndex.Channel) - time.ActiveChannel)
-                    + time.Total;
+                if (channelTimeWhenActiveList == null || !channelTimeWhenActiveList.Any())
+                {
+                    nextTime.Channel = null;
+                }
+                else
+                {
+                    nextTime.Channel = (channelTimeWhenActiveList.ElementAt(nextIndex.Channel) - time.ActiveChannel)
+                        + time.Total;
+                }
 
                 // store event
                 // 
@@ -101,7 +112,7 @@ namespace WpfSaimmodFour.Models
                     currentEvent = (
                         IsGeneratorEvent: false,
                         IsPriority: false);
-                    nextTime.Total = nextTime.Channel;
+                    nextTime.Total = (double)nextTime.Channel;
                 }
                 else
                 {
@@ -121,25 +132,32 @@ namespace WpfSaimmodFour.Models
                 {
                     statesTimeCounter.Add(systemState, 0.0);
                 }
-                statesTimeCounter[systemState] += (nextTime.Total - time.Total);
+                if (nextTime.Total < maxTimeBound)
+                {
+                    statesTimeCounter[systemState] += (nextTime.Total - time.Total);
+                }
+                else
+                {
+                    statesTimeCounter[systemState] += (maxTimeBound - time.Total);
+                }
 
                 #endregion
 
                 #region debug information colletion
-#if DEBUG
-                deb_output.Append(
-                    $"{nameof(time.Total)}={time.Total.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(time.ActiveChannel)}={time.ActiveChannel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(nextTime.Generator)}={nextTime.Generator.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(nextTime.Channel)}={nextTime.Channel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(channelTimeWhenActiveList)}[]={channelTimeWhenActiveList.ElementAt(nextIndex.Channel).ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{((systemState.Queue == null) ? 0.ToString() : (systemState.Queue == true ? 2.ToString() : 1.ToString()))}" +
-                    $"{((systemState.Channel == null) ? 0.ToString() : (systemState.Channel == true ? 2.ToString() : 1.ToString()))}: " +
-                    $"{(currentEvent.IsGeneratorEvent ? "L" : "M")}" +
-                    $"{((!currentEvent.IsGeneratorEvent) ? "" : (currentEvent.IsPriority ? "(P)" : "(1-P)"))}  " +
-                    $"\n"
-                );
-#endif
+                //#if DEBUG
+                //                deb_output.Append(
+                //                    $"{nameof(time.Total)}={time.Total.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                //                    $"{nameof(time.ActiveChannel)}={time.ActiveChannel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                //                    $"{nameof(nextTime.Generator)}={nextTime.Generator.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                //                    $"{nameof(nextTime.Channel)}={nextTime.Channel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                //                    $"{nameof(channelTimeWhenActiveList)}[]={channelTimeWhenActiveList.ElementAt(nextIndex.Channel).ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                //                    $"{((systemState.Queue == null) ? 0.ToString() : (systemState.Queue == true ? 2.ToString() : 1.ToString()))}" +
+                //                    $"{((systemState.Channel == null) ? 0.ToString() : (systemState.Channel == true ? 2.ToString() : 1.ToString()))}: " +
+                //                    $"{(currentEvent.IsGeneratorEvent ? "L" : "M")}" +
+                //                    $"{((!currentEvent.IsGeneratorEvent) ? "" : (currentEvent.IsPriority ? "(P)" : "(1-P)"))}  " +
+                //                    $"\n"
+                //                );
+                //#endif
                 #endregion
 
                 if (systemState.Channel != null)
@@ -149,6 +167,12 @@ namespace WpfSaimmodFour.Models
                 // go to event moment
                 time.Total = nextTime.Total;
 
+#if DEBUG
+                if (currentEvent.IsGeneratorEvent)
+                {
+                    deb_generated++;
+                }
+#endif
                 // drop item if it should 
                 switch (ShouldDropPriorityItem(systemState, currentEvent))
                 {
@@ -170,27 +194,56 @@ namespace WpfSaimmodFour.Models
             {
                 StatesProbabilities.Add(item.Key, item.Value / statesTimeCounter.Sum(i => i.Value));
             }
+            if (!StatesProbabilities.Any())
+            {
+                StatesProbabilities.Add((null, null), 1);
+            }
             #endregion
 
             #region debug output
 #if DEBUG
             var deb_fileName = DateTime.Now.ToBinary().ToString();
+            deb_output.Append($"\nTOTAL GENERATED: {deb_generated}");
+            deb_output.Append($"\nTIME: {maxTimeBound}");
+            deb_output.Append($"\nTIME SUM: {statesTimeCounter.Sum(i => i.Value)}");
             File.WriteAllText(deb_fileName, deb_output.ToString());
 #endif
             #endregion
 
             int totalEmitted = storedGeneratorEvent.Index + 1;
 
-            RelativeProbabilityOfPriorityItems = 1 - (dropItemCount.Priority 
+            RelativeProbabilityOfPriorityItems = 1 - ((dropItemCount.Priority + CountItemsInsideSystem(true, systemState))
                 / (double)generatorDataList.Take(storedGeneratorEvent.Index + 1).Count(i => i.IsPriorityItem));
 
-            RelativeProbabilityOfUsualItems = 1 - (dropItemCount.Usual
+            RelativeProbabilityOfUsualItems = 1 - ((dropItemCount.Usual + CountItemsInsideSystem(false, systemState))
                 / (double)generatorDataList.Take(storedGeneratorEvent.Index + 1).Count(i => !i.IsPriorityItem)); 
         }
 
         #endregion
 
         #region private methods
+
+        private static int CountItemsInsideSystem(bool isPriority, (bool? Queue, bool? Channel) state) 
+        {
+            var result = 0;
+            if (isPriority && (state.Queue == true))
+            {
+                result++;
+            }
+            if (isPriority && (state.Channel == true))
+            {
+                result++;
+            }
+            if (!isPriority && (state.Queue == false))
+            {
+                result++;
+            }
+            if (!isPriority && (state.Queue == false))
+            {
+                result++;
+            }
+            return result;
+        }
 
         private static (bool? Queue, bool? Channel) ChangeState(
             (bool? Queue, bool? Channel) systemState,
@@ -301,8 +354,20 @@ namespace WpfSaimmodFour.Models
 
             var boolRandom = new Random();
 
-            double time = Math.Min(generatorAccumulatedDistribution.Last(), channelAccumulatedDistribution.Last());
-
+            double time;
+            if (!generatorAccumulatedDistribution.Any())
+            {
+                time = 0;
+            }
+            else if (generatorAccumulatedDistribution.Any() && !channelAccumulatedDistribution.Any())
+            {
+                time = generatorAccumulatedDistribution.Last();
+            }
+            else
+            {
+                time = Math.Min(generatorAccumulatedDistribution.Last(), channelAccumulatedDistribution.Last());
+            }
+            
             IEnumerable<(double Time, bool IsPriorityItem)> generatorData
                 = Enumerable.Range(0, generatorAccumulatedDistribution.Count())
                 .Select((item, index) =>

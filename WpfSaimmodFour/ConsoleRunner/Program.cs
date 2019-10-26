@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using WpfSaimmodFour.Models;
 
@@ -12,7 +11,11 @@ namespace ConsoleRunner
             const double lambda = 0.45;
             const double mu = 0.5;
             const double p = 0.4;
-            const double timeApprox = 2_000_000;
+            const double timeApprox = 1_000_000;
+
+            Console.WriteLine($"{nameof(lambda)} = {lambda}\n" +
+                $"{nameof(mu)}     = {mu}\n" +
+                $"{nameof(p)}      = {p}\n\n");
 
             var model = new AppModel(lambda, mu, p, timeApprox);
 
