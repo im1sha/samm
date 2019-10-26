@@ -183,7 +183,7 @@ namespace WpfSaimmodFour.Models
                         dropItemCount.Usual++;
                         break;
                 }
-
+                
                 // go to new state
                 systemState = ChangeState(systemState, currentEvent);
             }
@@ -238,7 +238,7 @@ namespace WpfSaimmodFour.Models
             {
                 result++;
             }
-            if (!isPriority && (state.Queue == false))
+            if (!isPriority && (state.Channel == false))
             {
                 result++;
             }
