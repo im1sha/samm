@@ -322,13 +322,9 @@ namespace WpfSaimmodFour.Models
                (bool? Queue, bool? Channel) systemState,
                (bool IsGeneratorEvent, bool IsPriority) lastEvent)
             {
-                if (systemState.Channel != null
+                return systemState.Channel != null
                     && systemState.Queue != null
-                    && lastEvent.IsGeneratorEvent)
-                {
-                    return true;
-                }
-                return false;
+                    && lastEvent.IsGeneratorEvent;              
             }
 
             // use if ShouldDropItem returns true =>
@@ -337,34 +333,20 @@ namespace WpfSaimmodFour.Models
                 (bool? Queue, bool? Channel) systemState,
                 bool IsPriorityItem)
             {
-                if (systemState.Queue == true
+                return systemState.Queue == true
                     && systemState.Channel == true
-                    && IsPriorityItem)
-                {
-                    return true;
-                }
-                return false;
+                    && IsPriorityItem;
             }
 
             #endregion
 
             if (ShouldDropItem(systemState, lastEvent))
             {
-                if (IsPriorityDroppedItem(systemState, lastEvent.IsPriority))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return IsPriorityDroppedItem(systemState, lastEvent.IsPriority);
             }
 
             return null;
         }
-
-
-
         #endregion
 
     }
