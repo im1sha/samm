@@ -21,10 +21,8 @@ namespace WpfSaimmodFour.Models
 
         public Dictionary<(bool? Queue, bool? Channel), double> StatesProbabilities { get; private set; }
 
-        public double RelativeProbabilityOfPriorityItems => throw new NotImplementedException();
-        //{ get; private set; }
-        public double RelativeProbabilityOfUsualItems => throw new NotImplementedException();
-        //{ get; private set; }
+        public double RelativeProbabilityOfPriorityItems { get; private set; }
+        public double RelativeProbabilityOfUsualItems { get; private set; }
 
         #endregion
 
@@ -76,9 +74,9 @@ namespace WpfSaimmodFour.Models
             (bool IsGeneratorEvent, bool IsPriority) currentEvent;
 
             // it should count time for channel relatively to its active state
-            (int Index, double Time) storedChannelWhenActiveEvent = (-1, 0);  
-            (int Index, double Time, bool IsPriority) storedGeneratorEvent = (-1, 0, false);                
-       
+            (int Index, double Time) storedChannelWhenActiveEvent = (-1, 0);
+            (int Index, double Time, bool IsPriority) storedGeneratorEvent = (-1, 0, false);
+
             (double Total, double Generator, double Channel) nextTime;
             (int Generator, int Channel) nextIndex;
 
@@ -101,7 +99,7 @@ namespace WpfSaimmodFour.Models
                         Index: nextIndex.Channel,
                         Time: channelTimeWhenActiveList.ElementAt(nextIndex.Channel));
                     currentEvent = (
-                        IsGeneratorEvent: false, 
+                        IsGeneratorEvent: false,
                         IsPriority: false);
                     nextTime.Total = nextTime.Channel;
                 }
@@ -112,7 +110,7 @@ namespace WpfSaimmodFour.Models
                         Time: generatorDataList.ElementAt(nextIndex.Generator).Time,
                         IsPriority: generatorDataList.ElementAt(nextIndex.Generator).IsPriorityItem);
                     currentEvent = (
-                        IsGeneratorEvent: true, 
+                        IsGeneratorEvent: true,
                         IsPriority: generatorDataList.ElementAt(nextIndex.Generator).IsPriorityItem);
                     nextTime.Total = nextTime.Generator;
                 }
@@ -181,7 +179,13 @@ namespace WpfSaimmodFour.Models
 #endif
             #endregion
 
-            //int totalEmitted = storedGeneratorEvent.Index + 1;
+            int totalEmitted = storedGeneratorEvent.Index + 1;
+
+            RelativeProbabilityOfPriorityItems = 1 - (dropItemCount.Priority 
+                / (double)generatorDataList.Take(storedGeneratorEvent.Index + 1).Count(i => i.IsPriorityItem));
+
+            RelativeProbabilityOfUsualItems = 1 - (dropItemCount.Usual
+                / (double)generatorDataList.Take(storedGeneratorEvent.Index + 1).Count(i => !i.IsPriorityItem)); 
         }
 
         #endregion
