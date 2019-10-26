@@ -6,7 +6,7 @@ using WpfSaimmodTwo.Models.Generators;
 
 namespace WpfSaimmodFour.Models
 {
-    internal class ExponentialGeneratorWrapper
+    public class ExponentialGeneratorWrapper
     {
         public double Lambda { get; }
 
@@ -44,8 +44,13 @@ namespace WpfSaimmodFour.Models
             return generator.GenerateSequence(uniformNormalizedSequence).ToArray();
         }
 
-        public IEnumerable<double> AccumulateDistribution(IEnumerable<double> distribution)
+        public static IEnumerable<double> AccumulateDistribution(IEnumerable<double> distribution)
         {
+            if (distribution == null)
+            {
+                throw new ArgumentNullException(nameof(distribution));
+            }
+
             List<double> result = new List<double>();
 
             var sum = 0.0;

@@ -17,9 +17,14 @@ namespace WpfSaimmodFour.Models
 
         #endregion
 
-        #region calculated properties
+        #region calculated data
 
         public Dictionary<(bool? Queue, bool? Channel), double> StatesProbabilities { get; private set; }
+
+        public double RelativeProbabilityOfPriorityItems => throw new NotImplementedException();
+        //{ get; private set; }
+        public double RelativeProbabilityOfUsualItems => throw new NotImplementedException();
+        //{ get; private set; }
 
         #endregion
 
@@ -41,67 +46,75 @@ namespace WpfSaimmodFour.Models
 
         #region public methods
 
-        public (double RelativeProbabilityOfPriorityItems, double RelativeProbabilityOfUsualItems) Run()
+        public void Run()
         {
             Dictionary<(bool? Queue, bool? Channel), double> statesTimeCounter
                 = new Dictionary<(bool? Queue, bool? Channel), double>();
 
             // generatorData[i].Time & channelTime store moments of time (NOT deltas)
-            var (generatorData, channelTimeWhenActiveList, maxTimeBound) = GetReady(
+            var (generatorDataList, channelTimeWhenActiveList, maxTimeBound) = GetReady(
                 GeneratorIntensivity, ChannelIntesivity,
                 HighPriorityItemPorbability, TimeApproximation);
 
+            #region debug
 #if DEBUG
             StringBuilder deb_output = new StringBuilder(string.Empty);
-            deb_output.Append($"priority = {generatorData.Count(i => i.IsPriorityItem) / (double)generatorData.Count()} " +
-                $"usual = {generatorData.Count(i => !i.IsPriorityItem) / (double)generatorData.Count()}" +
+            deb_output.Append($"priority = {generatorDataList.Count(i => i.IsPriorityItem) / (double)generatorDataList.Count()} " +
+                $"usual = {generatorDataList.Count(i => !i.IsPriorityItem) / (double)generatorDataList.Count()}" +
                 $"\n");
 #endif
 
-            (double Total, double ActiveChannel) time = (0.0, 0.0);
-            (int PriorityItem, int UsualItem) dropCount = (0, 0);
+            #endregion
 
-            (int Index, double EventTime, bool IsPriority) lastGeneratorEventDesription
-                = (-1, 0, false);
-            // it should count time for channel relatively to its active state
-            (int Index, double EventTime) lastChannelEventWhenActiveDesription = (-1, 0);
+            (double Total, double ActiveChannel) time = (0.0, 0.0);
+            (int Priority, int Usual) dropItemCount = (0, 0);
 
             // null is free
             // true is high priority item
             // false is low priority item
             (bool? Queue, bool? Channel) systemState = (null, null);
-
             (bool IsGeneratorEvent, bool IsPriority) currentEvent;
 
-            double nextGeneratorTime;
-            double nextChannelTime;
-            int nextChannelIndex;
-            int nextGeneratorIndex;
-            double nextTime;
+            // it should count time for channel relatively to its active state
+            (int Index, double Time) storedChannelWhenActiveEvent = (-1, 0);  
+            (int Index, double Time, bool IsPriority) storedGeneratorEvent = (-1, 0, false);                
+       
+            (double Total, double Generator, double Channel) nextTime;
+            (int Generator, int Channel) nextIndex;
 
             while (time.Total < maxTimeBound)
             {
-                nextGeneratorIndex = lastGeneratorEventDesription.Index + 1;
-                nextChannelIndex = lastChannelEventWhenActiveDesription.Index + 1;
+                nextIndex.Generator = storedGeneratorEvent.Index + 1;
+                nextIndex.Channel = storedChannelWhenActiveEvent.Index + 1;
 
-                nextGeneratorTime = generatorData.ElementAt(nextGeneratorIndex).Time;
-                nextChannelTime = (channelTimeWhenActiveList.ElementAt(nextChannelIndex) - time.ActiveChannel)
+                nextTime.Generator = generatorDataList.ElementAt(nextIndex.Generator).Time;
+                nextTime.Channel = (channelTimeWhenActiveList.ElementAt(nextIndex.Channel) - time.ActiveChannel)
                     + time.Total;
 
-                // ignore nextGeneratorTime == nextChannelTime due to its porbability -> 0               
-                if ((systemState.Channel != null) && (nextChannelTime < nextGeneratorTime))
+                // store event
+                // 
+                // ignore next case: nextTime.Channel == nextTime.Generator
+                // due to its porbability -> 0               
+                if ((systemState.Channel != null) && (nextTime.Channel < nextTime.Generator))
                 {
-                    lastChannelEventWhenActiveDesription = (nextChannelIndex, channelTimeWhenActiveList.ElementAt(nextChannelIndex));
-                    currentEvent = (false, false);
-                    nextTime = nextChannelTime;
+                    storedChannelWhenActiveEvent = (
+                        Index: nextIndex.Channel,
+                        Time: channelTimeWhenActiveList.ElementAt(nextIndex.Channel));
+                    currentEvent = (
+                        IsGeneratorEvent: false, 
+                        IsPriority: false);
+                    nextTime.Total = nextTime.Channel;
                 }
                 else
                 {
-                    lastGeneratorEventDesription = (nextGeneratorIndex,
-                        nextGeneratorTime,
-                        generatorData.ElementAt(nextGeneratorIndex).IsPriorityItem);
-                    currentEvent = (true, generatorData.ElementAt(nextGeneratorIndex).IsPriorityItem);
-                    nextTime = nextGeneratorTime;
+                    storedGeneratorEvent = (
+                        Index: nextIndex.Generator,
+                        Time: generatorDataList.ElementAt(nextIndex.Generator).Time,
+                        IsPriority: generatorDataList.ElementAt(nextIndex.Generator).IsPriorityItem);
+                    currentEvent = (
+                        IsGeneratorEvent: true, 
+                        IsPriority: generatorDataList.ElementAt(nextIndex.Generator).IsPriorityItem);
+                    nextTime.Total = nextTime.Generator;
                 }
 
                 #region states time counter
@@ -110,7 +123,7 @@ namespace WpfSaimmodFour.Models
                 {
                     statesTimeCounter.Add(systemState, 0.0);
                 }
-                statesTimeCounter[systemState] += (nextTime - time.Total);
+                statesTimeCounter[systemState] += (nextTime.Total - time.Total);
 
                 #endregion
 
@@ -119,9 +132,9 @@ namespace WpfSaimmodFour.Models
                 deb_output.Append(
                     $"{nameof(time.Total)}={time.Total.ToString().PadRight(20, '0').Substring(0, 9)}  " +
                     $"{nameof(time.ActiveChannel)}={time.ActiveChannel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(nextGeneratorTime)}={nextGeneratorTime.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(nextChannelTime)}={nextChannelTime.ToString().PadRight(20, '0').Substring(0, 9)}  " +
-                    $"{nameof(channelTimeWhenActiveList)}[]={channelTimeWhenActiveList.ElementAt(nextChannelIndex).ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                    $"{nameof(nextTime.Generator)}={nextTime.Generator.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                    $"{nameof(nextTime.Channel)}={nextTime.Channel.ToString().PadRight(20, '0').Substring(0, 9)}  " +
+                    $"{nameof(channelTimeWhenActiveList)}[]={channelTimeWhenActiveList.ElementAt(nextIndex.Channel).ToString().PadRight(20, '0').Substring(0, 9)}  " +
                     $"{((systemState.Queue == null) ? 0.ToString() : (systemState.Queue == true ? 2.ToString() : 1.ToString()))}" +
                     $"{((systemState.Channel == null) ? 0.ToString() : (systemState.Channel == true ? 2.ToString() : 1.ToString()))}: " +
                     $"{(currentEvent.IsGeneratorEvent ? "L" : "M")}" +
@@ -133,20 +146,23 @@ namespace WpfSaimmodFour.Models
 
                 if (systemState.Channel != null)
                 {
-                    time.ActiveChannel += (nextTime - time.Total);
+                    time.ActiveChannel += (nextTime.Total - time.Total);
                 }
-                time.Total = nextTime;
+                // go to event moment
+                time.Total = nextTime.Total;
 
+                // drop item if it should 
                 switch (ShouldDropPriorityItem(systemState, currentEvent))
                 {
                     case true:
-                        dropCount.PriorityItem++;
+                        dropItemCount.Priority++;
                         break;
                     case false:
-                        dropCount.UsualItem++;
+                        dropItemCount.Usual++;
                         break;
                 }
 
+                // go to new state
                 systemState = ChangeState(systemState, currentEvent);
             }
 
@@ -165,12 +181,7 @@ namespace WpfSaimmodFour.Models
 #endif
             #endregion
 
-            int totalEmitted = lastGeneratorEventDesription.Index;
-            int totalPriorityItemsEmitted = generatorData.Take(totalEmitted).Count(i => i.IsPriorityItem);
-            int totalUsualItemsEmitted = totalEmitted - totalPriorityItemsEmitted;
-
-            return ((totalPriorityItemsEmitted - dropCount.PriorityItem) / (double)totalPriorityItemsEmitted,
-                (totalUsualItemsEmitted - dropCount.UsualItem) / (double)totalUsualItemsEmitted);
+            //int totalEmitted = storedGeneratorEvent.Index + 1;
         }
 
         #endregion
@@ -279,9 +290,9 @@ namespace WpfSaimmodFour.Models
                 generatorIntensivity, new Random(initilizationRandom.Next()), timeApproximation);
             var generatorForChannel = new ExponentialGeneratorWrapper(
                 channelIntesivity, new Random(initilizationRandom.Next()), timeApproximation);
-            IEnumerable<double> generatorAccumulatedDistribution = generatorForSource
+            IEnumerable<double> generatorAccumulatedDistribution = ExponentialGeneratorWrapper
                 .AccumulateDistribution(generatorForSource.GenerateDistribution());
-            IEnumerable<double> channelAccumulatedDistribution = generatorForChannel
+            IEnumerable<double> channelAccumulatedDistribution = ExponentialGeneratorWrapper
                 .AccumulateDistribution(generatorForChannel.GenerateDistribution());
 
             var boolRandom = new Random();
