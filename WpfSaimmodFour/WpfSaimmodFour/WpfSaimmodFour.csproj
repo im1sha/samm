@@ -102,6 +102,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Docs\report.docx" />
     <None Include="Docs\v27.xmcd" />
     <None Include="Docs\v27_scheme.vsdx" />
     <None Include="packages.config" />
